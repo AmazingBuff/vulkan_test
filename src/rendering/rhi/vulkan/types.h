@@ -7,15 +7,15 @@
 #include "utils/volk.h"
 #include "rendering/rhi/rhi.h"
 
-#define VK_NAMESPACE_BEGIN	NAMESPACE_BEGIN(Amazing)			\
-							NAMESPACE_BEGIN(Rendering)			\
-							NAMESPACE_BEGIN(HardwareInterface)	\
-							NAMESPACE_BEGIN(Vulkan)
+#define VK_NAMESPACE_BEGIN				RHI_NAMESPACE_BEGIN			\
+										NAMESPACE_BEGIN(Vulkan)
 
-#define VK_NAMESPACE_END	NAMESPACE_END(Vulkan)				\
-							NAMESPACE_END(HardwareInterface)	\
-							NAMESPACE_END(Rendering)			\
-							NAMESPACE_END(Amazing)
+#define VK_NAMESPACE_END				NAMESPACE_END(Vulkan)		\
+										RHI_NAMESPACE_END
+#define VK_NAMESPACE 					NAMESPACE_CONCAT(RHI_NAMESPACE, NAMESPACE(Vulkan))
+#define VK_NAMESPACE_VARIABLE(var)		NAMESPACE_VARIABLE(VK_NAMESPACE, var)
+
+#define VK_TYPE_INIT(type, name)	type name = VK_NULL_HANDLE
 
 VK_NAMESPACE_BEGIN
 
@@ -29,7 +29,7 @@ static constexpr uint32_t Vulkan_Version = VK_API_VERSION_1_3;
 static const char* Validation_Layers = "VK_LAYER_KHRONOS_validation";
 #endif
 
-#if defined(_WIN32)
+#if defined(_WIN32) || defined(WIN32) 
 static const std::vector<const char*> Platform_Extensions = { VK_KHR_SURFACE_EXTENSION_NAME, VK_KHR_WIN32_SURFACE_EXTENSION_NAME };
 #endif
 

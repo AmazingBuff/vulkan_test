@@ -1,6 +1,6 @@
 #include "instance.h"
-#include "utils/util.h"
-
+#include "base/logger.h"
+#include <SDL2/SDL_vulkan.h>
 
 VK_NAMESPACE_BEGIN
 
@@ -33,16 +33,16 @@ static VKAPI_ATTR VkBool32 VKAPI_CALL debug_callback(
 	switch (message_severity)
 	{
 	case VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT:
-		std::cout << "[Verbose, " << type << "]: " << callback_data->pMessage << std::endl;
+		std::cout << "[Vulkan, Verbose, " << type << "]: " << callback_data->pMessage << std::endl;
 		break;
 	case VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT:
-		std::cout << "[Info, " << type << "]: " << callback_data->pMessage << std::endl;
+		std::cout << "[Vulkan, Info, " << type << "]: " << callback_data->pMessage << std::endl;
 		break;
 	case VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT:
-		std::cerr << "[Warning, " << type << "]: " << callback_data->pMessage << std::endl;
+		std::cerr << "[Vulkan, Warning, " << type << "]: " << callback_data->pMessage << std::endl;
 		break;
 	case VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT:
-		std::cerr << "[Error, " << type << "]: " << callback_data->pMessage << std::endl;
+		std::cerr << "[Vulkan, Error, " << type << "]: " << callback_data->pMessage << std::endl;
 		break;
 	default:
 		break;
@@ -52,8 +52,11 @@ static VKAPI_ATTR VkBool32 VKAPI_CALL debug_callback(
 }
 #endif
 
+Instance::Instance(const std::shared_ptr<WINDOW_NAMESPACE::Window>& window) : m_window(window) {}
+
 Instance::~Instance()
 {
+	vkDestroySurfaceKHR(m_instance, m_surface, nullptr);
 #if defined(_DEBUG) || defined(DEBUG)
 	vkDestroyDebugUtilsMessengerEXT(m_instance, m_debug_messenger, nullptr);
 #endif
@@ -66,6 +69,17 @@ void Instance::initialize()
 #if defined(_DEBUG) || defined(DEBUG)
 	setup_debug_messenger();
 #endif
+	create_surface();
+}
+
+VkInstance Instance::get_instance() const
+{
+	return m_instance;
+}
+
+NODISCARD VkSurfaceKHR Instance::get_surface() const
+{
+	return m_surface;
 }
 
 void Instance::create_instance()
@@ -88,7 +102,6 @@ void Instance::create_instance()
 		layers.push_back(Validation_Layers);
 		extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
 	}
-#endif
 
 	std::vector<VkExtensionProperties> extension_properties = vkEnumerateProperties(vkEnumerateInstanceExtensionProperties, nullptr);
 	size_t counter = 0;
@@ -112,6 +125,7 @@ void Instance::create_instance()
 		std::cerr << "Fatal : Required extensions are not supported." << std::endl;
 		ASSERT(extension_support);
 	}
+#endif
 
 	VkApplicationInfo app_info{
 		.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO,
@@ -154,6 +168,12 @@ void Instance::create_instance()
 	volkLoadInstance(m_instance);
 }
 
+void Instance::create_surface()
+{
+	if (SDL_Vulkan_CreateSurface(m_window->get_window(), m_instance, &m_surface) == SDL_FALSE)
+		RENDERING_LOG_ERROR(SDL_GetError());
+}
+
 #if defined(_DEBUG) || defined(DEBUG)
 void Instance::setup_debug_messenger()
 {
@@ -173,7 +193,6 @@ void Instance::setup_debug_messenger()
 
 	VK_CHECK_RESULT(vkCreateDebugUtilsMessengerEXT(m_instance, &create_info, nullptr, &m_debug_messenger));
 }
-
 
 #endif
 

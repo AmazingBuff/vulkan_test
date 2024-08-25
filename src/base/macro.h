@@ -2,15 +2,26 @@
 
 #include <cassert>
 
-#define NAMESPACE_BEGIN(name)	namespace name {
-#define NAMESPACE_END(name)		}
+#define NAMESPACE_BEGIN(name)			namespace name {
+#define NAMESPACE_END(name)				}
+#define NAMESPACE(name)					name
+#define NAMESPACE_VARIABLE(name, var)	name::var
+#define NAMESPACE_CONCAT(a, b)			a::b
 
-#define STRING(x)				#x
+#define AMAZING_NAMESPACE_BEGIN(name)	NAMESPACE_BEGIN(Amazing)	\
+										NAMESPACE_BEGIN(name)
+#define AMAZING_NAMESPACE_END(name)		NAMESPACE_END(Amazing)	\
+										NAMESPACE_END(name)
+#define AMAZING_NAMESPACE_CONCAT(name)	NAMESPACE_CONCAT(NAMESPACE(Amazing), NAMESPACE(name))
 
-#define ZERO_MEMORY(ptr, size)	memset(ptr, 0, size)
+#define STRING(x)						#x
+
+#define ZERO_MEMORY(ptr, size)			memset(ptr, 0, size)
+
+#define NODISCARD						[[nodiscard]]
 
 #if defined(_DEBUG) || defined(DEBUG)
-#define ASSERT(expr)			assert(expr)
+#define ASSERT(expr)					assert(expr)
 #else
 #define ASSERT(expr)
 #endif // DEBUG
