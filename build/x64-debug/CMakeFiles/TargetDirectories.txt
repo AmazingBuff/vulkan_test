@@ -1,0 +1,3 @@
+D:/code/vs/vulkan_test/build/x64-debug/CMakeFiles/vulkan_test.dir
+D:/code/vs/vulkan_test/build/x64-debug/CMakeFiles/edit_cache.dir
+D:/code/vs/vulkan_test/build/x64-debug/CMakeFiles/rebuild_cache.dir

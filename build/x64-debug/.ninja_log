@@ -1,0 +1,13 @@
+# ninja log v5
+11	1559	7462751508137180	CMakeFiles/vulkan_test.dir/cmake_pch.cxx.obj	96d3463b57f15738
+25	215	7462768979971691	CMakeFiles/vulkan_test.dir/src/rendering/rhi/vulkan/utils/util.cpp.obj	f04af015576a83a3
+16	666	7462768984394343	CMakeFiles/vulkan_test.dir/src/main.cpp.obj	8225434baa793b46
+21	310	7462768980914930	CMakeFiles/vulkan_test.dir/src/rendering/rhi/vulkan/instance.cpp.obj	b097d0df20a8a5d5
+1038	1259	7462748908899122	vulkan_test.exe	bedf708acc9cbd1f
+15	311	7462769740560750	build.ninja	c30441ddf736dc66
+16	202	7462769774975159	CMakeFiles/vulkan_test.dir/src/rendering/rhi/vulkan/utils/volk.cpp.obj	15e66b15e61af40e
+202	399	7462769776298165	vulkan_test.exe	bb148f89173613f1
+3	317	7462773006611492	CMakeFiles/vulkan_test.dir/src/rendering/rhi/vulkan/instance.cpp.obj	b097d0df20a8a5d5
+317	514	7462773007978986	vulkan_test.exe	bb148f89173613f1
+15	328	7462778449983236	CMakeFiles/vulkan_test.dir/src/rendering/rhi/vulkan/instance.cpp.obj	b097d0df20a8a5d5
+329	564	7462778451592978	vulkan_test.exe	bb148f89173613f1
