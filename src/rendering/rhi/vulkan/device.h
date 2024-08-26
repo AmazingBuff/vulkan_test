@@ -16,11 +16,28 @@ public:
 		{
 			return graphics_family.has_value() && present_family.has_value();
 		}
+
+		NODISCARD constexpr bool is_same_family() const
+		{
+			ASSERT(*this);
+			return graphics_family.value() == present_family.value();
+		}
+	};
+
+	struct SwapChainSupportDetails
+	{
+		std::optional<VkSurfaceCapabilitiesKHR>		capabilities;
+		std::vector<VkSurfaceFormatKHR>				formats;
+		std::vector<VkPresentModeKHR>				present_modes;
+
+		NODISCARD constexpr operator bool() const
+		{
+			return capabilities.has_value() && !formats.empty() && !present_modes.empty();
+		}
 	};
 
 public:
 	explicit PhysicalDevice(const std::shared_ptr<Instance>& instance);
-	PhysicalDevice(const PhysicalDevice& other);
 	~PhysicalDevice() override = default;
 	void initialize() override;
 
@@ -28,7 +45,7 @@ public:
 	VkPhysicalDeviceProperties			m_properties{};
 	VkPhysicalDeviceFeatures			m_features{};
 	QueueFamilyIndices					m_indices;
-	int									m_score = 0;
+	SwapChainSupportDetails				m_support_details;
 private:
 	void pick_physical_device();
 private:
@@ -50,7 +67,8 @@ private:
 	std::shared_ptr<PhysicalDevice>		m_physical_device;
 private:
 	VK_TYPE_INIT(VkDevice, m_device);
-	VK_TYPE_INIT(VkQueue, m_queue);
+	VK_TYPE_INIT(VkQueue, m_graphics_queue);
+	VK_TYPE_INIT(VkQueue, m_present_queue);
 };
 
 VK_NAMESPACE_END

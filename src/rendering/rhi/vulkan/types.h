@@ -33,4 +33,6 @@ static const char* Validation_Layers = "VK_LAYER_KHRONOS_validation";
 static const std::vector<const char*> Platform_Extensions = { VK_KHR_SURFACE_EXTENSION_NAME, VK_KHR_WIN32_SURFACE_EXTENSION_NAME };
 #endif
 
+static const std::vector<const char*> Device_Extensions = { VK_KHR_SWAPCHAIN_EXTENSION_NAME };
+
 VK_NAMESPACE_END

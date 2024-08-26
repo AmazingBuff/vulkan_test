@@ -104,26 +104,14 @@ void Instance::create_instance()
 	}
 
 	std::vector<VkExtensionProperties> extension_properties = vkEnumerateProperties(vkEnumerateInstanceExtensionProperties, nullptr);
-	size_t counter = 0;
-	bool extension_support = false;
+	std::set<std::string> required_extensions(extensions.begin(), extensions.end());
 	for (auto& property : extension_properties)
-	{
-		for (auto& extension : extensions)
-		{
-			if (std::strcmp(property.extensionName, extension) == 0)
-				counter++;
-			if (counter == extensions.size())
-			{
-				extension_support = true;
-				break;
-			}
-		}
-	}
+		required_extensions.erase(property.extensionName);
 
-	if (!extension_support)
+	if (!required_extensions.empty())
 	{
 		std::cerr << "Fatal : Required extensions are not supported." << std::endl;
-		ASSERT(extension_support);
+		ASSERT(required_extensions.empty());
 	}
 #endif
 
