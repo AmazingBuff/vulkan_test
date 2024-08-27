@@ -1,5 +1,7 @@
 #include "instance.h"
 #include "base/logger.h"
+#include "window/window.h"
+#include "system/system.h"
 #include <SDL2/SDL_vulkan.h>
 
 VK_NAMESPACE_BEGIN
@@ -52,9 +54,7 @@ static VKAPI_ATTR VkBool32 VKAPI_CALL debug_callback(
 }
 #endif
 
-Instance::Instance(const std::shared_ptr<WINDOW_NAMESPACE::Window>& window) : m_window(window) {}
-
-Instance::~Instance()
+VK_CLASS(Instance)::~VK_CLASS(Instance)()
 {
 	vkDestroySurfaceKHR(m_instance, m_surface, nullptr);
 #if defined(_DEBUG) || defined(DEBUG)
@@ -63,7 +63,7 @@ Instance::~Instance()
 	vkDestroyInstance(m_instance, nullptr);
 }
 
-void Instance::initialize()
+void VK_CLASS(Instance)::initialize()
 {
 	create_instance();
 #if defined(_DEBUG) || defined(DEBUG)
@@ -72,17 +72,22 @@ void Instance::initialize()
 	create_surface();
 }
 
-VkInstance Instance::get_instance() const
+constexpr RHIFlag VK_CLASS(Instance)::flag() const
+{
+	return RHIFlag::e_instance;
+}
+
+VkInstance VK_CLASS(Instance)::get_instance() const
 {
 	return m_instance;
 }
 
-NODISCARD VkSurfaceKHR Instance::get_surface() const
+NODISCARD VkSurfaceKHR VK_CLASS(Instance)::get_surface() const
 {
 	return m_surface;
 }
 
-void Instance::create_instance()
+void VK_CLASS(Instance)::create_instance()
 {
 	VK_CHECK_RESULT(volkInitialize());
 
@@ -156,14 +161,14 @@ void Instance::create_instance()
 	volkLoadInstance(m_instance);
 }
 
-void Instance::create_surface()
+void VK_CLASS(Instance)::create_surface()
 {
-	if (SDL_Vulkan_CreateSurface(m_window->get_window(), m_instance, &m_surface) == SDL_FALSE)
+	if (SDL_Vulkan_CreateSurface(g_system_context->g_window_system->get_window(), m_instance, &m_surface) == SDL_FALSE)
 		RENDERING_LOG_ERROR(SDL_GetError());
 }
 
 #if defined(_DEBUG) || defined(DEBUG)
-void Instance::setup_debug_messenger()
+void VK_CLASS(Instance)::setup_debug_messenger()
 {
 	VkDebugUtilsMessengerCreateInfoEXT create_info{
 		.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT,

@@ -15,7 +15,8 @@
 #define VK_NAMESPACE 					NAMESPACE_CONCAT(RHI_NAMESPACE, NAMESPACE(Vulkan))
 #define VK_NAMESPACE_VARIABLE(var)		NAMESPACE_VARIABLE(VK_NAMESPACE, var)
 
-#define VK_TYPE_INIT(type, name)	type name = VK_NULL_HANDLE
+#define VK_TYPE_INIT(type, name)		type name = VK_NULL_HANDLE
+#define VK_CLASS(name)					RHI_CLASS(Vulkan, name)
 
 VK_NAMESPACE_BEGIN
 

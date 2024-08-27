@@ -1,8 +1,13 @@
 #include "device.h"
+#include "system/system.h"
+#include "rendering/renderer.h"
+#include "rendering/rhi/drawable.h"
+#include "window/window.h"
+#include <SDL2/SDL_vulkan.h>
 
 VK_NAMESPACE_BEGIN
 
-static int rate_score(PhysicalDevice& physical_device)
+static int rate_score(VK_CLASS(PhysicalDevice)& physical_device)
 {
 	vkGetPhysicalDeviceProperties(physical_device.m_device, &physical_device.m_properties);
 	vkGetPhysicalDeviceFeatures(physical_device.m_device, &physical_device.m_features);
@@ -25,7 +30,7 @@ static int rate_score(PhysicalDevice& physical_device)
 	return score;
 }
 
-static void find_queue_families(PhysicalDevice& physical_device, VkSurfaceKHR surface)
+static void find_queue_families(VK_CLASS(PhysicalDevice)& physical_device)
 {
 	std::vector<VkQueueFamilyProperties> queue_properties = vkEnumerateProperties(vkGetPhysicalDeviceQueueFamilyProperties, physical_device.m_device);
 	for (size_t i = 0; i < queue_properties.size(); i++)
@@ -34,7 +39,7 @@ static void find_queue_families(PhysicalDevice& physical_device, VkSurfaceKHR su
 			physical_device.m_indices.graphics_family = i;
 
 		VkBool32 present_support = false;
-		VK_CHECK_RESULT(vkGetPhysicalDeviceSurfaceSupportKHR(physical_device.m_device, i, surface, &present_support));
+		VK_CHECK_RESULT(vkGetPhysicalDeviceSurfaceSupportKHR(physical_device.m_device, i, g_system_context->g_render_system->m_drawable->m_instance->get_surface(), &present_support));
 		if (present_support)
 			physical_device.m_indices.present_family = i;
 
@@ -52,8 +57,9 @@ static bool check_device_extension_support(VkPhysicalDevice device)
 	return required_extensions.empty();
 }
 
-static void query_swap_chain_support(PhysicalDevice& physical_device, VkSurfaceKHR surface)
+static void query_swap_chain_support(VK_CLASS(PhysicalDevice)& physical_device)
 {
+	VkSurfaceKHR surface = g_system_context->g_render_system->m_drawable->m_instance->get_surface();
 	VkSurfaceCapabilitiesKHR capabilities;
 	VK_CHECK_RESULT(vkGetPhysicalDeviceSurfaceCapabilitiesKHR(physical_device.m_device, surface, &capabilities));
 	physical_device.m_support_details.capabilities = std::move(capabilities);
@@ -61,27 +67,30 @@ static void query_swap_chain_support(PhysicalDevice& physical_device, VkSurfaceK
 	physical_device.m_support_details.present_modes = vkEnumerateProperties(vkGetPhysicalDeviceSurfacePresentModesKHR, physical_device.m_device, surface);
 }
 
-
-PhysicalDevice::PhysicalDevice(const std::shared_ptr<Instance>& instance) : m_instance(instance) {}
-
-void PhysicalDevice::initialize()
+void VK_CLASS(PhysicalDevice)::initialize()
 {
 	pick_physical_device();
+	choose_swap_chain_details();
 }
 
-void PhysicalDevice::pick_physical_device()
+constexpr RHIFlag VK_CLASS(PhysicalDevice)::flag() const
 {
-	std::vector<VkPhysicalDevice> devices = vkEnumerateProperties(vkEnumeratePhysicalDevices, m_instance->get_instance());
+	return RHIFlag::e_physical_device;
+}
+
+void VK_CLASS(PhysicalDevice)::pick_physical_device()
+{
+	std::vector<VkPhysicalDevice> devices = vkEnumerateProperties(vkEnumeratePhysicalDevices, g_system_context->g_render_system->m_drawable->m_instance->get_instance());
 
 	std::multimap<int, PhysicalDevice> candidates;
 	for (auto& device : devices)
 	{
-		PhysicalDevice physical_device(m_instance);
+		PhysicalDevice physical_device;
 		physical_device.m_device = device;
-		find_queue_families(physical_device, m_instance->get_surface());
+		find_queue_families(physical_device);
 		bool extensions_supported = check_device_extension_support(device);
 		if(extensions_supported)
-			query_swap_chain_support(physical_device, m_instance->get_surface());
+			query_swap_chain_support(physical_device);
 		int score = rate_score(physical_device);
 		if (!physical_device.m_indices || !extensions_supported || !physical_device.m_support_details)
 			score = 0;
@@ -96,21 +105,64 @@ void PhysicalDevice::pick_physical_device()
 		ASSERT(candidates.rbegin()->first > 0);
 }
 
-Device::Device(const std::shared_ptr<Instance>& instance, 
-	const std::shared_ptr<PhysicalDevice>& physical_device) 
-	: m_instance(instance), m_physical_device(physical_device) {}
+void VK_CLASS(PhysicalDevice)::choose_swap_chain_details()
+{
+	if(!std::any_of(m_support_details.formats.begin(), m_support_details.formats.end(), 
+		[&](const VkSurfaceFormatKHR& available_format) -> bool
+		{
+			if (available_format.format == VK_FORMAT_B8G8R8A8_SRGB &&
+				available_format.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR)
+			{
+				m_swap_chain_details.format = available_format;
+				return true;
+			}
+			else
+				return false;
+		}))
+		m_swap_chain_details.format = m_support_details.formats[0];
 
-Device::~Device()
+	if (!std::any_of(m_support_details.present_modes.begin(), m_support_details.present_modes.end(),
+		[&](const VkPresentModeKHR& available_present_mode) -> bool
+		{
+			if (available_present_mode == VK_PRESENT_MODE_MAILBOX_KHR)
+			{
+				m_swap_chain_details.present_mode = available_present_mode;
+				return true;
+			}
+			else
+				return false;
+		}))
+		m_swap_chain_details.present_mode = VK_PRESENT_MODE_FIFO_KHR;
+
+	if (m_support_details.capabilities->currentExtent.width != std::numeric_limits<uint32_t>::max())
+		m_swap_chain_details.extent = m_support_details.capabilities->currentExtent;
+	else
+	{
+		int width, height;
+		SDL_Vulkan_GetDrawableSize(g_system_context->g_window_system->get_window(), &width, &height);
+		VkExtent2D actual_extent{ static_cast<uint32_t>(width), static_cast<uint32_t>(height) };
+		actual_extent.width = std::clamp(actual_extent.width, m_support_details.capabilities->minImageExtent.width, m_support_details.capabilities->maxImageExtent.width);
+		actual_extent.height = std::clamp(actual_extent.height, m_support_details.capabilities->minImageExtent.height, m_support_details.capabilities->maxImageExtent.height);
+		m_swap_chain_details.extent = actual_extent;
+	}
+}
+
+VK_CLASS(Device)::~VK_CLASS(Device)()
 {
 	vkDestroyDevice(m_device, nullptr);
 }
 
-void Device::initialize()
+void VK_CLASS(Device)::initialize()
 {
 	create_logical_device();
 }
 
-void Device::create_logical_device()
+constexpr RHIFlag VK_CLASS(Device)::flag() const
+{
+	return RHIFlag::e_device;
+}
+
+void VK_CLASS(Device)::create_logical_device()
 {	
 	std::vector<const char*> layers;
 #if defined(_DEBUG) || defined(DEBUG)
@@ -126,20 +178,22 @@ void Device::create_logical_device()
 		layers.push_back(Validation_Layers);
 #endif
 	
+	auto physical_device = g_system_context->g_render_system->m_drawable->m_physical_device;
+
 	float queue_priority = 1.0f;
 	std::vector<VkDeviceQueueCreateInfo> queue_create_infos;
-	if (m_physical_device->m_indices.is_same_family())
+	if (physical_device->m_indices.is_same_family())
 	{
 		queue_create_infos.push_back({
 			.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO,
-			.queueFamilyIndex = m_physical_device->m_indices.graphics_family.value(),
+			.queueFamilyIndex = physical_device->m_indices.graphics_family.value(),
 			.queueCount = 1,
 			.pQueuePriorities = &queue_priority
 			});
 	}
 	else
 	{
-		std::set<uint32_t> unique_families = { m_physical_device->m_indices.graphics_family.value(), m_physical_device->m_indices.present_family.value() };
+		std::set<uint32_t> unique_families = { physical_device->m_indices.graphics_family.value(), physical_device->m_indices.present_family.value() };
 		for (uint32_t queue_family : unique_families)
 		{
 			queue_create_infos.push_back({
@@ -163,9 +217,9 @@ void Device::create_logical_device()
 		.pEnabledFeatures = &device_features
 	};
 
-	VK_CHECK_RESULT(vkCreateDevice(m_physical_device->m_device, &device_create_info, nullptr, &m_device));
-	vkGetDeviceQueue(m_device, m_physical_device->m_indices.graphics_family.value(), 0, &m_graphics_queue);
-	vkGetDeviceQueue(m_device, m_physical_device->m_indices.present_family.value(), 0, &m_present_queue);
+	VK_CHECK_RESULT(vkCreateDevice(physical_device->m_device, &device_create_info, nullptr, &m_device));
+	vkGetDeviceQueue(m_device, physical_device->m_indices.graphics_family.value(), 0, &m_graphics_queue);
+	vkGetDeviceQueue(m_device, physical_device->m_indices.present_family.value(), 0, &m_present_queue);
 }
 
 VK_NAMESPACE_END

@@ -4,7 +4,7 @@
 
 VK_NAMESPACE_BEGIN
 
-class PhysicalDevice final : public RHI
+class VK_CLASS(PhysicalDevice) final : public RHI
 {
 public:
 	struct QueueFamilyIndices
@@ -36,35 +36,43 @@ public:
 		}
 	};
 
-public:
-	explicit PhysicalDevice(const std::shared_ptr<Instance>& instance);
-	~PhysicalDevice() override = default;
-	void initialize() override;
+	struct SwapChainDetails
+	{
+		std::optional<VkSurfaceFormatKHR>		format;
+		std::optional<VkPresentModeKHR>			present_mode;
+		std::optional<VkExtent2D>				extent;
 
+		NODISCARD constexpr operator bool() const
+		{
+			return format.has_value() && present_mode.has_value() && extent.has_value();
+		}
+	};
+public:
+	VK_CLASS(PhysicalDevice)() = default;
+	~VK_CLASS(PhysicalDevice)() override = default;
+	void initialize() override;
+	NODISCARD constexpr RHIFlag flag() const override;
+public:
 	VK_TYPE_INIT(VkPhysicalDevice, m_device);
 	VkPhysicalDeviceProperties			m_properties{};
 	VkPhysicalDeviceFeatures			m_features{};
 	QueueFamilyIndices					m_indices;
 	SwapChainSupportDetails				m_support_details;
+	SwapChainDetails					m_swap_chain_details;
 private:
 	void pick_physical_device();
-private:
-	std::shared_ptr<Instance>			m_instance;
+	void choose_swap_chain_details();
 };
 
-class Device final : public RHI
+class VK_CLASS(Device) final : public RHI
 {
 public:
-	explicit Device(const std::shared_ptr<Instance>& instance, 
-		const std::shared_ptr<PhysicalDevice>& physical_device);
-	~Device() override;
+	VK_CLASS(Device)() = default;
+	~VK_CLASS(Device)() override;
 	void initialize() override;
-
+	NODISCARD constexpr RHIFlag flag() const override;
 private:
 	void create_logical_device();
-private:
-	std::shared_ptr<Instance>			m_instance;
-	std::shared_ptr<PhysicalDevice>		m_physical_device;
 private:
 	VK_TYPE_INIT(VkDevice, m_device);
 	VK_TYPE_INIT(VkQueue, m_graphics_queue);
