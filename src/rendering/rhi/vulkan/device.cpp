@@ -7,10 +7,10 @@
 
 VK_NAMESPACE_BEGIN
 
-static int rate_score(VK_CLASS(PhysicalDevice)& physical_device)
+static int rate_score(VkPhysicalDevice device, VK_CLASS(PhysicalDevice)& physical_device)
 {
-	vkGetPhysicalDeviceProperties(physical_device.m_device, &physical_device.m_properties);
-	vkGetPhysicalDeviceFeatures(physical_device.m_device, &physical_device.m_features);
+	vkGetPhysicalDeviceProperties(device, &physical_device.m_properties);
+	vkGetPhysicalDeviceFeatures(device, &physical_device.m_features);
 
 	int score = 0;
 	if (physical_device.m_properties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU)
@@ -30,22 +30,24 @@ static int rate_score(VK_CLASS(PhysicalDevice)& physical_device)
 	return score;
 }
 
-static void find_queue_families(VK_CLASS(PhysicalDevice)& physical_device)
+static PhysicalDevice::QueueFamilyIndices find_queue_families(VkPhysicalDevice physical_device, VkSurfaceKHR surface)
 {
-	std::vector<VkQueueFamilyProperties> queue_properties = vkEnumerateProperties(vkGetPhysicalDeviceQueueFamilyProperties, physical_device.m_device);
+	PhysicalDevice::QueueFamilyIndices indices;
+	std::vector<VkQueueFamilyProperties> queue_properties = vkEnumerateProperties(vkGetPhysicalDeviceQueueFamilyProperties, physical_device);
 	for (size_t i = 0; i < queue_properties.size(); i++)
 	{
 		if (queue_properties[i].queueFlags & VK_QUEUE_GRAPHICS_BIT)
-			physical_device.m_indices.graphics_family = i;
+			indices.graphics_family = i;
 
 		VkBool32 present_support = false;
-		VK_CHECK_RESULT(vkGetPhysicalDeviceSurfaceSupportKHR(physical_device.m_device, i, g_system_context->g_render_system->m_drawable->m_instance->get_surface(), &present_support));
+		VK_CHECK_RESULT(vkGetPhysicalDeviceSurfaceSupportKHR(physical_device, i, surface, &present_support));
 		if (present_support)
-			physical_device.m_indices.present_family = i;
+			indices.present_family = i;
 
-		if (physical_device.m_indices)
-			return;
+		if (indices)
+			break;
 	}
+	return indices;
 }
 
 static bool check_device_extension_support(VkPhysicalDevice device)
@@ -57,14 +59,15 @@ static bool check_device_extension_support(VkPhysicalDevice device)
 	return required_extensions.empty();
 }
 
-static void query_swap_chain_support(VK_CLASS(PhysicalDevice)& physical_device)
+static PhysicalDevice::SwapChainSupportDetails query_swap_chain_support(VkPhysicalDevice physical_device, VkSurfaceKHR surface)
 {
-	VkSurfaceKHR surface = g_system_context->g_render_system->m_drawable->m_instance->get_surface();
+	PhysicalDevice::SwapChainSupportDetails support_details;
 	VkSurfaceCapabilitiesKHR capabilities;
-	VK_CHECK_RESULT(vkGetPhysicalDeviceSurfaceCapabilitiesKHR(physical_device.m_device, surface, &capabilities));
-	physical_device.m_support_details.capabilities = std::move(capabilities);
-	physical_device.m_support_details.formats = vkEnumerateProperties(vkGetPhysicalDeviceSurfaceFormatsKHR, physical_device.m_device, surface);
-	physical_device.m_support_details.present_modes = vkEnumerateProperties(vkGetPhysicalDeviceSurfacePresentModesKHR, physical_device.m_device, surface);
+	VK_CHECK_RESULT(vkGetPhysicalDeviceSurfaceCapabilitiesKHR(physical_device, surface, &capabilities));
+	support_details.capabilities = std::move(capabilities);
+	support_details.formats = vkEnumerateProperties(vkGetPhysicalDeviceSurfaceFormatsKHR, physical_device, surface);
+	support_details.present_modes = vkEnumerateProperties(vkGetPhysicalDeviceSurfacePresentModesKHR, physical_device, surface);
+	return support_details;
 }
 
 void VK_CLASS(PhysicalDevice)::initialize()
@@ -80,18 +83,19 @@ constexpr RHIFlag VK_CLASS(PhysicalDevice)::flag() const
 
 void VK_CLASS(PhysicalDevice)::pick_physical_device()
 {
-	std::vector<VkPhysicalDevice> devices = vkEnumerateProperties(vkEnumeratePhysicalDevices, g_system_context->g_render_system->m_drawable->m_instance->get_instance());
+	auto instance = g_system_context->g_render_system->m_drawable->m_instance;
+	std::vector<VkPhysicalDevice> devices = vkEnumerateProperties(vkEnumeratePhysicalDevices, instance->m_instance);
 
 	std::multimap<int, PhysicalDevice> candidates;
 	for (auto& device : devices)
 	{
 		PhysicalDevice physical_device;
 		physical_device.m_device = device;
-		find_queue_families(physical_device);
+		physical_device.m_indices = find_queue_families(device, instance->m_surface);
 		bool extensions_supported = check_device_extension_support(device);
 		if(extensions_supported)
-			query_swap_chain_support(physical_device);
-		int score = rate_score(physical_device);
+			physical_device.m_support_details = query_swap_chain_support(device, instance->m_surface);
+		int score = rate_score(device, physical_device);
 		if (!physical_device.m_indices || !extensions_supported || !physical_device.m_support_details)
 			score = 0;
 		else if(physical_device.m_indices.is_same_family())

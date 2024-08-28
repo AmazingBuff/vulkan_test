@@ -12,8 +12,6 @@ public:
 	~VK_CLASS(Instance)() override;
 	void initialize() override;
 	NODISCARD constexpr RHIFlag flag() const override;
-	NODISCARD VkInstance get_instance() const;
-	NODISCARD VkSurfaceKHR get_surface() const;
 private:
 	void create_instance();
 	void create_surface();
@@ -21,11 +19,15 @@ private:
 	void setup_debug_messenger();
 #endif
 private:
-	VK_TYPE_INIT(VkInstance, m_instance);
-	VK_TYPE_INIT(VkSurfaceKHR, m_surface);
+	VK_TYPE_INIT(VkInstance,				m_instance);
+	VK_TYPE_INIT(VkSurfaceKHR,				m_surface);
 #if defined(_DEBUG) || defined(DEBUG)
-	VK_TYPE_INIT(VkDebugUtilsMessengerEXT, m_debug_messenger);
+	VK_TYPE_INIT(VkDebugUtilsMessengerEXT,	m_debug_messenger);
 #endif
+
+	friend class VK_CLASS(PhysicalDevice);
+	friend class VK_CLASS(Device);
+	friend class VK_CLASS(SwapChain);
 };
 
 VK_NAMESPACE_END

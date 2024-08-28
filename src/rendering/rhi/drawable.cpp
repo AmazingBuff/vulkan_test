@@ -10,6 +10,8 @@ void Drawable::initialize()
 	m_physical_device->initialize();
 	m_device = std::make_shared<Device>();
 	m_device->initialize();
+	m_swap_chain = std::make_shared<SwapChain>();
+	m_swap_chain->initialize();
 }
 
 RHI_NAMESPACE_END

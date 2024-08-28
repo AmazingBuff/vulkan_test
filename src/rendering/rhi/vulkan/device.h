@@ -53,7 +53,6 @@ public:
 	void initialize() override;
 	NODISCARD constexpr RHIFlag flag() const override;
 public:
-	VK_TYPE_INIT(VkPhysicalDevice, m_device);
 	VkPhysicalDeviceProperties			m_properties{};
 	VkPhysicalDeviceFeatures			m_features{};
 	QueueFamilyIndices					m_indices;
@@ -62,6 +61,11 @@ public:
 private:
 	void pick_physical_device();
 	void choose_swap_chain_details();
+private:
+	VK_TYPE_INIT(VkPhysicalDevice,		m_device);
+
+	friend class VK_CLASS(Device);
+	friend class VK_CLASS(SwapChain);
 };
 
 class VK_CLASS(Device) final : public RHI
@@ -74,9 +78,11 @@ public:
 private:
 	void create_logical_device();
 private:
-	VK_TYPE_INIT(VkDevice, m_device);
-	VK_TYPE_INIT(VkQueue, m_graphics_queue);
-	VK_TYPE_INIT(VkQueue, m_present_queue);
+	VK_TYPE_INIT(VkDevice,		m_device);
+	VK_TYPE_INIT(VkQueue,		m_graphics_queue);
+	VK_TYPE_INIT(VkQueue,		m_present_queue);
+
+	friend class VK_CLASS(SwapChain);
 };
 
 VK_NAMESPACE_END

@@ -20,6 +20,9 @@
 
 VK_NAMESPACE_BEGIN
 
+static const char* Shader_Compiler = "glslc.exe";
+static const char* Shader_Compiler_Path = "D:/env/Vulkan/1.3.290.0/Bin/glslc.exe";
+
 static const char* Application_Name = "Renderer";
 static constexpr uint32_t Application_Version = VK_MAKE_VERSION(1, 0, 0);
 static const char* Engine_Name = "Amazing";
@@ -35,5 +38,11 @@ static const std::vector<const char*> Platform_Extensions = { VK_KHR_SURFACE_EXT
 #endif
 
 static const std::vector<const char*> Device_Extensions = { VK_KHR_SWAPCHAIN_EXTENSION_NAME };
+
+class VK_CLASS(Instance);
+class VK_CLASS(PhysicalDevice);
+class VK_CLASS(Device);
+class VK_CLASS(SwapChain);
+class VK_CLASS(Pipeline);
 
 VK_NAMESPACE_END
