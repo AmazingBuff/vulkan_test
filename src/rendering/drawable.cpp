@@ -1,6 +1,6 @@
 #include "drawable.h"
 
-RHI_NAMESPACE_BEGIN
+RENDERING_NAMESPACE_BEGIN
 
 void Drawable::initialize()
 {
@@ -14,4 +14,4 @@ void Drawable::initialize()
 	m_swap_chain->initialize();
 }
 
-RHI_NAMESPACE_END
+RENDERING_NAMESPACE_END

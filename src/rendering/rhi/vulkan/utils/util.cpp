@@ -1,6 +1,6 @@
 #include "util.h"
 
-VK_NAMESPACE_BEGIN
+RHI_NAMESPACE_BEGIN
 
 #define SWITCH_BRANCH(expr) case expr : return #expr
 
@@ -64,4 +64,4 @@ const char* vk_result_convert(VkResult res)
 #undef SWITCH_BRANCH
 
 
-VK_NAMESPACE_END
+RHI_NAMESPACE_END

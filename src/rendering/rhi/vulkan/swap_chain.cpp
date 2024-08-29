@@ -1,10 +1,10 @@
 #include "swap_chain.h"
 #include "system/system.h"
 #include "rendering/renderer.h"
-#include "rendering/rhi/drawable.h"
+#include "rendering/drawable.h"
 
 
-VK_NAMESPACE_BEGIN
+RHI_NAMESPACE_BEGIN
 
 VK_CLASS(SwapChain)::~VK_CLASS(SwapChain)()
 {
@@ -100,4 +100,4 @@ constexpr RHIFlag VK_CLASS(SwapChain)::flag() const
 }
 
 
-VK_NAMESPACE_END
+RHI_NAMESPACE_END

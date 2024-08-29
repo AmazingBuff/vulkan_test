@@ -2,7 +2,7 @@
 #include "utils/util.h"
 #include "rendering/rhi/rhi.h"
 
-WINDOW_NAMESPACE_BEGIN
+AMAZING_NAMESPACE_BEGIN
 
 Window::~Window()
 {
@@ -18,13 +18,13 @@ void Window::initialize()
     SDL_WindowFlags flags;
     switch (HARDWARE_API)
     {
-	case RHI_NAMESPACE::GraphicsAPI::e_opengl:
+	case RENDERING_NAMESPACE::GraphicsAPI::e_opengl:
 		flags = SDL_WINDOW_OPENGL;
 		break;
-	case RHI_NAMESPACE::GraphicsAPI::e_vulkan:
+	case RENDERING_NAMESPACE::GraphicsAPI::e_vulkan:
 		flags = SDL_WINDOW_VULKAN;
 		break;
-	case RHI_NAMESPACE::GraphicsAPI::e_metal:
+	case RENDERING_NAMESPACE::GraphicsAPI::e_metal:
 		flags = SDL_WINDOW_METAL;
 		break;
 	default:
@@ -42,4 +42,4 @@ NODISCARD SDL_Window* Window::get_window() const
 	return m_window;
 }
 
-WINDOW_NAMESPACE_END
+AMAZING_NAMESPACE_END

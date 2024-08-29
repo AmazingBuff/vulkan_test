@@ -1,11 +1,11 @@
 #include "device.h"
 #include "system/system.h"
 #include "rendering/renderer.h"
-#include "rendering/rhi/drawable.h"
+#include "rendering/drawable.h"
 #include "window/window.h"
 #include <SDL2/SDL_vulkan.h>
 
-VK_NAMESPACE_BEGIN
+RHI_NAMESPACE_BEGIN
 
 static int rate_score(VkPhysicalDevice device, VK_CLASS(PhysicalDevice)& physical_device)
 {
@@ -30,9 +30,9 @@ static int rate_score(VkPhysicalDevice device, VK_CLASS(PhysicalDevice)& physica
 	return score;
 }
 
-static PhysicalDevice::QueueFamilyIndices find_queue_families(VkPhysicalDevice physical_device, VkSurfaceKHR surface)
+static VK_CLASS(PhysicalDevice)::QueueFamilyIndices find_queue_families(VkPhysicalDevice physical_device, VkSurfaceKHR surface)
 {
-	PhysicalDevice::QueueFamilyIndices indices;
+	VK_CLASS(PhysicalDevice)::QueueFamilyIndices indices;
 	std::vector<VkQueueFamilyProperties> queue_properties = vkEnumerateProperties(vkGetPhysicalDeviceQueueFamilyProperties, physical_device);
 	for (size_t i = 0; i < queue_properties.size(); i++)
 	{
@@ -59,9 +59,9 @@ static bool check_device_extension_support(VkPhysicalDevice device)
 	return required_extensions.empty();
 }
 
-static PhysicalDevice::SwapChainSupportDetails query_swap_chain_support(VkPhysicalDevice physical_device, VkSurfaceKHR surface)
+static VK_CLASS(PhysicalDevice)::SwapChainSupportDetails query_swap_chain_support(VkPhysicalDevice physical_device, VkSurfaceKHR surface)
 {
-	PhysicalDevice::SwapChainSupportDetails support_details;
+	VK_CLASS(PhysicalDevice)::SwapChainSupportDetails support_details;
 	VkSurfaceCapabilitiesKHR capabilities;
 	VK_CHECK_RESULT(vkGetPhysicalDeviceSurfaceCapabilitiesKHR(physical_device, surface, &capabilities));
 	support_details.capabilities = std::move(capabilities);
@@ -226,4 +226,4 @@ void VK_CLASS(Device)::create_logical_device()
 	vkGetDeviceQueue(m_device, physical_device->m_indices.present_family.value(), 0, &m_present_queue);
 }
 
-VK_NAMESPACE_END
+RHI_NAMESPACE_END

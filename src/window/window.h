@@ -1,17 +1,10 @@
 #pragma once
 
 #include "base/macro.h"
-
-#include <glm/glm.hpp>
 #define SDL_MAIN_HANDLED
 #include <SDL2/SDL.h>
 
-#define WINDOW_NAMESPACE_BEGIN				AMAZING_NAMESPACE_BEGIN
-#define WINDOW_NAMESPACE_END				AMAZING_NAMESPACE_END
-#define WINDOW_NAMESPACE					AMAZING_NAMESPACE
-#define WINDOW_NAMESPACE_VARIABLE(var)		NAMESPACE_VARIABLE(WINDOW_NAMESPACE, var)
-
-WINDOW_NAMESPACE_BEGIN
+AMAZING_NAMESPACE_BEGIN
 
 static const char* Window_Title = "Vulkan Window";
 static constexpr int Window_Width = 1280;
@@ -29,4 +22,4 @@ private:
 };
 
 
-WINDOW_NAMESPACE_END
+AMAZING_NAMESPACE_END

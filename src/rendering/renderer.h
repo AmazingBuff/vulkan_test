@@ -1,9 +1,14 @@
 #pragma once
 
 #include "render_types.h"
-#include "rhi/interface.h"
 
 RENDERING_NAMESPACE_BEGIN
+class Drawable;
+class RenderResources;
+RENDERING_NAMESPACE_END
+
+AMAZING_NAMESPACE_BEGIN
+
 
 class Renderer
 {
@@ -13,8 +18,9 @@ public:
 	void initialize();
 
 public:
-	std::shared_ptr<Drawable> m_drawable;
+	std::shared_ptr<RENDERING_NAMESPACE::Drawable>			m_drawable;
+	std::shared_ptr<RENDERING_NAMESPACE::RenderResources>	m_render_resources;
 };
 
 
-RENDERING_NAMESPACE_END
+AMAZING_NAMESPACE_END

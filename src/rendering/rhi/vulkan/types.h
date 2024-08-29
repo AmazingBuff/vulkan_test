@@ -18,7 +18,7 @@
 #define VK_TYPE_INIT(type, name)		type name = VK_NULL_HANDLE
 #define VK_CLASS(name)					RHI_CLASS(Vulkan, name)
 
-VK_NAMESPACE_BEGIN
+RHI_NAMESPACE_BEGIN
 
 static const char* Shader_Compiler = "glslc.exe";
 static const char* Shader_Compiler_Path = "D:/env/Vulkan/1.3.290.0/Bin/glslc.exe";
@@ -45,4 +45,4 @@ class VK_CLASS(Device);
 class VK_CLASS(SwapChain);
 class VK_CLASS(Pipeline);
 
-VK_NAMESPACE_END
+RHI_NAMESPACE_END

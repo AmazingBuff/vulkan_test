@@ -1,9 +1,9 @@
 #pragma once
 #include "rendering/rhi/rhi.h"
-#include "vulkan/vk.h"
+#include "rhi/interface.h"
 
 
-RHI_NAMESPACE_BEGIN
+RENDERING_NAMESPACE_BEGIN
 
 class Drawable
 {
@@ -19,4 +19,4 @@ public:
 };
 
 
-RHI_NAMESPACE_END
+RENDERING_NAMESPACE_END

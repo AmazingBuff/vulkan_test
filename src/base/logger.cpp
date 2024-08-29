@@ -12,6 +12,7 @@ void Logger::log(const Level& level, const char* loc, const char* message)
 		break;
 	case Level::e_error:
 		std::cerr << "[" << loc << ", Error]: " << message << std::endl;
+		std::exit(EXIT_FAILURE);
 		break;
 	}
 }

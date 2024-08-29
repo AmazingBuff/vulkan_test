@@ -2,20 +2,20 @@
 #include "rendering/rhi/vulkan/types.h"
 #include <traits/func.h>
 
-VK_NAMESPACE_BEGIN
+RHI_NAMESPACE_BEGIN
 
 const char* vk_result_convert(VkResult res);
 
 #if defined(_DEBUG) || defined(DEBUG)
-#define VK_CHECK_RESULT(expr)														\
-{																					\
-	VkResult res = expr;															\
-	if (res != VK_SUCCESS)															\
-	{																				\
-		std::cerr << "Fatal : VkResult is \"" << vk_result_convert(res) << "\" in "	\
-					<< __FILE__	<< " at line " << __LINE__ << std::endl;			\
-		ASSERT(res == VK_SUCCESS);													\
-	}																				\
+#define VK_CHECK_RESULT(expr)																		\
+{																									\
+	VkResult res = expr;																			\
+	if (res != VK_SUCCESS)																			\
+	{																								\
+		std::cerr << "Fatal : VkResult is \"" << vk_result_convert(res)								\
+					<< "\" in "	<< __FILE__	<< " at line " << __LINE__ << std::endl;				\
+		ASSERT(res == VK_SUCCESS);																	\
+	}																								\
 }
 #else
 #define VK_CHECK_RESULT(expr) (expr)
@@ -46,4 +46,4 @@ auto vkEnumerateProperties(F&& func, Args&&... args)
 }
 
 
-VK_NAMESPACE_END
+RHI_NAMESPACE_END

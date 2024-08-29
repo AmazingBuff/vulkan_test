@@ -1,27 +1,31 @@
 #include "pipeline.h"
 #include "system/system.h"
 #include "rendering/renderer.h"
-#include "rendering/rhi/drawable.h"
+#include "rendering/drawable.h"
 
 
-VK_NAMESPACE_BEGIN
+RHI_NAMESPACE_BEGIN
 
-VK_CLASS(Pipeline)::~VK_CLASS(Pipeline)
+VK_CLASS(Pipeline)::~VK_CLASS(Pipeline)()
 {
 
 }
 
 void VK_CLASS(Pipeline)::initialize()
 {
-
+	create_pipeline();
 }
-
 
 NODISCARD constexpr RHIFlag VK_CLASS(Pipeline)::flag() const
 {
 	return RHIFlag::e_pipeline;
 }
 
-VK_NAMESPACE_END
+void VK_CLASS(Pipeline)::create_pipeline()
+{
+
+}
+
+RHI_NAMESPACE_END
 
 

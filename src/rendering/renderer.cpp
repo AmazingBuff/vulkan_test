@@ -1,16 +1,18 @@
 #include "renderer.h"
+#include "render_resouces.h"
+#include "drawable.h"
 
-RENDERING_NAMESPACE_BEGIN
+AMAZING_NAMESPACE_BEGIN
 
 
 void Renderer::initialize()
 {
-	m_drawable = std::make_shared<Drawable>();
+	m_drawable = std::make_shared<RENDERING_NAMESPACE::Drawable>();
 	m_drawable->initialize();
 }
 
 
 
-RENDERING_NAMESPACE_END
+AMAZING_NAMESPACE_END
 
 

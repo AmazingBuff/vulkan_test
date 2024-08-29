@@ -3,7 +3,7 @@
 #include "types.h"
 #include "utils/util.h"
 
-VK_NAMESPACE_BEGIN
+RHI_NAMESPACE_BEGIN
 
 
 class VK_CLASS(Pipeline) final : public RHI
@@ -14,7 +14,9 @@ public:
 	void initialize() override;
 
 	NODISCARD constexpr RHIFlag flag() const override;
+private:
+	void create_pipeline();
 };
 
 
-VK_NAMESPACE_END
+RHI_NAMESPACE_END

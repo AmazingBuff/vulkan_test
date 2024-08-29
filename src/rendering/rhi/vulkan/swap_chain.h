@@ -3,7 +3,7 @@
 #include "types.h"
 #include "utils/util.h"
 
-VK_NAMESPACE_BEGIN
+RHI_NAMESPACE_BEGIN
 
 class VK_CLASS(SwapChain) final : public RHI
 {
@@ -35,4 +35,4 @@ private:
 	std::vector<VkImageView>			m_image_views;
 };
 
-VK_NAMESPACE_END
+RHI_NAMESPACE_END
