@@ -33,6 +33,8 @@ private:
 	SwapChainInfo						m_info;	
 	std::vector<VkImage>				m_images;
 	std::vector<VkImageView>			m_image_views;
+
+	friend class VK_CLASS(Pipeline);
 };
 
 RHI_NAMESPACE_END

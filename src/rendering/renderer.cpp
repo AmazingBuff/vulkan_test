@@ -4,11 +4,12 @@
 
 AMAZING_NAMESPACE_BEGIN
 
-
 void Renderer::initialize()
 {
-	m_drawable = std::make_shared<RENDERING_NAMESPACE::Drawable>();
+	m_drawable = std::make_shared<Drawable>();
 	m_drawable->initialize();
+	m_render_resources = std::make_shared<RenderResources>();
+	m_render_resources->initialize();
 }
 
 

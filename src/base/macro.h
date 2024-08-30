@@ -14,6 +14,8 @@
 #define AMAZING_NAMESPACE_CONCAT(name)	NAMESPACE_CONCAT(NAMESPACE(Amazing), NAMESPACE(name))
 
 #define STRING(x)						#x
+#define CONCAT(a, b)					a##b
+#define IDENTITY(x)						x
 
 #define ZERO_MEMORY(ptr, size)			memset(ptr, 0, size)
 

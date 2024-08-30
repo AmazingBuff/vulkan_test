@@ -83,6 +83,7 @@ private:
 	VK_TYPE_INIT(VkQueue,		m_present_queue);
 
 	friend class VK_CLASS(SwapChain);
+	friend class VK_CLASS(Pipeline);
 };
 
 RHI_NAMESPACE_END

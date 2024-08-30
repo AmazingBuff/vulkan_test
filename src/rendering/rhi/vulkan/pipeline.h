@@ -6,7 +6,7 @@
 RHI_NAMESPACE_BEGIN
 
 
-class VK_CLASS(Pipeline) final : public RHI
+class VK_CLASS(Pipeline) : public RHI
 {
 public:
 	VK_CLASS(Pipeline)() = default;
