@@ -43,6 +43,10 @@ class VK_CLASS(Instance);
 class VK_CLASS(PhysicalDevice);
 class VK_CLASS(Device);
 class VK_CLASS(SwapChain);
+class VK_CLASS(PipelineLayout);
+class VK_CLASS(RenderPass);
 class VK_CLASS(Pipeline);
+class VK_CLASS(FrameBuffer);
+class VK_CLASS(CommandBuffer);
 
 RHI_NAMESPACE_END

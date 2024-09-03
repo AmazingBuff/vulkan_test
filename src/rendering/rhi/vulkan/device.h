@@ -66,6 +66,7 @@ private:
 
 	friend class VK_CLASS(Device);
 	friend class VK_CLASS(SwapChain);
+	friend class VK_CLASS(CommandBuffer);
 };
 
 class VK_CLASS(Device) final : public RHI
@@ -83,7 +84,11 @@ private:
 	VK_TYPE_INIT(VkQueue,		m_present_queue);
 
 	friend class VK_CLASS(SwapChain);
+	friend class VK_CLASS(PipelineLayout);
+	friend class VK_CLASS(RenderPass);
 	friend class VK_CLASS(Pipeline);
+	friend class VK_CLASS(FrameBuffer);
+	friend class VK_CLASS(CommandBuffer);
 };
 
 RHI_NAMESPACE_END

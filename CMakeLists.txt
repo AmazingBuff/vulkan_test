@@ -53,8 +53,11 @@ target_compile_features(
     cxx_std_23
 )
 
+
+
 target_compile_definitions(
     ${PROJECT_NAME}
     PRIVATE
+    VULKAN_RHI
     SOURCES_DIR="${CMAKE_CURRENT_SOURCE_DIR}"
 )

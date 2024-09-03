@@ -23,7 +23,7 @@ const char* vk_result_convert(VkResult res);
 
 template<typename F, typename... Args>
 	requires(!std::is_same_v<typename Trait::function_traits<std::decay_t<F>>::return_type, void>)
-auto vkEnumerateProperties(F&& func, Args&&... args)
+inline auto vkEnumerateProperties(F&& func, Args&&... args)
 {
 	using type = std::remove_pointer_t<typename Trait::tail_type_t<typename Trait::function_traits<std::decay_t<F>>::argument_type>>;
 	uint32_t count = 0;
@@ -35,7 +35,7 @@ auto vkEnumerateProperties(F&& func, Args&&... args)
 
 template<typename F, typename... Args>
 	requires(std::is_same_v<typename Trait::function_traits<std::decay_t<F>>::return_type, void>)
-auto vkEnumerateProperties(F&& func, Args&&... args)
+inline auto vkEnumerateProperties(F&& func, Args&&... args)
 {
 	using type = std::remove_pointer_t<typename Trait::tail_type_t<typename Trait::function_traits<std::decay_t<F>>::argument_type>>;
 	uint32_t count = 0;

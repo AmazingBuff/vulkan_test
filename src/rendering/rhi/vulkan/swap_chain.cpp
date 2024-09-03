@@ -6,12 +6,51 @@
 
 RHI_NAMESPACE_BEGIN
 
+VK_CLASS(FrameBuffer)::~VK_CLASS(FrameBuffer)()
+{
+	vkDestroyFramebuffer(g_system_context->g_render_system->m_drawable->m_device->m_device, m_frame_buffer, nullptr);
+}
+
+constexpr NODISCARD RHIFlag VK_CLASS(FrameBuffer)::flag() const
+{
+	return RHIFlag::e_framebuffer;
+}
+
+void VK_CLASS(FrameBuffer)::initialize(VkImageView image_view, VkRenderPass render_pass)
+{
+	create_frame_buffer(image_view, render_pass);
+}
+
+void VK_CLASS(FrameBuffer)::create_frame_buffer(VkImageView image_view, VkRenderPass render_pass)
+{
+	auto& extent = g_system_context->g_render_system->m_drawable->m_swap_chain->m_info.extent.value();
+	VkFramebufferCreateInfo create_info{
+		.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO,
+		.renderPass = render_pass,
+		.attachmentCount = 1,
+		.pAttachments = &image_view,
+		.width = extent.width,
+		.height = extent.height,
+		.layers = 1
+	};
+
+	VK_CHECK_RESULT(vkCreateFramebuffer(g_system_context->g_render_system->m_drawable->m_device->m_device, &create_info, nullptr, &m_frame_buffer));
+}
+
+
 VK_CLASS(SwapChain)::~VK_CLASS(SwapChain)()
 {
 	VkDevice divece = g_system_context->g_render_system->m_drawable->m_device->m_device;
 	for (auto& image_view : m_image_views)
 		vkDestroyImageView(divece, image_view, nullptr);
 	vkDestroySwapchainKHR(divece, m_swap_chain, nullptr);
+}
+
+void VK_CLASS(SwapChain)::create_frame_buffers(VkRenderPass render_pass)
+{
+	m_frame_buffers.resize(m_image_views.size());
+	for (size_t i = 0; i < m_image_views.size(); ++i)
+		m_frame_buffers[i].initialize(m_image_views[i], render_pass);
 }
 
 void VK_CLASS(SwapChain)::initialize()

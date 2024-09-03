@@ -27,6 +27,9 @@ enum class RHIFlag : uint8_t
 	e_physical_device,
 	e_device,
 	e_swap_chain,
+	e_framebuffer,
+	e_pipeline_layout,
+	e_render_pass,
 	e_pipeline,
 	e_unknown
 };
