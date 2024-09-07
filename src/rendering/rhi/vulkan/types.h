@@ -38,7 +38,9 @@ class VK_CLASS(SwapChain);
 class VK_CLASS(PipelineLayout);
 class VK_CLASS(RenderPass);
 class VK_CLASS(Pipeline);
-class VK_CLASS(FrameBuffer);
+class VK_CLASS(Framebuffer);
 class VK_CLASS(CommandBuffer);
+class VK_CLASS(Semaphore);
+class VK_CLASS(Fence);
 
 ENGINE_NAMESPACE_END

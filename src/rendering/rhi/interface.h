@@ -6,6 +6,7 @@
 #include "vulkan/swap_chain.h"
 #include "vulkan/pipeline.h"
 #include "vulkan/command_buffer.h"
+#include "vulkan/sync.h"
 #endif
 
 
@@ -25,6 +26,8 @@ using PipelineLayout = RHI_USING_CLASS(PipelineLayout);
 using RenderPass = RHI_USING_CLASS(RenderPass);
 using Pipeline = RHI_USING_CLASS(Pipeline);
 using CommandBuffer = RHI_USING_CLASS(CommandBuffer);
+using Semaphore = RHI_USING_CLASS(Semaphore);
+using Fence = RHI_USING_CLASS(Fence);
 
 ENGINE_NAMESPACE_END
 

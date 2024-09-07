@@ -12,7 +12,15 @@ void Renderer::initialize()
 	m_drawable->initialize();
 }
 
+void Renderer::render() const
+{
+	m_drawable->draw();
+}
 
+void Renderer::wait_idle() const
+{
+	m_drawable->wait_idle();
+}
 
 ENGINE_NAMESPACE_END
 

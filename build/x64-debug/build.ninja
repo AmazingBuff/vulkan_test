@@ -50,6 +50,7 @@ cmake_ninja_workdir = D$:\code\vs\vulkan_test\build\x64-debug\
 build cmake_object_order_depends_target_vulkan_test: phony || .
 
 build CMakeFiles\vulkan_test.dir\cmake_pch.cxx.obj: CXX_COMPILER__vulkan_test_unscanned_Debug D$:\code\vs\vulkan_test\build\x64-debug\CMakeFiles\vulkan_test.dir\cmake_pch.cxx | CMakeFiles\vulkan_test.dir\cmake_pch.hxx || cmake_object_order_depends_target_vulkan_test
+  DEFINES = -DSOURCES_DIR=\"D:/code/vs/vulkan_test\" -DVULKAN_RHI
   FLAGS = /DWIN32 /D_WINDOWS /EHsc /Ob0 /Od /RTC1 -std:c++latest -MDd -Zi /YcD:/code/vs/vulkan_test/build/x64-debug/CMakeFiles/vulkan_test.dir/cmake_pch.hxx /FpD:/code/vs/vulkan_test/build/x64-debug/CMakeFiles/vulkan_test.dir/./cmake_pch.cxx.pch /FID:/code/vs/vulkan_test/build/x64-debug/CMakeFiles/vulkan_test.dir/cmake_pch.hxx
   INCLUDES = -ID:\env\Vulkan\1.3.290.0\Include -ID:\code\vs\vulkan_test\ext -ID:\code\vs\vulkan_test\src -external:ID:\env\Vulkan\1.3.290.0\include -external:ID:\env\Vulkan\1.3.290.0\include\SDL2 -external:W0
   OBJECT_DIR = CMakeFiles\vulkan_test.dir
@@ -63,7 +64,26 @@ build CMakeFiles\vulkan_test.dir\cmake_pch.cxx.obj: CXX_COMPILER__vulkan_test_un
 
 build CMakeFiles\vulkan_test.dir\.\cmake_pch.cxx.pch: phony CMakeFiles\vulkan_test.dir\cmake_pch.cxx.obj
 
+build CMakeFiles\vulkan_test.dir\src\base\logger.cpp.obj: CXX_COMPILER__vulkan_test_unscanned_Debug D$:\code\vs\vulkan_test\src\base\logger.cpp | CMakeFiles\vulkan_test.dir\cmake_pch.hxx CMakeFiles\vulkan_test.dir\cmake_pch.cxx.pch || cmake_object_order_depends_target_vulkan_test
+  DEFINES = -DSOURCES_DIR=\"D:/code/vs/vulkan_test\" -DVULKAN_RHI
+  FLAGS = /DWIN32 /D_WINDOWS /EHsc /Ob0 /Od /RTC1 -std:c++latest -MDd -Zi /YuD:/code/vs/vulkan_test/build/x64-debug/CMakeFiles/vulkan_test.dir/cmake_pch.hxx /FpD:/code/vs/vulkan_test/build/x64-debug/CMakeFiles/vulkan_test.dir/./cmake_pch.cxx.pch /FID:/code/vs/vulkan_test/build/x64-debug/CMakeFiles/vulkan_test.dir/cmake_pch.hxx
+  INCLUDES = -ID:\env\Vulkan\1.3.290.0\Include -ID:\code\vs\vulkan_test\ext -ID:\code\vs\vulkan_test\src -external:ID:\env\Vulkan\1.3.290.0\include -external:ID:\env\Vulkan\1.3.290.0\include\SDL2 -external:W0
+  OBJECT_DIR = CMakeFiles\vulkan_test.dir
+  OBJECT_FILE_DIR = CMakeFiles\vulkan_test.dir\src\base
+  TARGET_COMPILE_PDB = CMakeFiles\vulkan_test.dir\
+  TARGET_PDB = vulkan_test.pdb
+
+build CMakeFiles\vulkan_test.dir\src\base\util.cpp.obj: CXX_COMPILER__vulkan_test_unscanned_Debug D$:\code\vs\vulkan_test\src\base\util.cpp | CMakeFiles\vulkan_test.dir\cmake_pch.hxx CMakeFiles\vulkan_test.dir\cmake_pch.cxx.pch || cmake_object_order_depends_target_vulkan_test
+  DEFINES = -DSOURCES_DIR=\"D:/code/vs/vulkan_test\" -DVULKAN_RHI
+  FLAGS = /DWIN32 /D_WINDOWS /EHsc /Ob0 /Od /RTC1 -std:c++latest -MDd -Zi /YuD:/code/vs/vulkan_test/build/x64-debug/CMakeFiles/vulkan_test.dir/cmake_pch.hxx /FpD:/code/vs/vulkan_test/build/x64-debug/CMakeFiles/vulkan_test.dir/./cmake_pch.cxx.pch /FID:/code/vs/vulkan_test/build/x64-debug/CMakeFiles/vulkan_test.dir/cmake_pch.hxx
+  INCLUDES = -ID:\env\Vulkan\1.3.290.0\Include -ID:\code\vs\vulkan_test\ext -ID:\code\vs\vulkan_test\src -external:ID:\env\Vulkan\1.3.290.0\include -external:ID:\env\Vulkan\1.3.290.0\include\SDL2 -external:W0
+  OBJECT_DIR = CMakeFiles\vulkan_test.dir
+  OBJECT_FILE_DIR = CMakeFiles\vulkan_test.dir\src\base
+  TARGET_COMPILE_PDB = CMakeFiles\vulkan_test.dir\
+  TARGET_PDB = vulkan_test.pdb
+
 build CMakeFiles\vulkan_test.dir\src\main.cpp.obj: CXX_COMPILER__vulkan_test_unscanned_Debug D$:\code\vs\vulkan_test\src\main.cpp | CMakeFiles\vulkan_test.dir\cmake_pch.hxx CMakeFiles\vulkan_test.dir\cmake_pch.cxx.pch || cmake_object_order_depends_target_vulkan_test
+  DEFINES = -DSOURCES_DIR=\"D:/code/vs/vulkan_test\" -DVULKAN_RHI
   FLAGS = /DWIN32 /D_WINDOWS /EHsc /Ob0 /Od /RTC1 -std:c++latest -MDd -Zi /YuD:/code/vs/vulkan_test/build/x64-debug/CMakeFiles/vulkan_test.dir/cmake_pch.hxx /FpD:/code/vs/vulkan_test/build/x64-debug/CMakeFiles/vulkan_test.dir/./cmake_pch.cxx.pch /FID:/code/vs/vulkan_test/build/x64-debug/CMakeFiles/vulkan_test.dir/cmake_pch.hxx
   INCLUDES = -ID:\env\Vulkan\1.3.290.0\Include -ID:\code\vs\vulkan_test\ext -ID:\code\vs\vulkan_test\src -external:ID:\env\Vulkan\1.3.290.0\include -external:ID:\env\Vulkan\1.3.290.0\include\SDL2 -external:W0
   OBJECT_DIR = CMakeFiles\vulkan_test.dir
@@ -71,7 +91,89 @@ build CMakeFiles\vulkan_test.dir\src\main.cpp.obj: CXX_COMPILER__vulkan_test_uns
   TARGET_COMPILE_PDB = CMakeFiles\vulkan_test.dir\
   TARGET_PDB = vulkan_test.pdb
 
+build CMakeFiles\vulkan_test.dir\src\rendering\drawable.cpp.obj: CXX_COMPILER__vulkan_test_unscanned_Debug D$:\code\vs\vulkan_test\src\rendering\drawable.cpp | CMakeFiles\vulkan_test.dir\cmake_pch.hxx CMakeFiles\vulkan_test.dir\cmake_pch.cxx.pch || cmake_object_order_depends_target_vulkan_test
+  DEFINES = -DSOURCES_DIR=\"D:/code/vs/vulkan_test\" -DVULKAN_RHI
+  FLAGS = /DWIN32 /D_WINDOWS /EHsc /Ob0 /Od /RTC1 -std:c++latest -MDd -Zi /YuD:/code/vs/vulkan_test/build/x64-debug/CMakeFiles/vulkan_test.dir/cmake_pch.hxx /FpD:/code/vs/vulkan_test/build/x64-debug/CMakeFiles/vulkan_test.dir/./cmake_pch.cxx.pch /FID:/code/vs/vulkan_test/build/x64-debug/CMakeFiles/vulkan_test.dir/cmake_pch.hxx
+  INCLUDES = -ID:\env\Vulkan\1.3.290.0\Include -ID:\code\vs\vulkan_test\ext -ID:\code\vs\vulkan_test\src -external:ID:\env\Vulkan\1.3.290.0\include -external:ID:\env\Vulkan\1.3.290.0\include\SDL2 -external:W0
+  OBJECT_DIR = CMakeFiles\vulkan_test.dir
+  OBJECT_FILE_DIR = CMakeFiles\vulkan_test.dir\src\rendering
+  TARGET_COMPILE_PDB = CMakeFiles\vulkan_test.dir\
+  TARGET_PDB = vulkan_test.pdb
+
+build CMakeFiles\vulkan_test.dir\src\rendering\render_resouces.cpp.obj: CXX_COMPILER__vulkan_test_unscanned_Debug D$:\code\vs\vulkan_test\src\rendering\render_resouces.cpp | CMakeFiles\vulkan_test.dir\cmake_pch.hxx CMakeFiles\vulkan_test.dir\cmake_pch.cxx.pch || cmake_object_order_depends_target_vulkan_test
+  DEFINES = -DSOURCES_DIR=\"D:/code/vs/vulkan_test\" -DVULKAN_RHI
+  FLAGS = /DWIN32 /D_WINDOWS /EHsc /Ob0 /Od /RTC1 -std:c++latest -MDd -Zi /YuD:/code/vs/vulkan_test/build/x64-debug/CMakeFiles/vulkan_test.dir/cmake_pch.hxx /FpD:/code/vs/vulkan_test/build/x64-debug/CMakeFiles/vulkan_test.dir/./cmake_pch.cxx.pch /FID:/code/vs/vulkan_test/build/x64-debug/CMakeFiles/vulkan_test.dir/cmake_pch.hxx
+  INCLUDES = -ID:\env\Vulkan\1.3.290.0\Include -ID:\code\vs\vulkan_test\ext -ID:\code\vs\vulkan_test\src -external:ID:\env\Vulkan\1.3.290.0\include -external:ID:\env\Vulkan\1.3.290.0\include\SDL2 -external:W0
+  OBJECT_DIR = CMakeFiles\vulkan_test.dir
+  OBJECT_FILE_DIR = CMakeFiles\vulkan_test.dir\src\rendering
+  TARGET_COMPILE_PDB = CMakeFiles\vulkan_test.dir\
+  TARGET_PDB = vulkan_test.pdb
+
+build CMakeFiles\vulkan_test.dir\src\rendering\renderer.cpp.obj: CXX_COMPILER__vulkan_test_unscanned_Debug D$:\code\vs\vulkan_test\src\rendering\renderer.cpp | CMakeFiles\vulkan_test.dir\cmake_pch.hxx CMakeFiles\vulkan_test.dir\cmake_pch.cxx.pch || cmake_object_order_depends_target_vulkan_test
+  DEFINES = -DSOURCES_DIR=\"D:/code/vs/vulkan_test\" -DVULKAN_RHI
+  FLAGS = /DWIN32 /D_WINDOWS /EHsc /Ob0 /Od /RTC1 -std:c++latest -MDd -Zi /YuD:/code/vs/vulkan_test/build/x64-debug/CMakeFiles/vulkan_test.dir/cmake_pch.hxx /FpD:/code/vs/vulkan_test/build/x64-debug/CMakeFiles/vulkan_test.dir/./cmake_pch.cxx.pch /FID:/code/vs/vulkan_test/build/x64-debug/CMakeFiles/vulkan_test.dir/cmake_pch.hxx
+  INCLUDES = -ID:\env\Vulkan\1.3.290.0\Include -ID:\code\vs\vulkan_test\ext -ID:\code\vs\vulkan_test\src -external:ID:\env\Vulkan\1.3.290.0\include -external:ID:\env\Vulkan\1.3.290.0\include\SDL2 -external:W0
+  OBJECT_DIR = CMakeFiles\vulkan_test.dir
+  OBJECT_FILE_DIR = CMakeFiles\vulkan_test.dir\src\rendering
+  TARGET_COMPILE_PDB = CMakeFiles\vulkan_test.dir\
+  TARGET_PDB = vulkan_test.pdb
+
+build CMakeFiles\vulkan_test.dir\src\rendering\resources\shader\shader_manager.cpp.obj: CXX_COMPILER__vulkan_test_unscanned_Debug D$:\code\vs\vulkan_test\src\rendering\resources\shader\shader_manager.cpp | CMakeFiles\vulkan_test.dir\cmake_pch.hxx CMakeFiles\vulkan_test.dir\cmake_pch.cxx.pch || cmake_object_order_depends_target_vulkan_test
+  DEFINES = -DSOURCES_DIR=\"D:/code/vs/vulkan_test\" -DVULKAN_RHI
+  FLAGS = /DWIN32 /D_WINDOWS /EHsc /Ob0 /Od /RTC1 -std:c++latest -MDd -Zi /YuD:/code/vs/vulkan_test/build/x64-debug/CMakeFiles/vulkan_test.dir/cmake_pch.hxx /FpD:/code/vs/vulkan_test/build/x64-debug/CMakeFiles/vulkan_test.dir/./cmake_pch.cxx.pch /FID:/code/vs/vulkan_test/build/x64-debug/CMakeFiles/vulkan_test.dir/cmake_pch.hxx
+  INCLUDES = -ID:\env\Vulkan\1.3.290.0\Include -ID:\code\vs\vulkan_test\ext -ID:\code\vs\vulkan_test\src -external:ID:\env\Vulkan\1.3.290.0\include -external:ID:\env\Vulkan\1.3.290.0\include\SDL2 -external:W0
+  OBJECT_DIR = CMakeFiles\vulkan_test.dir
+  OBJECT_FILE_DIR = CMakeFiles\vulkan_test.dir\src\rendering\resources\shader
+  TARGET_COMPILE_PDB = CMakeFiles\vulkan_test.dir\
+  TARGET_PDB = vulkan_test.pdb
+
+build CMakeFiles\vulkan_test.dir\src\rendering\rhi\vulkan\command_buffer.cpp.obj: CXX_COMPILER__vulkan_test_unscanned_Debug D$:\code\vs\vulkan_test\src\rendering\rhi\vulkan\command_buffer.cpp | CMakeFiles\vulkan_test.dir\cmake_pch.hxx CMakeFiles\vulkan_test.dir\cmake_pch.cxx.pch || cmake_object_order_depends_target_vulkan_test
+  DEFINES = -DSOURCES_DIR=\"D:/code/vs/vulkan_test\" -DVULKAN_RHI
+  FLAGS = /DWIN32 /D_WINDOWS /EHsc /Ob0 /Od /RTC1 -std:c++latest -MDd -Zi /YuD:/code/vs/vulkan_test/build/x64-debug/CMakeFiles/vulkan_test.dir/cmake_pch.hxx /FpD:/code/vs/vulkan_test/build/x64-debug/CMakeFiles/vulkan_test.dir/./cmake_pch.cxx.pch /FID:/code/vs/vulkan_test/build/x64-debug/CMakeFiles/vulkan_test.dir/cmake_pch.hxx
+  INCLUDES = -ID:\env\Vulkan\1.3.290.0\Include -ID:\code\vs\vulkan_test\ext -ID:\code\vs\vulkan_test\src -external:ID:\env\Vulkan\1.3.290.0\include -external:ID:\env\Vulkan\1.3.290.0\include\SDL2 -external:W0
+  OBJECT_DIR = CMakeFiles\vulkan_test.dir
+  OBJECT_FILE_DIR = CMakeFiles\vulkan_test.dir\src\rendering\rhi\vulkan
+  TARGET_COMPILE_PDB = CMakeFiles\vulkan_test.dir\
+  TARGET_PDB = vulkan_test.pdb
+
+build CMakeFiles\vulkan_test.dir\src\rendering\rhi\vulkan\device.cpp.obj: CXX_COMPILER__vulkan_test_unscanned_Debug D$:\code\vs\vulkan_test\src\rendering\rhi\vulkan\device.cpp | CMakeFiles\vulkan_test.dir\cmake_pch.hxx CMakeFiles\vulkan_test.dir\cmake_pch.cxx.pch || cmake_object_order_depends_target_vulkan_test
+  DEFINES = -DSOURCES_DIR=\"D:/code/vs/vulkan_test\" -DVULKAN_RHI
+  FLAGS = /DWIN32 /D_WINDOWS /EHsc /Ob0 /Od /RTC1 -std:c++latest -MDd -Zi /YuD:/code/vs/vulkan_test/build/x64-debug/CMakeFiles/vulkan_test.dir/cmake_pch.hxx /FpD:/code/vs/vulkan_test/build/x64-debug/CMakeFiles/vulkan_test.dir/./cmake_pch.cxx.pch /FID:/code/vs/vulkan_test/build/x64-debug/CMakeFiles/vulkan_test.dir/cmake_pch.hxx
+  INCLUDES = -ID:\env\Vulkan\1.3.290.0\Include -ID:\code\vs\vulkan_test\ext -ID:\code\vs\vulkan_test\src -external:ID:\env\Vulkan\1.3.290.0\include -external:ID:\env\Vulkan\1.3.290.0\include\SDL2 -external:W0
+  OBJECT_DIR = CMakeFiles\vulkan_test.dir
+  OBJECT_FILE_DIR = CMakeFiles\vulkan_test.dir\src\rendering\rhi\vulkan
+  TARGET_COMPILE_PDB = CMakeFiles\vulkan_test.dir\
+  TARGET_PDB = vulkan_test.pdb
+
 build CMakeFiles\vulkan_test.dir\src\rendering\rhi\vulkan\instance.cpp.obj: CXX_COMPILER__vulkan_test_unscanned_Debug D$:\code\vs\vulkan_test\src\rendering\rhi\vulkan\instance.cpp | CMakeFiles\vulkan_test.dir\cmake_pch.hxx CMakeFiles\vulkan_test.dir\cmake_pch.cxx.pch || cmake_object_order_depends_target_vulkan_test
+  DEFINES = -DSOURCES_DIR=\"D:/code/vs/vulkan_test\" -DVULKAN_RHI
+  FLAGS = /DWIN32 /D_WINDOWS /EHsc /Ob0 /Od /RTC1 -std:c++latest -MDd -Zi /YuD:/code/vs/vulkan_test/build/x64-debug/CMakeFiles/vulkan_test.dir/cmake_pch.hxx /FpD:/code/vs/vulkan_test/build/x64-debug/CMakeFiles/vulkan_test.dir/./cmake_pch.cxx.pch /FID:/code/vs/vulkan_test/build/x64-debug/CMakeFiles/vulkan_test.dir/cmake_pch.hxx
+  INCLUDES = -ID:\env\Vulkan\1.3.290.0\Include -ID:\code\vs\vulkan_test\ext -ID:\code\vs\vulkan_test\src -external:ID:\env\Vulkan\1.3.290.0\include -external:ID:\env\Vulkan\1.3.290.0\include\SDL2 -external:W0
+  OBJECT_DIR = CMakeFiles\vulkan_test.dir
+  OBJECT_FILE_DIR = CMakeFiles\vulkan_test.dir\src\rendering\rhi\vulkan
+  TARGET_COMPILE_PDB = CMakeFiles\vulkan_test.dir\
+  TARGET_PDB = vulkan_test.pdb
+
+build CMakeFiles\vulkan_test.dir\src\rendering\rhi\vulkan\pipeline.cpp.obj: CXX_COMPILER__vulkan_test_unscanned_Debug D$:\code\vs\vulkan_test\src\rendering\rhi\vulkan\pipeline.cpp | CMakeFiles\vulkan_test.dir\cmake_pch.hxx CMakeFiles\vulkan_test.dir\cmake_pch.cxx.pch || cmake_object_order_depends_target_vulkan_test
+  DEFINES = -DSOURCES_DIR=\"D:/code/vs/vulkan_test\" -DVULKAN_RHI
+  FLAGS = /DWIN32 /D_WINDOWS /EHsc /Ob0 /Od /RTC1 -std:c++latest -MDd -Zi /YuD:/code/vs/vulkan_test/build/x64-debug/CMakeFiles/vulkan_test.dir/cmake_pch.hxx /FpD:/code/vs/vulkan_test/build/x64-debug/CMakeFiles/vulkan_test.dir/./cmake_pch.cxx.pch /FID:/code/vs/vulkan_test/build/x64-debug/CMakeFiles/vulkan_test.dir/cmake_pch.hxx
+  INCLUDES = -ID:\env\Vulkan\1.3.290.0\Include -ID:\code\vs\vulkan_test\ext -ID:\code\vs\vulkan_test\src -external:ID:\env\Vulkan\1.3.290.0\include -external:ID:\env\Vulkan\1.3.290.0\include\SDL2 -external:W0
+  OBJECT_DIR = CMakeFiles\vulkan_test.dir
+  OBJECT_FILE_DIR = CMakeFiles\vulkan_test.dir\src\rendering\rhi\vulkan
+  TARGET_COMPILE_PDB = CMakeFiles\vulkan_test.dir\
+  TARGET_PDB = vulkan_test.pdb
+
+build CMakeFiles\vulkan_test.dir\src\rendering\rhi\vulkan\swap_chain.cpp.obj: CXX_COMPILER__vulkan_test_unscanned_Debug D$:\code\vs\vulkan_test\src\rendering\rhi\vulkan\swap_chain.cpp | CMakeFiles\vulkan_test.dir\cmake_pch.hxx CMakeFiles\vulkan_test.dir\cmake_pch.cxx.pch || cmake_object_order_depends_target_vulkan_test
+  DEFINES = -DSOURCES_DIR=\"D:/code/vs/vulkan_test\" -DVULKAN_RHI
+  FLAGS = /DWIN32 /D_WINDOWS /EHsc /Ob0 /Od /RTC1 -std:c++latest -MDd -Zi /YuD:/code/vs/vulkan_test/build/x64-debug/CMakeFiles/vulkan_test.dir/cmake_pch.hxx /FpD:/code/vs/vulkan_test/build/x64-debug/CMakeFiles/vulkan_test.dir/./cmake_pch.cxx.pch /FID:/code/vs/vulkan_test/build/x64-debug/CMakeFiles/vulkan_test.dir/cmake_pch.hxx
+  INCLUDES = -ID:\env\Vulkan\1.3.290.0\Include -ID:\code\vs\vulkan_test\ext -ID:\code\vs\vulkan_test\src -external:ID:\env\Vulkan\1.3.290.0\include -external:ID:\env\Vulkan\1.3.290.0\include\SDL2 -external:W0
+  OBJECT_DIR = CMakeFiles\vulkan_test.dir
+  OBJECT_FILE_DIR = CMakeFiles\vulkan_test.dir\src\rendering\rhi\vulkan
+  TARGET_COMPILE_PDB = CMakeFiles\vulkan_test.dir\
+  TARGET_PDB = vulkan_test.pdb
+
+build CMakeFiles\vulkan_test.dir\src\rendering\rhi\vulkan\sync.cpp.obj: CXX_COMPILER__vulkan_test_unscanned_Debug D$:\code\vs\vulkan_test\src\rendering\rhi\vulkan\sync.cpp | CMakeFiles\vulkan_test.dir\cmake_pch.hxx CMakeFiles\vulkan_test.dir\cmake_pch.cxx.pch || cmake_object_order_depends_target_vulkan_test
+  DEFINES = -DSOURCES_DIR=\"D:/code/vs/vulkan_test\" -DVULKAN_RHI
   FLAGS = /DWIN32 /D_WINDOWS /EHsc /Ob0 /Od /RTC1 -std:c++latest -MDd -Zi /YuD:/code/vs/vulkan_test/build/x64-debug/CMakeFiles/vulkan_test.dir/cmake_pch.hxx /FpD:/code/vs/vulkan_test/build/x64-debug/CMakeFiles/vulkan_test.dir/./cmake_pch.cxx.pch /FID:/code/vs/vulkan_test/build/x64-debug/CMakeFiles/vulkan_test.dir/cmake_pch.hxx
   INCLUDES = -ID:\env\Vulkan\1.3.290.0\Include -ID:\code\vs\vulkan_test\ext -ID:\code\vs\vulkan_test\src -external:ID:\env\Vulkan\1.3.290.0\include -external:ID:\env\Vulkan\1.3.290.0\include\SDL2 -external:W0
   OBJECT_DIR = CMakeFiles\vulkan_test.dir
@@ -80,6 +182,7 @@ build CMakeFiles\vulkan_test.dir\src\rendering\rhi\vulkan\instance.cpp.obj: CXX_
   TARGET_PDB = vulkan_test.pdb
 
 build CMakeFiles\vulkan_test.dir\src\rendering\rhi\vulkan\utils\util.cpp.obj: CXX_COMPILER__vulkan_test_unscanned_Debug D$:\code\vs\vulkan_test\src\rendering\rhi\vulkan\utils\util.cpp | CMakeFiles\vulkan_test.dir\cmake_pch.hxx CMakeFiles\vulkan_test.dir\cmake_pch.cxx.pch || cmake_object_order_depends_target_vulkan_test
+  DEFINES = -DSOURCES_DIR=\"D:/code/vs/vulkan_test\" -DVULKAN_RHI
   FLAGS = /DWIN32 /D_WINDOWS /EHsc /Ob0 /Od /RTC1 -std:c++latest -MDd -Zi /YuD:/code/vs/vulkan_test/build/x64-debug/CMakeFiles/vulkan_test.dir/cmake_pch.hxx /FpD:/code/vs/vulkan_test/build/x64-debug/CMakeFiles/vulkan_test.dir/./cmake_pch.cxx.pch /FID:/code/vs/vulkan_test/build/x64-debug/CMakeFiles/vulkan_test.dir/cmake_pch.hxx
   INCLUDES = -ID:\env\Vulkan\1.3.290.0\Include -ID:\code\vs\vulkan_test\ext -ID:\code\vs\vulkan_test\src -external:ID:\env\Vulkan\1.3.290.0\include -external:ID:\env\Vulkan\1.3.290.0\include\SDL2 -external:W0
   OBJECT_DIR = CMakeFiles\vulkan_test.dir
@@ -88,10 +191,29 @@ build CMakeFiles\vulkan_test.dir\src\rendering\rhi\vulkan\utils\util.cpp.obj: CX
   TARGET_PDB = vulkan_test.pdb
 
 build CMakeFiles\vulkan_test.dir\src\rendering\rhi\vulkan\utils\volk.cpp.obj: CXX_COMPILER__vulkan_test_unscanned_Debug D$:\code\vs\vulkan_test\src\rendering\rhi\vulkan\utils\volk.cpp | CMakeFiles\vulkan_test.dir\cmake_pch.hxx CMakeFiles\vulkan_test.dir\cmake_pch.cxx.pch || cmake_object_order_depends_target_vulkan_test
+  DEFINES = -DSOURCES_DIR=\"D:/code/vs/vulkan_test\" -DVULKAN_RHI
   FLAGS = /DWIN32 /D_WINDOWS /EHsc /Ob0 /Od /RTC1 -std:c++latest -MDd -Zi /YuD:/code/vs/vulkan_test/build/x64-debug/CMakeFiles/vulkan_test.dir/cmake_pch.hxx /FpD:/code/vs/vulkan_test/build/x64-debug/CMakeFiles/vulkan_test.dir/./cmake_pch.cxx.pch /FID:/code/vs/vulkan_test/build/x64-debug/CMakeFiles/vulkan_test.dir/cmake_pch.hxx
   INCLUDES = -ID:\env\Vulkan\1.3.290.0\Include -ID:\code\vs\vulkan_test\ext -ID:\code\vs\vulkan_test\src -external:ID:\env\Vulkan\1.3.290.0\include -external:ID:\env\Vulkan\1.3.290.0\include\SDL2 -external:W0
   OBJECT_DIR = CMakeFiles\vulkan_test.dir
   OBJECT_FILE_DIR = CMakeFiles\vulkan_test.dir\src\rendering\rhi\vulkan\utils
+  TARGET_COMPILE_PDB = CMakeFiles\vulkan_test.dir\
+  TARGET_PDB = vulkan_test.pdb
+
+build CMakeFiles\vulkan_test.dir\src\system\system.cpp.obj: CXX_COMPILER__vulkan_test_unscanned_Debug D$:\code\vs\vulkan_test\src\system\system.cpp | CMakeFiles\vulkan_test.dir\cmake_pch.hxx CMakeFiles\vulkan_test.dir\cmake_pch.cxx.pch || cmake_object_order_depends_target_vulkan_test
+  DEFINES = -DSOURCES_DIR=\"D:/code/vs/vulkan_test\" -DVULKAN_RHI
+  FLAGS = /DWIN32 /D_WINDOWS /EHsc /Ob0 /Od /RTC1 -std:c++latest -MDd -Zi /YuD:/code/vs/vulkan_test/build/x64-debug/CMakeFiles/vulkan_test.dir/cmake_pch.hxx /FpD:/code/vs/vulkan_test/build/x64-debug/CMakeFiles/vulkan_test.dir/./cmake_pch.cxx.pch /FID:/code/vs/vulkan_test/build/x64-debug/CMakeFiles/vulkan_test.dir/cmake_pch.hxx
+  INCLUDES = -ID:\env\Vulkan\1.3.290.0\Include -ID:\code\vs\vulkan_test\ext -ID:\code\vs\vulkan_test\src -external:ID:\env\Vulkan\1.3.290.0\include -external:ID:\env\Vulkan\1.3.290.0\include\SDL2 -external:W0
+  OBJECT_DIR = CMakeFiles\vulkan_test.dir
+  OBJECT_FILE_DIR = CMakeFiles\vulkan_test.dir\src\system
+  TARGET_COMPILE_PDB = CMakeFiles\vulkan_test.dir\
+  TARGET_PDB = vulkan_test.pdb
+
+build CMakeFiles\vulkan_test.dir\src\window\window.cpp.obj: CXX_COMPILER__vulkan_test_unscanned_Debug D$:\code\vs\vulkan_test\src\window\window.cpp | CMakeFiles\vulkan_test.dir\cmake_pch.hxx CMakeFiles\vulkan_test.dir\cmake_pch.cxx.pch || cmake_object_order_depends_target_vulkan_test
+  DEFINES = -DSOURCES_DIR=\"D:/code/vs/vulkan_test\" -DVULKAN_RHI
+  FLAGS = /DWIN32 /D_WINDOWS /EHsc /Ob0 /Od /RTC1 -std:c++latest -MDd -Zi /YuD:/code/vs/vulkan_test/build/x64-debug/CMakeFiles/vulkan_test.dir/cmake_pch.hxx /FpD:/code/vs/vulkan_test/build/x64-debug/CMakeFiles/vulkan_test.dir/./cmake_pch.cxx.pch /FID:/code/vs/vulkan_test/build/x64-debug/CMakeFiles/vulkan_test.dir/cmake_pch.hxx
+  INCLUDES = -ID:\env\Vulkan\1.3.290.0\Include -ID:\code\vs\vulkan_test\ext -ID:\code\vs\vulkan_test\src -external:ID:\env\Vulkan\1.3.290.0\include -external:ID:\env\Vulkan\1.3.290.0\include\SDL2 -external:W0
+  OBJECT_DIR = CMakeFiles\vulkan_test.dir
+  OBJECT_FILE_DIR = CMakeFiles\vulkan_test.dir\src\window
   TARGET_COMPILE_PDB = CMakeFiles\vulkan_test.dir\
   TARGET_PDB = vulkan_test.pdb
 
@@ -103,7 +225,7 @@ build CMakeFiles\vulkan_test.dir\src\rendering\rhi\vulkan\utils\volk.cpp.obj: CX
 #############################################
 # Link the executable vulkan_test.exe
 
-build vulkan_test.exe: CXX_EXECUTABLE_LINKER__vulkan_test_Debug CMakeFiles\vulkan_test.dir\cmake_pch.cxx.obj CMakeFiles\vulkan_test.dir\src\main.cpp.obj CMakeFiles\vulkan_test.dir\src\rendering\rhi\vulkan\instance.cpp.obj CMakeFiles\vulkan_test.dir\src\rendering\rhi\vulkan\utils\util.cpp.obj CMakeFiles\vulkan_test.dir\src\rendering\rhi\vulkan\utils\volk.cpp.obj | D$:\env\Vulkan\1.3.290.0\Lib\vulkan-1.lib D$:\env\Vulkan\1.3.290.0\lib\SDL2main.lib D$:\env\Vulkan\1.3.290.0\lib\SDL2.lib
+build vulkan_test.exe: CXX_EXECUTABLE_LINKER__vulkan_test_Debug CMakeFiles\vulkan_test.dir\cmake_pch.cxx.obj CMakeFiles\vulkan_test.dir\src\base\logger.cpp.obj CMakeFiles\vulkan_test.dir\src\base\util.cpp.obj CMakeFiles\vulkan_test.dir\src\main.cpp.obj CMakeFiles\vulkan_test.dir\src\rendering\drawable.cpp.obj CMakeFiles\vulkan_test.dir\src\rendering\render_resouces.cpp.obj CMakeFiles\vulkan_test.dir\src\rendering\renderer.cpp.obj CMakeFiles\vulkan_test.dir\src\rendering\resources\shader\shader_manager.cpp.obj CMakeFiles\vulkan_test.dir\src\rendering\rhi\vulkan\command_buffer.cpp.obj CMakeFiles\vulkan_test.dir\src\rendering\rhi\vulkan\device.cpp.obj CMakeFiles\vulkan_test.dir\src\rendering\rhi\vulkan\instance.cpp.obj CMakeFiles\vulkan_test.dir\src\rendering\rhi\vulkan\pipeline.cpp.obj CMakeFiles\vulkan_test.dir\src\rendering\rhi\vulkan\swap_chain.cpp.obj CMakeFiles\vulkan_test.dir\src\rendering\rhi\vulkan\sync.cpp.obj CMakeFiles\vulkan_test.dir\src\rendering\rhi\vulkan\utils\util.cpp.obj CMakeFiles\vulkan_test.dir\src\rendering\rhi\vulkan\utils\volk.cpp.obj CMakeFiles\vulkan_test.dir\src\system\system.cpp.obj CMakeFiles\vulkan_test.dir\src\window\window.cpp.obj | D$:\env\Vulkan\1.3.290.0\Lib\vulkan-1.lib D$:\env\Vulkan\1.3.290.0\lib\SDL2main.lib D$:\env\Vulkan\1.3.290.0\lib\SDL2.lib
   FLAGS = /DWIN32 /D_WINDOWS /EHsc /Ob0 /Od /RTC1 -MDd -Zi
   LINK_FLAGS = /machine:x64 /debug /INCREMENTAL /subsystem:console
   LINK_LIBRARIES = D:\env\Vulkan\1.3.290.0\Lib\vulkan-1.lib  D:\env\Vulkan\1.3.290.0\lib\SDL2main.lib  D:\env\Vulkan\1.3.290.0\lib\SDL2.lib  shell32.lib  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib

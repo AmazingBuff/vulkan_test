@@ -93,12 +93,23 @@ void VK_CLASS(RenderPass)::create_render_pass()
 		.pColorAttachments = &color_attachment_ref
 	};
 
+	VkSubpassDependency dependency{
+		.srcSubpass = VK_SUBPASS_EXTERNAL,
+		.dstSubpass = 0,
+		.srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
+		.dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
+		.srcAccessMask = 0,
+		.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT
+	};
+
 	VkRenderPassCreateInfo render_pass_info{
 		.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO,
 		.attachmentCount = 1,
 		.pAttachments = &color_attachment,
 		.subpassCount = 1,
 		.pSubpasses = &subpass,
+		.dependencyCount = 1,
+		.pDependencies = &dependency
 	};
 
 	VK_CHECK_RESULT(vkCreateRenderPass(device, &render_pass_info, nullptr, &m_render_pass));
@@ -109,6 +120,16 @@ void VK_CLASS(RenderPass)::create_render_pass()
 VK_CLASS(Pipeline)::~VK_CLASS(Pipeline)()
 {
 	vkDestroyPipeline(g_system_context->g_render_system->m_drawable->m_device->m_device, m_pipeline, nullptr);
+}
+
+void VK_CLASS(Pipeline)::set_render_pass(const std::shared_ptr<VK_CLASS(RenderPass)>& render_pass)
+{
+	m_render_pass = render_pass;
+}
+
+void VK_CLASS(Pipeline)::set_pipeline_layout(const std::shared_ptr<VK_CLASS(PipelineLayout)>& pipeline_layout)
+{
+	m_pipeline_layout = pipeline_layout;
 }
 
 void VK_CLASS(Pipeline)::initialize()
@@ -126,10 +147,6 @@ void VK_CLASS(Pipeline)::create_pipeline()
 	auto device = g_system_context->g_render_system->m_drawable->m_device->m_device;
 	// todo: design a shader, pipeline layout and render pass manager which read configuration from a yaml file
 	// here just temporarily hard code the shader, pipeline layout and render pass
-	m_pipeline_layout = std::make_shared<VK_CLASS(PipelineLayout)>();
-	m_pipeline_layout->initialize();
-	m_render_pass = std::make_shared<VK_CLASS(RenderPass)>();
-	m_render_pass->initialize();
 	auto& shaders = g_system_context->g_render_system->m_render_resources->get_shader_resource("triangle");
 
 	VkShaderModule vert_shader_module = create_shader_module(device, shaders.vertex_shader);

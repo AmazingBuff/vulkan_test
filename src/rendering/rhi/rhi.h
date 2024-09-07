@@ -25,11 +25,13 @@ enum class RHIFlag : uint8_t
 	e_render_pass,
 	e_pipeline,
 	e_command_buffer,
+	e_semaphore,
+	e_fence,
 	e_unknown
 };
 
 static constexpr GraphicsAPI Hardware_API = GraphicsAPI::e_vulkan;
-#define HARDWARE_API Hardware_API
+static constexpr uint32_t k_Max_Frames_In_Flight = 2;
 
 class RHI
 {

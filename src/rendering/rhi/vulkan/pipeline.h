@@ -2,6 +2,7 @@
 
 #include "types.h"
 #include "utils/util.h"
+#include "rendering/render_types.h"
 
 ENGINE_NAMESPACE_BEGIN
 
@@ -36,6 +37,9 @@ private:
 	VK_TYPE_INIT(VkRenderPass, m_render_pass);
 
 	friend class VK_CLASS(Pipeline);
+	friend class VK_CLASS(CommandBuffer);
+	friend class VK_CLASS(SwapChain);
+	friend class VK_CLASS(Framebuffer);
 };
 
 
@@ -44,6 +48,8 @@ class VK_CLASS(Pipeline) final : public RHI
 public:
 	VK_CLASS(Pipeline)() = default;
 	~VK_CLASS(Pipeline)();
+	void set_pipeline_layout(const std::shared_ptr<VK_CLASS(PipelineLayout)>& pipeline_layout);
+	void set_render_pass(const std::shared_ptr<VK_CLASS(RenderPass)>& render_pass);
 	void initialize() override;
 
 
@@ -55,6 +61,9 @@ private:
 	std::shared_ptr<VK_CLASS(RenderPass)>		m_render_pass;
 private:
 	VK_TYPE_INIT(VkPipeline,					m_pipeline);
+
+	friend class VK_CLASS(CommandBuffer);
+	friend class VK_CLASS(SwapChain);
 };
 
 

@@ -7,12 +7,22 @@ ENGINE_NAMESPACE_BEGIN
 
 std::unique_ptr<System> g_system_context = std::make_unique<System>();
 
+System::~System()
+{
+	g_render_system->wait_idle();
+}
+
 void System::initialize()
 {
 	g_window_system = std::make_shared<Window>();
 	g_window_system->initialize();
 	g_render_system = std::make_shared<Renderer>();
 	g_render_system->initialize();
+}
+
+void System::run()
+{
+	g_window_system->present();
 }
 
 ENGINE_NAMESPACE_END

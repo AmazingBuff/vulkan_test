@@ -16,6 +16,7 @@ public:
 	Window() = default;
 	~Window();
 	void initialize();
+	void present() const;
 	NODISCARD SDL_Window* get_window() const;
 private:
 	SDL_Window* m_window = nullptr;

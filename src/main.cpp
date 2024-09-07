@@ -9,9 +9,12 @@
 #include <vector>
 #include "system/system.h"
 
+using namespace ENGINE_NAMESPACE;
+
 int main()
 {
-    ENGINE_NAMESPACE::g_system_context->initialize();
+    g_system_context->initialize();
+    g_system_context->run();
 
     return 0;
 }

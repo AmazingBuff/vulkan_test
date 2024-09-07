@@ -76,6 +76,9 @@ public:
 	~VK_CLASS(Device)() override;
 	void initialize() override;
 	NODISCARD constexpr RHIFlag flag() const override;
+
+	void present() const;
+	void wait_idle() const;
 private:
 	void create_logical_device();
 private:
@@ -87,8 +90,10 @@ private:
 	friend class VK_CLASS(PipelineLayout);
 	friend class VK_CLASS(RenderPass);
 	friend class VK_CLASS(Pipeline);
-	friend class VK_CLASS(FrameBuffer);
+	friend class VK_CLASS(Framebuffer);
 	friend class VK_CLASS(CommandBuffer);
+	friend class VK_CLASS(Semaphore);
+	friend class VK_CLASS(Fence);
 };
 
 ENGINE_NAMESPACE_END

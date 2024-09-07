@@ -6,34 +6,36 @@
 
 ENGINE_NAMESPACE_BEGIN
 
-VK_CLASS(FrameBuffer)::~VK_CLASS(FrameBuffer)()
+VK_CLASS(Framebuffer)::~VK_CLASS(Framebuffer)()
 {
-	vkDestroyFramebuffer(g_system_context->g_render_system->m_drawable->m_device->m_device, m_frame_buffer, nullptr);
+	auto device = g_system_context->g_render_system->m_drawable->m_device->m_device;
+	vkDestroyImageView(device, m_image_view, nullptr);
+	vkDestroyFramebuffer(device, m_frame_buffer, nullptr);
 }
 
-constexpr NODISCARD RHIFlag VK_CLASS(FrameBuffer)::flag() const
+void VK_CLASS(Framebuffer)::set_render_pass(const std::shared_ptr<VK_CLASS(RenderPass)>& render_pass)
+{
+	m_render_pass = render_pass;
+}
+
+constexpr NODISCARD RHIFlag VK_CLASS(Framebuffer)::flag() const
 {
 	return RHIFlag::e_framebuffer;
 }
 
-void VK_CLASS(FrameBuffer)::initialize()
+void VK_CLASS(Framebuffer)::initialize()
 {
-	
+	create_frame_buffer();
 }
 
-void VK_CLASS(FrameBuffer)::initialize(VkImageView image_view, VkRenderPass render_pass)
-{
-	create_frame_buffer(image_view, render_pass);
-}
-
-void VK_CLASS(FrameBuffer)::create_frame_buffer(VkImageView image_view, VkRenderPass render_pass)
+void VK_CLASS(Framebuffer)::create_frame_buffer()
 {
 	auto& extent = g_system_context->g_render_system->m_drawable->m_swap_chain->m_info.extent.value();
 	VkFramebufferCreateInfo create_info{
 		.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO,
-		.renderPass = render_pass,
+		.renderPass = m_render_pass->m_render_pass,
 		.attachmentCount = 1,
-		.pAttachments = &image_view,
+		.pAttachments = &m_image_view,
 		.width = extent.width,
 		.height = extent.height,
 		.layers = 1
@@ -45,17 +47,33 @@ void VK_CLASS(FrameBuffer)::create_frame_buffer(VkImageView image_view, VkRender
 
 VK_CLASS(SwapChain)::~VK_CLASS(SwapChain)()
 {
-	VkDevice divece = g_system_context->g_render_system->m_drawable->m_device->m_device;
-	for (auto& image_view : m_image_views)
-		vkDestroyImageView(divece, image_view, nullptr);
-	vkDestroySwapchainKHR(divece, m_swap_chain, nullptr);
+	vkDestroySwapchainKHR(g_system_context->g_render_system->m_drawable->m_device->m_device, m_swap_chain, nullptr);
 }
 
-void VK_CLASS(SwapChain)::create_frame_buffers(VkRenderPass render_pass)
+const std::shared_ptr<VK_CLASS(Framebuffer)>& VK_CLASS(SwapChain)::current_frame_buffer() const
 {
-	m_frame_buffers.resize(m_image_views.size());
-	for (size_t i = 0; i < m_image_views.size(); ++i)
-		m_frame_buffers[i].initialize(m_image_views[i], render_pass);
+	return m_frame_buffers[m_image_index];
+}
+
+void VK_CLASS(SwapChain)::acquire_next_image()
+{
+	auto drawable = g_system_context->g_render_system->m_drawable;
+	VK_CHECK_RESULT(vkAcquireNextImageKHR(
+		drawable->m_device->m_device,
+		m_swap_chain, 
+		UINT64_MAX, 
+		drawable->m_command_buffer->m_image_available_semaphores[drawable->m_command_buffer->m_current_frame].m_semaphore,
+		VK_NULL_HANDLE, 
+		&m_image_index));
+}
+
+void VK_CLASS(SwapChain)::create_frame_buffers(const std::shared_ptr<VK_CLASS(RenderPass)>& render_pass)
+{
+	for (auto& frame_buffer : m_frame_buffers)
+	{
+		frame_buffer->set_render_pass(render_pass);
+		frame_buffer->initialize();
+	}
 }
 
 void VK_CLASS(SwapChain)::initialize()
@@ -112,9 +130,11 @@ void VK_CLASS(SwapChain)::create_swap_chain()
 
 void VK_CLASS(SwapChain)::create_image_views()
 {
-	m_image_views.resize(m_images.size());
+	m_frame_buffers.resize(m_images.size());
 	for (size_t i = 0; i < m_images.size(); ++i)
 	{
+		m_frame_buffers[i] = std::make_shared<VK_CLASS(Framebuffer)>();
+
 		VkImageViewCreateInfo create_info{
 			.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO,
 			.image = m_images[i],
@@ -134,7 +154,7 @@ void VK_CLASS(SwapChain)::create_image_views()
 				.layerCount = 1
 			}
 		};
-		VK_CHECK_RESULT(vkCreateImageView(g_system_context->g_render_system->m_drawable->m_device->m_device, &create_info, nullptr, &m_image_views[i]));
+		VK_CHECK_RESULT(vkCreateImageView(g_system_context->g_render_system->m_drawable->m_device->m_device, &create_info, nullptr, &m_frame_buffers[i]->m_image_view));
 	}
 }
 
@@ -142,6 +162,5 @@ constexpr RHIFlag VK_CLASS(SwapChain)::flag() const
 {
 	return RHIFlag::e_swap_chain;
 }
-
 
 ENGINE_NAMESPACE_END

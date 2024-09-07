@@ -156,6 +156,26 @@ VK_CLASS(Device)::~VK_CLASS(Device)()
 	vkDestroyDevice(m_device, nullptr);
 }
 
+void VK_CLASS(Device)::present() const
+{
+	auto drawable = g_system_context->g_render_system->m_drawable;
+	auto swap_chain = drawable->m_swap_chain;
+	VkPresentInfoKHR present_info{
+		.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR,
+		.waitSemaphoreCount = 1,
+		.pWaitSemaphores = &drawable->m_command_buffer->m_render_finished_semaphores[drawable->m_command_buffer->m_current_frame].m_semaphore,
+		.swapchainCount = 1,
+		.pSwapchains = &swap_chain->m_swap_chain,
+		.pImageIndices = &swap_chain->m_image_index
+	};
+	VK_CHECK_RESULT(vkQueuePresentKHR(m_present_queue, &present_info));
+}
+
+void VK_CLASS(Device)::wait_idle() const
+{
+	VK_CHECK_RESULT(vkDeviceWaitIdle(m_device));
+}
+
 void VK_CLASS(Device)::initialize()
 {
 	create_logical_device();

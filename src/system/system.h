@@ -12,8 +12,9 @@ class System final
 {
 public:
 	System() = default;
-	~System() = default;
+	~System();
 	void initialize();
+	void run();
 public:
 	std::shared_ptr<Window>		g_window_system;
 	std::shared_ptr<Renderer>	g_render_system;
