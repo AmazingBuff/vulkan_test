@@ -5,7 +5,7 @@
 #include "window/window.h"
 #include <SDL2/SDL_vulkan.h>
 
-RHI_NAMESPACE_BEGIN
+ENGINE_NAMESPACE_BEGIN
 
 static int rate_score(VkPhysicalDevice device, VK_CLASS(PhysicalDevice)& physical_device)
 {
@@ -226,4 +226,4 @@ void VK_CLASS(Device)::create_logical_device()
 	vkGetDeviceQueue(m_device, physical_device->m_indices.present_family.value(), 0, &m_present_queue);
 }
 
-RHI_NAMESPACE_END
+ENGINE_NAMESPACE_END

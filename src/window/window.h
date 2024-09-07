@@ -4,7 +4,7 @@
 #define SDL_MAIN_HANDLED
 #include <SDL2/SDL.h>
 
-AMAZING_NAMESPACE_BEGIN
+ENGINE_NAMESPACE_BEGIN
 
 static const char* Window_Title = "Vulkan Window";
 static constexpr int Window_Width = 1280;
@@ -22,4 +22,4 @@ private:
 };
 
 
-AMAZING_NAMESPACE_END
+ENGINE_NAMESPACE_END

@@ -3,7 +3,7 @@
 #include "types.h"
 #include "utils/util.h"
 
-RHI_NAMESPACE_BEGIN
+ENGINE_NAMESPACE_BEGIN
 
 class VK_CLASS(PipelineLayout) final : public RHI
 {
@@ -58,4 +58,4 @@ private:
 };
 
 
-RHI_NAMESPACE_END
+ENGINE_NAMESPACE_END

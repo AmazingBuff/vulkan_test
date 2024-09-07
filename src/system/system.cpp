@@ -3,7 +3,7 @@
 #include "rendering/renderer.h"
 
 
-AMAZING_NAMESPACE_BEGIN
+ENGINE_NAMESPACE_BEGIN
 
 std::unique_ptr<System> g_system_context = std::make_unique<System>();
 
@@ -15,4 +15,4 @@ void System::initialize()
 	g_render_system->initialize();
 }
 
-AMAZING_NAMESPACE_END
+ENGINE_NAMESPACE_END

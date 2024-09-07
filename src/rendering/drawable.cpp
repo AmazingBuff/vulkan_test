@@ -1,6 +1,6 @@
 #include "drawable.h"
 
-RENDERING_NAMESPACE_BEGIN
+ENGINE_NAMESPACE_BEGIN
 
 void Drawable::initialize()
 {
@@ -18,4 +18,4 @@ void Drawable::initialize()
 	m_pipeline->initialize();
 }
 
-RENDERING_NAMESPACE_END
+ENGINE_NAMESPACE_END

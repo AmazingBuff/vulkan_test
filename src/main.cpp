@@ -11,7 +11,7 @@
 
 int main()
 {
-    Amazing::g_system_context->initialize();
+    ENGINE_NAMESPACE::g_system_context->initialize();
 
     return 0;
 }

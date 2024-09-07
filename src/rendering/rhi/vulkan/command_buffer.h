@@ -2,7 +2,7 @@
 
 #include "types.h"
 
-RHI_NAMESPACE_BEGIN
+ENGINE_NAMESPACE_BEGIN
 
 class VK_CLASS(CommandBuffer) final : public RHI
 {
@@ -11,6 +11,7 @@ public:
 	~VK_CLASS(CommandBuffer)() override;
 	void initialize() override;
 	void begin_record_command() const;
+	NODISCARD constexpr RHIFlag flag() const override;
 private:
 	void create_command_pool();
 	void create_command_buffer();
@@ -20,4 +21,4 @@ private:
 };
 
 
-RHI_NAMESPACE_END
+ENGINE_NAMESPACE_END

@@ -1,8 +1,8 @@
 #pragma once
 
-#include "render_info.h"
+#include "render_types.h"
 
-AMAZING_NAMESPACE_BEGIN
+ENGINE_NAMESPACE_BEGIN
 
 class Renderer
 {
@@ -17,4 +17,4 @@ public:
 };
 
 
-AMAZING_NAMESPACE_END
+ENGINE_NAMESPACE_END

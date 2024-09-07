@@ -2,7 +2,7 @@
 #include "base/util.h"
 #include "rendering/utils/util.h"
 
-RESOURCE_NAMESPACE_BEGIN
+ENGINE_NAMESPACE_BEGIN
 
 #define SHADER_PATH SOURCES_DIR"/res/shaders/"
 
@@ -77,4 +77,4 @@ NODISCARD const ShaderResource& ShaderManager::get_shader_resource(const std::st
 	}
 }
 
-RESOURCE_NAMESPACE_END
+ENGINE_NAMESPACE_END

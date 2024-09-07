@@ -2,7 +2,7 @@
 #include "rendering/rhi/vulkan/types.h"
 #include <traits/func.h>
 
-RHI_NAMESPACE_BEGIN
+ENGINE_NAMESPACE_BEGIN
 
 const char* vk_result_convert(VkResult res);
 
@@ -46,4 +46,4 @@ inline auto vkEnumerateProperties(F&& func, Args&&... args)
 }
 
 
-RHI_NAMESPACE_END
+ENGINE_NAMESPACE_END

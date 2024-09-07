@@ -3,7 +3,7 @@
 #include "types.h"
 #include "utils/util.h"
 
-RHI_NAMESPACE_BEGIN
+ENGINE_NAMESPACE_BEGIN
 
 class VK_CLASS(FrameBuffer) final : public RHI
 {
@@ -58,4 +58,4 @@ private:
 	friend class VK_CLASS(FrameBuffer);
 };
 
-RHI_NAMESPACE_END
+ENGINE_NAMESPACE_END

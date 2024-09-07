@@ -7,18 +7,10 @@
 #include "utils/volk.h"
 #include "rendering/rhi/rhi.h"
 
-#define VK_NAMESPACE_BEGIN				RHI_NAMESPACE_BEGIN			\
-										NAMESPACE_BEGIN(Vulkan)
-
-#define VK_NAMESPACE_END				NAMESPACE_END(Vulkan)		\
-										RHI_NAMESPACE_END
-#define VK_NAMESPACE 					NAMESPACE_CONCAT(RHI_NAMESPACE, NAMESPACE(Vulkan))
-#define VK_NAMESPACE_VARIABLE(var)		NAMESPACE_VARIABLE(VK_NAMESPACE, var)
-
 #define VK_TYPE_INIT(type, name)		type name = VK_NULL_HANDLE
 #define VK_CLASS(name)					RHI_CLASS(Vulkan, name)
 
-RHI_NAMESPACE_BEGIN
+ENGINE_NAMESPACE_BEGIN
 
 static const char* Shader_Compiler = "glslc.exe";
 static const char* Shader_Compiler_Path = "D:/env/Vulkan/1.3.290.0/Bin/glslc.exe";
@@ -49,4 +41,4 @@ class VK_CLASS(Pipeline);
 class VK_CLASS(FrameBuffer);
 class VK_CLASS(CommandBuffer);
 
-RHI_NAMESPACE_END
+ENGINE_NAMESPACE_END

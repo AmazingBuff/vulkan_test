@@ -4,7 +4,7 @@
 #include "system/system.h"
 #include <SDL2/SDL_vulkan.h>
 
-RHI_NAMESPACE_BEGIN
+ENGINE_NAMESPACE_BEGIN
 
 #if defined(_DEBUG) || defined(DEBUG)
 static VKAPI_ATTR VkBool32 VKAPI_CALL debug_callback(
@@ -179,4 +179,4 @@ void VK_CLASS(Instance)::setup_debug_messenger()
 
 #endif
 
-RHI_NAMESPACE_END
+ENGINE_NAMESPACE_END

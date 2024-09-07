@@ -2,7 +2,7 @@
 
 #include "rendering/resources/resource_types.h"
 
-RESOURCE_NAMESPACE_BEGIN
+ENGINE_NAMESPACE_BEGIN
 
 struct ShaderResource
 {
@@ -17,4 +17,4 @@ struct ShaderResource
 	}
 };
 
-RESOURCE_NAMESPACE_END
+ENGINE_NAMESPACE_END

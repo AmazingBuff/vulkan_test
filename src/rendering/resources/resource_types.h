@@ -1,11 +1,11 @@
 #pragma once
 
-#include "rendering/render_types.h"
+#include "base/macro.h"
 
-#define RESOURCE_NAMESPACE_BEGIN				RENDERING_NAMESPACE_BEGIN		\
-												NAMESPACE_BEGIN(Resource)	
-#define RESOURCE_NAMESPACE_END					NAMESPACE_END(Resource)			\
-												RENDERING_NAMESPACE_END
 
-#define RESOURCE_NAMESPACE						NAMESPACE_CONCAT(RENDERING_NAMESPACE, NAMESPACE(Resource))
-#define RESOURCE_NAMESPACE_VARIABLE(var)		NAMESPACE_VARIABLE(RESOURCE_NAMESPACE, var)
+ENGINE_NAMESPACE_BEGIN
+
+class ShaderResource;
+class ShaderManager;
+
+ENGINE_NAMESPACE_END

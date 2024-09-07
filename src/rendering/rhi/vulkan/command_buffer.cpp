@@ -3,12 +3,17 @@
 #include "rendering/renderer.h"
 #include "rendering/drawable.h"
 
-RHI_NAMESPACE_BEGIN
+ENGINE_NAMESPACE_BEGIN
 
 
 VK_CLASS(CommandBuffer)::~VK_CLASS(CommandBuffer)()
 {
 	vkDestroyCommandPool(g_system_context->g_render_system->m_drawable->m_device->m_device, m_command_pool, nullptr);
+}
+
+constexpr NODISCARD RHIFlag VK_CLASS(CommandBuffer)::flag() const
+{
+	return RHIFlag::e_command_buffer;
 }
 
 void VK_CLASS(CommandBuffer)::begin_record_command() const
@@ -53,4 +58,4 @@ void VK_CLASS(CommandBuffer)::create_command_buffer()
 	VK_CHECK_RESULT(vkAllocateCommandBuffers(drawable->m_device->m_device, &allocate_info, &m_command_buffer));
 }
 
-RHI_NAMESPACE_END
+ENGINE_NAMESPACE_END

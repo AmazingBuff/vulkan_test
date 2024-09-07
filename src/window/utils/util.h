@@ -3,10 +3,10 @@
 #include "window/window.h"
 #include "base/logger.h"
 
-AMAZING_NAMESPACE_BEGIN
+ENGINE_NAMESPACE_BEGIN
 
 #define WINDOW_LOG_INFO(message)		LOG_INFO("Window", message)
 #define WINDOW_LOG_WARNING(message)		LOG_WARNING("Window", message)
 #define WINDOW_LOG_ERROR(message)		LOG_ERROR("Window", message)
 
-AMAZING_NAMESPACE_END
+ENGINE_NAMESPACE_END

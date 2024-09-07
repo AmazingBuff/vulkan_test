@@ -2,8 +2,10 @@
 #include "system/system.h"
 #include "rendering/renderer.h"
 #include "rendering/drawable.h"
+#include "rendering/render_resouces.h"
+#include "rendering/resources/shader/shader_manager.h"
 
-RHI_NAMESPACE_BEGIN
+ENGINE_NAMESPACE_BEGIN
 
 static VkShaderModule create_shader_module(VkDevice device, const std::vector<char>& code)
 {
@@ -265,6 +267,4 @@ void VK_CLASS(Pipeline)::create_pipeline()
 	vkDestroyShaderModule(device, vert_shader_module, nullptr);
 }
 
-RHI_NAMESPACE_END
-
-
+ENGINE_NAMESPACE_END

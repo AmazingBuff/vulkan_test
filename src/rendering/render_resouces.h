@@ -1,9 +1,9 @@
 #pragma once
 
 #include "render_types.h"
-#include "resources/resource.h"
+#include "resources/resource_types.h"
 
-RENDERING_NAMESPACE_BEGIN
+ENGINE_NAMESPACE_BEGIN
 
 class RenderResources final
 {
@@ -13,7 +13,7 @@ public:
 	void initialize();
 	NODISCARD const ShaderResource& get_shader_resource(const std::string& name);
 private:
-	std::unique_ptr<ShaderManager>		m_shader_manager;
+	std::shared_ptr<ShaderManager>		m_shader_manager;
 };
 
-RENDERING_NAMESPACE_END
+ENGINE_NAMESPACE_END

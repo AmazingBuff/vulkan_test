@@ -4,7 +4,7 @@
 #include "rendering/drawable.h"
 
 
-RHI_NAMESPACE_BEGIN
+ENGINE_NAMESPACE_BEGIN
 
 VK_CLASS(FrameBuffer)::~VK_CLASS(FrameBuffer)()
 {
@@ -14,6 +14,11 @@ VK_CLASS(FrameBuffer)::~VK_CLASS(FrameBuffer)()
 constexpr NODISCARD RHIFlag VK_CLASS(FrameBuffer)::flag() const
 {
 	return RHIFlag::e_framebuffer;
+}
+
+void VK_CLASS(FrameBuffer)::initialize()
+{
+	
 }
 
 void VK_CLASS(FrameBuffer)::initialize(VkImageView image_view, VkRenderPass render_pass)
@@ -139,4 +144,4 @@ constexpr RHIFlag VK_CLASS(SwapChain)::flag() const
 }
 
 
-RHI_NAMESPACE_END
+ENGINE_NAMESPACE_END

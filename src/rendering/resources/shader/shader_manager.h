@@ -2,7 +2,7 @@
 
 #include "shader.h"
 
-RESOURCE_NAMESPACE_BEGIN
+ENGINE_NAMESPACE_BEGIN
 
 class ShaderManager final
 {
@@ -18,4 +18,4 @@ private:
 	std::unordered_map<std::string, ShaderResource>		m_shader_resources;
 };
 
-RESOURCE_NAMESPACE_END
+ENGINE_NAMESPACE_END

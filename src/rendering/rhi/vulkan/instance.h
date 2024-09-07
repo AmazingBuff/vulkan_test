@@ -3,7 +3,7 @@
 #include "types.h"
 #include "utils/util.h"
 
-RHI_NAMESPACE_BEGIN
+ENGINE_NAMESPACE_BEGIN
 
 class VK_CLASS(Instance) final : public RHI
 {
@@ -30,4 +30,4 @@ private:
 	friend class VK_CLASS(SwapChain);
 };
 
-RHI_NAMESPACE_END
+ENGINE_NAMESPACE_END

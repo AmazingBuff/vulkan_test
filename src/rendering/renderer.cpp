@@ -2,7 +2,7 @@
 #include "render_resouces.h"
 #include "drawable.h"
 
-AMAZING_NAMESPACE_BEGIN
+ENGINE_NAMESPACE_BEGIN
 
 void Renderer::initialize()
 {
@@ -14,6 +14,6 @@ void Renderer::initialize()
 
 
 
-AMAZING_NAMESPACE_END
+ENGINE_NAMESPACE_END
 
 

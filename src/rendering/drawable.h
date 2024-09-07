@@ -3,7 +3,7 @@
 #include "rhi/interface.h"
 
 
-RENDERING_NAMESPACE_BEGIN
+ENGINE_NAMESPACE_BEGIN
 
 class Drawable
 {
@@ -23,4 +23,4 @@ public:
 };
 
 
-RENDERING_NAMESPACE_END
+ENGINE_NAMESPACE_END

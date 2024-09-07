@@ -2,7 +2,7 @@
 
 #include "instance.h"
 
-RHI_NAMESPACE_BEGIN
+ENGINE_NAMESPACE_BEGIN
 
 class VK_CLASS(PhysicalDevice) final : public RHI
 {
@@ -91,4 +91,4 @@ private:
 	friend class VK_CLASS(CommandBuffer);
 };
 
-RHI_NAMESPACE_END
+ENGINE_NAMESPACE_END

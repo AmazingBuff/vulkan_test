@@ -3,7 +3,7 @@
 #include "base/macro.h"
 #include "base/template.h"
 
-AMAZING_NAMESPACE_BEGIN
+ENGINE_NAMESPACE_BEGIN
 
 class Window;
 class Renderer;
@@ -21,4 +21,4 @@ public:
 
 extern std::unique_ptr<System> g_system_context;
 
-AMAZING_NAMESPACE_END
+ENGINE_NAMESPACE_END
