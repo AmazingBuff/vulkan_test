@@ -1,8 +1,23 @@
 #pragma once
 #include "rendering/rhi/vulkan/types.h"
+#include "base/util.h"
 #include <traits/func.h>
 
 ENGINE_NAMESPACE_BEGIN
+
+struct SwapChainSupportDetails
+{
+	std::optional<VkSurfaceCapabilitiesKHR>		capabilities;
+	std::vector<VkSurfaceFormatKHR>				formats;
+	std::vector<VkPresentModeKHR>				present_modes;
+
+	NODISCARD constexpr operator bool() const
+	{
+		return capabilities.has_value() && !formats.empty() && !present_modes.empty();
+	}
+};
+
+
 
 const char* vk_result_convert(VkResult res);
 
@@ -12,14 +27,18 @@ const char* vk_result_convert(VkResult res);
 	VkResult res = expr;																			\
 	if (res != VK_SUCCESS)																			\
 	{																								\
-		std::cerr << "Fatal : VkResult is \"" << vk_result_convert(res)								\
-					<< "\" in "	<< __FILE__	<< " at line " << __LINE__ << std::endl;				\
-		ASSERT(res == VK_SUCCESS);																	\
+		const char* message = vk_result_convert(res);												\
+		std::cerr << "Fatal : VkResult is \"" << message											\
+					<< "\" in "	<< __FILE__	<< " in function " << __FUNCTION__						\
+					<< " at line " << __LINE__ << std::endl;										\
+		fatal_error(message);																		\
 	}																								\
 }
 #else
 #define VK_CHECK_RESULT(expr) (expr)
 #endif
+
+SwapChainSupportDetails query_swap_chain_support(VkPhysicalDevice physical_device, VkSurfaceKHR surface);
 
 template<typename F, typename... Args>
 	requires(!std::is_same_v<typename Trait::function_traits<std::decay_t<F>>::return_type, void>)
@@ -27,9 +46,9 @@ inline auto vkEnumerateProperties(F&& func, Args&&... args)
 {
 	using type = std::remove_pointer_t<typename Trait::tail_type_t<typename Trait::function_traits<std::decay_t<F>>::argument_type>>;
 	uint32_t count = 0;
-	VK_CHECK_RESULT(std::invoke(std::forward<F>(func), std::forward<Args>(args)..., &count, nullptr));
+	VK_CHECK_RESULT(Trait::invoke(std::forward<F>(func), std::forward<Args>(args)..., &count, nullptr));
 	std::vector<type> properties(count);
-	VK_CHECK_RESULT(std::invoke(std::forward<F>(func), std::forward<Args>(args)..., &count, properties.data()));
+	VK_CHECK_RESULT(Trait::invoke(std::forward<F>(func), std::forward<Args>(args)..., &count, properties.data()));
 	return properties;
 }
 
@@ -39,9 +58,9 @@ inline auto vkEnumerateProperties(F&& func, Args&&... args)
 {
 	using type = std::remove_pointer_t<typename Trait::tail_type_t<typename Trait::function_traits<std::decay_t<F>>::argument_type>>;
 	uint32_t count = 0;
-	std::invoke(std::forward<F>(func), std::forward<Args>(args)..., &count, nullptr);
+	Trait::invoke(std::forward<F>(func), std::forward<Args>(args)..., &count, nullptr);
 	std::vector<type> properties(count);
-	std::invoke(std::forward<F>(func), std::forward<Args>(args)..., &count, properties.data());
+	Trait::invoke(std::forward<F>(func), std::forward<Args>(args)..., &count, properties.data());
 	return properties;
 }
 

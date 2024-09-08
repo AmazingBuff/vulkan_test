@@ -30,5 +30,3 @@ using Semaphore = RHI_USING_CLASS(Semaphore);
 using Fence = RHI_USING_CLASS(Fence);
 
 ENGINE_NAMESPACE_END
-
-#undef RHI_USING_CLASS

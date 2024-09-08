@@ -72,7 +72,7 @@ void VK_CLASS(RenderPass)::create_render_pass()
 	auto swap_chain = g_system_context->g_render_system->m_drawable->m_swap_chain;
 
 	VkAttachmentDescription color_attachment{
-		.format = swap_chain->m_info.format.value(),
+		.format = swap_chain->m_details.format.value().format,
 		.samples = VK_SAMPLE_COUNT_1_BIT,
 		.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR,
 		.storeOp = VK_ATTACHMENT_STORE_OP_STORE,
@@ -190,7 +190,7 @@ void VK_CLASS(Pipeline)::create_pipeline()
 		.primitiveRestartEnable = VK_FALSE
 	};
 
-	auto& extent = g_system_context->g_render_system->m_drawable->m_swap_chain->m_info.extent.value();
+	auto& extent = g_system_context->g_render_system->m_drawable->m_swap_chain->m_details.extent.value();
 	VkViewport viewport{
 		.x = 0.0f,
 		.y = 0.0f,

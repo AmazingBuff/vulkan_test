@@ -1,4 +1,5 @@
 #include "logger.h"
+#include "util.h"
 
 void Logger::log(const Level& level, const char* loc, const char* message)
 {
@@ -11,8 +12,7 @@ void Logger::log(const Level& level, const char* loc, const char* message)
 		std::cerr << "[" << loc << ", Warning]: " << message << std::endl;
 		break;
 	case Level::e_error:
-		std::cerr << "[" << loc << ", Error]: " << message << std::endl;
-		std::exit(EXIT_FAILURE);
+		fatal_error(message);
 		break;
 	}
 }

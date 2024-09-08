@@ -63,5 +63,15 @@ const char* vk_result_convert(VkResult res)
 
 #undef SWITCH_BRANCH
 
+SwapChainSupportDetails query_swap_chain_support(VkPhysicalDevice physical_device, VkSurfaceKHR surface)
+{
+    SwapChainSupportDetails support_details;
+    VkSurfaceCapabilitiesKHR capabilities;
+    VK_CHECK_RESULT(vkGetPhysicalDeviceSurfaceCapabilitiesKHR(physical_device, surface, &capabilities));
+    support_details.capabilities = std::move(capabilities);
+    support_details.formats = vkEnumerateProperties(vkGetPhysicalDeviceSurfaceFormatsKHR, physical_device, surface);
+    support_details.present_modes = vkEnumerateProperties(vkGetPhysicalDeviceSurfacePresentModesKHR, physical_device, surface);
+    return support_details;
+}
 
 ENGINE_NAMESPACE_END

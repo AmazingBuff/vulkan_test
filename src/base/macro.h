@@ -27,6 +27,7 @@
 #define ZERO_MEMORY(ptr, size)			memset(ptr, 0, size)
 
 #define NODISCARD						[[nodiscard]]
+#define NORETURN						[[noreturn]]
 
 #if defined(_DEBUG) || defined(DEBUG)
 #define ASSERT(expr)					assert(expr)

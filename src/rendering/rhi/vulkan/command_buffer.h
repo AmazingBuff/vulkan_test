@@ -13,6 +13,7 @@ public:
 	void initialize() override;
 	// wait for previous frame
 	void wait() const;
+	// reset command buffer and fence
 	void reset() const;
 	void begin_record_command() const;
 	void begin_render_pass(const std::shared_ptr<VK_CLASS(RenderPass)>& render_pass, const std::shared_ptr<VK_CLASS(Framebuffer)>& framebuffer) const;
@@ -28,14 +29,14 @@ private:
 	void create_command_buffer();
 	void create_sync_objects();
 private:
-	std::array<VkCommandBuffer, k_Max_Frames_In_Flight>			m_command_buffers{};
-	std::array<VK_CLASS(Semaphore), k_Max_Frames_In_Flight>		m_image_available_semaphores{};
-	std::array<VK_CLASS(Semaphore), k_Max_Frames_In_Flight>		m_render_finished_semaphores{};
-	std::array<VK_CLASS(Fence), k_Max_Frames_In_Flight>			m_in_flight_fences{};
+	std::array<VkCommandBuffer, k_Max_Frames_In_Flight>								m_command_buffers{};
+	std::array<std::shared_ptr<VK_CLASS(Semaphore)>, k_Max_Frames_In_Flight>		m_image_available_semaphores;
+	std::array<std::shared_ptr<VK_CLASS(Semaphore)>, k_Max_Frames_In_Flight>		m_render_finished_semaphores;
+	std::array<std::shared_ptr<VK_CLASS(Fence)>, k_Max_Frames_In_Flight>			m_in_flight_fences;
 
-	uint32_t													m_current_frame = 0;
+	uint32_t																		m_current_frame = 0;
 private:
-	VK_TYPE_INIT(VkCommandPool,									m_command_pool);
+	VK_TYPE_INIT(VkCommandPool,														m_command_pool);
 
 	friend class VK_CLASS(Device);
 	friend class VK_CLASS(SwapChain);

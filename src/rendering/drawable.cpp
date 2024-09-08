@@ -1,6 +1,12 @@
 #include "drawable.h"
+#include "window/window.h"
 
 ENGINE_NAMESPACE_BEGIN
+
+Drawable::~Drawable()
+{
+	m_device->wait_idle();
+}
 
 void Drawable::initialize()
 {
@@ -33,12 +39,16 @@ void Drawable::initialize()
 	m_pipeline->initialize();
 }
 
-void Drawable::draw() const
+void Drawable::draw(const RHIRenderInfos& info)
 {
 	// wait for previous frame
 	m_command_buffer->wait();
 	// acquire next image
-	m_swap_chain->acquire_next_image();
+	if (!m_swap_chain->acquire_next_image())
+	{
+		recreate_swap_chain();
+		return;
+	}
 
 	m_command_buffer->reset();
 	// begin record command
@@ -53,14 +63,24 @@ void Drawable::draw() const
 	m_command_buffer->submit();
 
 	// present
-	m_device->present();
-
+	if(!m_device->present() || info.framebuffer_resized)
+		recreate_swap_chain();
+	
+	// refresh frame
 	m_command_buffer->refresh_frame();
 }
 
-void Drawable::wait_idle() const
+void Drawable::recreate_swap_chain()
 {
+	// minimization
+	SDL_Event event;
+	while (m_swap_chain->is_minimization())
+		SDL_WaitEvent(&event);
+
 	m_device->wait_idle();
+	m_swap_chain = std::make_shared<SwapChain>();
+	m_swap_chain->initialize();
+	m_swap_chain->create_frame_buffers(m_render_pass);
 }
 
 ENGINE_NAMESPACE_END

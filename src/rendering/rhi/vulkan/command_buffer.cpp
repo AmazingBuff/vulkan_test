@@ -13,11 +13,12 @@ VK_CLASS(CommandBuffer)::~VK_CLASS(CommandBuffer)()
 
 void VK_CLASS(CommandBuffer)::wait() const
 {
-	m_in_flight_fences[m_current_frame].wait_and_reset();
+	m_in_flight_fences[m_current_frame]->wait();
 }
 
 void VK_CLASS(CommandBuffer)::reset() const
 {
+	m_in_flight_fences[m_current_frame]->reset();
 	VK_CHECK_RESULT(vkResetCommandBuffer(m_command_buffers[m_current_frame], 0));
 }
 
@@ -32,7 +33,7 @@ void VK_CLASS(CommandBuffer)::begin_render_pass(const std::shared_ptr<VK_CLASS(R
 		.framebuffer = framebuffer->m_frame_buffer,
 		.renderArea = {
 			.offset = {0, 0},
-			.extent = g_system_context->g_render_system->m_drawable->m_swap_chain->m_info.extent.value()
+			.extent = g_system_context->g_render_system->m_drawable->m_swap_chain->m_details.extent.value()
 		},
 		.clearValueCount = 1,
 		.pClearValues = &clear_color
@@ -50,7 +51,7 @@ void VK_CLASS(CommandBuffer)::bind_pipeline(const std::shared_ptr<VK_CLASS(Pipel
 {
 	vkCmdBindPipeline(m_command_buffers[m_current_frame], VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline->m_pipeline);
 
-	auto& extent = g_system_context->g_render_system->m_drawable->m_swap_chain->m_info.extent.value();
+	auto& extent = g_system_context->g_render_system->m_drawable->m_swap_chain->m_details.extent.value();
 	VkViewport viewport{
 		.x = 0.0f,
 		.y = 0.0f,
@@ -96,8 +97,8 @@ void VK_CLASS(CommandBuffer)::draw(uint32_t vertex_count, uint32_t instance_coun
 
 void VK_CLASS(CommandBuffer)::submit() const
 {
-	VkSemaphore wait_semaphores[] = { m_image_available_semaphores[m_current_frame].m_semaphore};
-	VkSemaphore signal_semaphores[] = { m_render_finished_semaphores[m_current_frame].m_semaphore };
+	VkSemaphore wait_semaphores[] = { m_image_available_semaphores[m_current_frame]->m_semaphore};
+	VkSemaphore signal_semaphores[] = { m_render_finished_semaphores[m_current_frame]->m_semaphore };
 	VkPipelineStageFlags wait_stages[] = { VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT };
 
 	VkSubmitInfo submit_info{
@@ -111,7 +112,7 @@ void VK_CLASS(CommandBuffer)::submit() const
 		.pSignalSemaphores = signal_semaphores
 	};
 
-	VK_CHECK_RESULT(vkQueueSubmit(g_system_context->g_render_system->m_drawable->m_device->m_graphics_queue, 1, &submit_info, m_in_flight_fences[m_current_frame].m_fence));
+	VK_CHECK_RESULT(vkQueueSubmit(g_system_context->g_render_system->m_drawable->m_device->m_graphics_queue, 1, &submit_info, m_in_flight_fences[m_current_frame]->m_fence));
 }
 
 void VK_CLASS(CommandBuffer)::refresh_frame()
@@ -155,9 +156,12 @@ void VK_CLASS(CommandBuffer)::create_sync_objects()
 {
 	for (uint32_t i = 0; i < k_Max_Frames_In_Flight; i++)
 	{
-		m_image_available_semaphores[i].initialize();
-		m_render_finished_semaphores[i].initialize();
-		m_in_flight_fences[i].initialize();
+		m_image_available_semaphores[i] = std::make_shared<VK_CLASS(Semaphore)>();
+		m_image_available_semaphores[i]->initialize();
+		m_render_finished_semaphores[i] = std::make_shared<VK_CLASS(Semaphore)>();
+		m_render_finished_semaphores[i]->initialize();
+		m_in_flight_fences[i] = std::make_shared<VK_CLASS(Fence)>();
+		m_in_flight_fences[i]->initialize();
 	}
 }
 

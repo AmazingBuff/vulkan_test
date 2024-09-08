@@ -5,6 +5,12 @@
 
 ENGINE_NAMESPACE_BEGIN
 
+struct RenderInfos
+{
+	bool framebuffer_resized = false;
+};
+
+
 class RenderResources;
 class Drawable;
 

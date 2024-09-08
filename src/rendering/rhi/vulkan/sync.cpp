@@ -21,7 +21,7 @@ void VK_CLASS(Semaphore)::initialize()
 	VkSemaphoreCreateInfo semaphore_create_info{
 		.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO
 	};
-
+	
 	VK_CHECK_RESULT(vkCreateSemaphore(g_system_context->g_render_system->m_drawable->m_device->m_device, &semaphore_create_info, nullptr, &m_semaphore));
 }
 
@@ -32,11 +32,14 @@ VK_CLASS(Fence)::~VK_CLASS(Fence)()
 	vkDestroyFence(g_system_context->g_render_system->m_drawable->m_device->m_device, m_fence, nullptr);
 }
 
-void VK_CLASS(Fence)::wait_and_reset() const
+void VK_CLASS(Fence)::reset() const
 {
-	auto device = g_system_context->g_render_system->m_drawable->m_device->m_device;
-	VK_CHECK_RESULT(vkWaitForFences(device, 1, &m_fence, VK_TRUE, UINT64_MAX));
-	VK_CHECK_RESULT(vkResetFences(device, 1, &m_fence));
+	VK_CHECK_RESULT(vkResetFences(g_system_context->g_render_system->m_drawable->m_device->m_device, 1, &m_fence));
+}
+
+void VK_CLASS(Fence)::wait() const
+{
+	VK_CHECK_RESULT(vkWaitForFences(g_system_context->g_render_system->m_drawable->m_device->m_device, 1, &m_fence, VK_TRUE, UINT64_MAX));
 }
 
 constexpr NODISCARD RHIFlag VK_CLASS(Fence)::flag() const

@@ -2,8 +2,6 @@
 #include "system/system.h"
 #include "rendering/renderer.h"
 #include "rendering/drawable.h"
-#include "window/window.h"
-#include <SDL2/SDL_vulkan.h>
 
 ENGINE_NAMESPACE_BEGIN
 
@@ -59,21 +57,9 @@ static bool check_device_extension_support(VkPhysicalDevice device)
 	return required_extensions.empty();
 }
 
-static VK_CLASS(PhysicalDevice)::SwapChainSupportDetails query_swap_chain_support(VkPhysicalDevice physical_device, VkSurfaceKHR surface)
-{
-	VK_CLASS(PhysicalDevice)::SwapChainSupportDetails support_details;
-	VkSurfaceCapabilitiesKHR capabilities;
-	VK_CHECK_RESULT(vkGetPhysicalDeviceSurfaceCapabilitiesKHR(physical_device, surface, &capabilities));
-	support_details.capabilities = std::move(capabilities);
-	support_details.formats = vkEnumerateProperties(vkGetPhysicalDeviceSurfaceFormatsKHR, physical_device, surface);
-	support_details.present_modes = vkEnumerateProperties(vkGetPhysicalDeviceSurfacePresentModesKHR, physical_device, surface);
-	return support_details;
-}
-
 void VK_CLASS(PhysicalDevice)::initialize()
 {
 	pick_physical_device();
-	choose_swap_chain_details();
 }
 
 constexpr RHIFlag VK_CLASS(PhysicalDevice)::flag() const
@@ -93,10 +79,11 @@ void VK_CLASS(PhysicalDevice)::pick_physical_device()
 		physical_device.m_device = device;
 		physical_device.m_indices = find_queue_families(device, instance->m_surface);
 		bool extensions_supported = check_device_extension_support(device);
+		SwapChainSupportDetails support_details;
 		if(extensions_supported)
-			physical_device.m_support_details = query_swap_chain_support(device, instance->m_surface);
+			support_details = query_swap_chain_support(device, instance->m_surface);
 		int score = rate_score(device, physical_device);
-		if (!physical_device.m_indices || !extensions_supported || !physical_device.m_support_details)
+		if (!physical_device.m_indices || !extensions_supported || !support_details)
 			score = 0;
 		else if(physical_device.m_indices.is_same_family())
 			score += 1000;
@@ -109,66 +96,30 @@ void VK_CLASS(PhysicalDevice)::pick_physical_device()
 		ASSERT(candidates.rbegin()->first > 0);
 }
 
-void VK_CLASS(PhysicalDevice)::choose_swap_chain_details()
-{
-	if(!std::any_of(m_support_details.formats.begin(), m_support_details.formats.end(), 
-		[&](const VkSurfaceFormatKHR& available_format) -> bool
-		{
-			if (available_format.format == VK_FORMAT_B8G8R8A8_SRGB &&
-				available_format.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR)
-			{
-				m_swap_chain_details.format = available_format;
-				return true;
-			}
-			else
-				return false;
-		}))
-		m_swap_chain_details.format = m_support_details.formats[0];
-
-	if (!std::any_of(m_support_details.present_modes.begin(), m_support_details.present_modes.end(),
-		[&](const VkPresentModeKHR& available_present_mode) -> bool
-		{
-			if (available_present_mode == VK_PRESENT_MODE_MAILBOX_KHR)
-			{
-				m_swap_chain_details.present_mode = available_present_mode;
-				return true;
-			}
-			else
-				return false;
-		}))
-		m_swap_chain_details.present_mode = VK_PRESENT_MODE_FIFO_KHR;
-
-	if (m_support_details.capabilities->currentExtent.width != std::numeric_limits<uint32_t>::max())
-		m_swap_chain_details.extent = m_support_details.capabilities->currentExtent;
-	else
-	{
-		int width, height;
-		SDL_Vulkan_GetDrawableSize(g_system_context->g_window_system->get_window(), &width, &height);
-		VkExtent2D actual_extent{ static_cast<uint32_t>(width), static_cast<uint32_t>(height) };
-		actual_extent.width = std::clamp(actual_extent.width, m_support_details.capabilities->minImageExtent.width, m_support_details.capabilities->maxImageExtent.width);
-		actual_extent.height = std::clamp(actual_extent.height, m_support_details.capabilities->minImageExtent.height, m_support_details.capabilities->maxImageExtent.height);
-		m_swap_chain_details.extent = actual_extent;
-	}
-}
-
 VK_CLASS(Device)::~VK_CLASS(Device)()
 {
 	vkDestroyDevice(m_device, nullptr);
 }
 
-void VK_CLASS(Device)::present() const
+bool VK_CLASS(Device)::present() const
 {
 	auto drawable = g_system_context->g_render_system->m_drawable;
 	auto swap_chain = drawable->m_swap_chain;
 	VkPresentInfoKHR present_info{
 		.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR,
 		.waitSemaphoreCount = 1,
-		.pWaitSemaphores = &drawable->m_command_buffer->m_render_finished_semaphores[drawable->m_command_buffer->m_current_frame].m_semaphore,
+		.pWaitSemaphores = &drawable->m_command_buffer->m_render_finished_semaphores[drawable->m_command_buffer->m_current_frame]->m_semaphore,
 		.swapchainCount = 1,
 		.pSwapchains = &swap_chain->m_swap_chain,
 		.pImageIndices = &swap_chain->m_image_index
 	};
-	VK_CHECK_RESULT(vkQueuePresentKHR(m_present_queue, &present_info));
+	VkResult result = vkQueuePresentKHR(m_present_queue, &present_info);
+	if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR)
+		return false;
+	else
+		VK_CHECK_RESULT(result);
+
+	return true;
 }
 
 void VK_CLASS(Device)::wait_idle() const

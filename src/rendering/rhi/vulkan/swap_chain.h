@@ -30,14 +30,15 @@ private:
 class VK_CLASS(SwapChain) final : public RHI
 {
 public:
-	struct SwapChainInfo
+	struct SwapChainDetails
 	{
-		std::optional<VkFormat> format;
-		std::optional<VkExtent2D> extent;
+		std::optional<VkSurfaceFormatKHR>		format;
+		std::optional<VkPresentModeKHR>			present_mode;
+		std::optional<VkExtent2D>				extent;
 
 		NODISCARD constexpr operator bool() const
 		{
-			return format.has_value() && extent.has_value();
+			return format.has_value() && present_mode.has_value() && extent.has_value();
 		}
 	};
 
@@ -48,19 +49,25 @@ public:
 	NODISCARD constexpr RHIFlag flag() const override;
 
 	void create_frame_buffers(const std::shared_ptr<VK_CLASS(RenderPass)>& render_pass);
-	void acquire_next_image();
+	// return false means that a new swap chain need to be created
+	NODISCARD bool acquire_next_image();
 	// must acquire next image first
-	const std::shared_ptr<VK_CLASS(Framebuffer)>& current_frame_buffer() const;
+	NODISCARD const std::shared_ptr<VK_CLASS(Framebuffer)>& current_frame_buffer() const;
+	//
+	NODISCARD bool is_minimization() const;
 private:
+	void choose_swap_chain_details();
 	void create_swap_chain();
 	void create_image_views();
 private:
 	VK_TYPE_INIT(VkSwapchainKHR,							m_swap_chain);
-	SwapChainInfo											m_info;	
+	SwapChainSupportDetails									m_support_details;	
+	SwapChainDetails										m_details;
 	std::vector<VkImage>									m_images;
 	std::vector<std::shared_ptr<VK_CLASS(Framebuffer)>>		m_frame_buffers;
 
 	uint32_t												m_image_index = 0;
+	bool													m_frame_buffer_resize = false;
 
 	friend class VK_CLASS(PipelineLayout);
 	friend class VK_CLASS(RenderPass);

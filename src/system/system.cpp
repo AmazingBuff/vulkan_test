@@ -9,7 +9,6 @@ std::unique_ptr<System> g_system_context = std::make_unique<System>();
 
 System::~System()
 {
-	g_render_system->wait_idle();
 }
 
 void System::initialize()
@@ -22,7 +21,17 @@ void System::initialize()
 
 void System::run()
 {
-	g_window_system->present();
+	WindowEvents events;
+	RenderInfos render_infos;
+	while (!events.quit)
+	{
+		g_window_system->present(events);
+		render_infos.framebuffer_resized = events.framebuffer_resized;
+		g_render_system->render(render_infos);
+
+
+		events.framebuffer_resized = false;
+	}
 }
 
 ENGINE_NAMESPACE_END

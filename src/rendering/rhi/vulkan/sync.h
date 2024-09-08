@@ -29,7 +29,8 @@ public:
 	VK_CLASS(Fence)() = default;
 	~VK_CLASS(Fence)() override;
 	void initialize() override;
-	void wait_and_reset() const;
+	void wait() const;
+	void reset() const;
 
 	NODISCARD constexpr RHIFlag flag() const override;
 private:

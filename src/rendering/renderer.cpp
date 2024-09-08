@@ -12,14 +12,11 @@ void Renderer::initialize()
 	m_drawable->initialize();
 }
 
-void Renderer::render() const
+void Renderer::render(const RenderInfos& info) const
 {
-	m_drawable->draw();
-}
-
-void Renderer::wait_idle() const
-{
-	m_drawable->wait_idle();
+	RHIRenderInfos rhi_info;
+	rhi_info.framebuffer_resized = info.framebuffer_resized;
+	m_drawable->draw(rhi_info);
 }
 
 ENGINE_NAMESPACE_END

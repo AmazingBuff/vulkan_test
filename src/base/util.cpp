@@ -1,4 +1,15 @@
 #include "util.h"
+#include "logger.h"
+
+NORETURN void fatal_error(const char* message)
+{
+	throw std::runtime_error(message);
+}
+
+NORETURN void fatal_error(const std::string& message)
+{
+	throw std::runtime_error(message);
+}
 
 std::vector<char> read_file(const std::string& filename)
 {

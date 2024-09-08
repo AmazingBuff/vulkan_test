@@ -24,29 +24,6 @@ public:
 		}
 	};
 
-	struct SwapChainSupportDetails
-	{
-		std::optional<VkSurfaceCapabilitiesKHR>		capabilities;
-		std::vector<VkSurfaceFormatKHR>				formats;
-		std::vector<VkPresentModeKHR>				present_modes;
-
-		NODISCARD constexpr operator bool() const
-		{
-			return capabilities.has_value() && !formats.empty() && !present_modes.empty();
-		}
-	};
-
-	struct SwapChainDetails
-	{
-		std::optional<VkSurfaceFormatKHR>		format;
-		std::optional<VkPresentModeKHR>			present_mode;
-		std::optional<VkExtent2D>				extent;
-
-		NODISCARD constexpr operator bool() const
-		{
-			return format.has_value() && present_mode.has_value() && extent.has_value();
-		}
-	};
 public:
 	VK_CLASS(PhysicalDevice)() = default;
 	~VK_CLASS(PhysicalDevice)() override = default;
@@ -56,11 +33,8 @@ public:
 	VkPhysicalDeviceProperties			m_properties{};
 	VkPhysicalDeviceFeatures			m_features{};
 	QueueFamilyIndices					m_indices;
-	SwapChainSupportDetails				m_support_details;
-	SwapChainDetails					m_swap_chain_details;
 private:
 	void pick_physical_device();
-	void choose_swap_chain_details();
 private:
 	VK_TYPE_INIT(VkPhysicalDevice,		m_device);
 
@@ -77,7 +51,8 @@ public:
 	void initialize() override;
 	NODISCARD constexpr RHIFlag flag() const override;
 
-	void present() const;
+	// return false means that a new swap chain need to be created
+	NODISCARD bool present() const;
 	void wait_idle() const;
 private:
 	void create_logical_device();

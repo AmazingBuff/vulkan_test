@@ -3,6 +3,7 @@
 #include "rendering/rhi/rhi.h"
 #include "system/system.h"
 #include "rendering/renderer.h"
+#include <SDL2/SDL_vulkan.h>
 
 ENGINE_NAMESPACE_BEGIN
 
@@ -17,20 +18,20 @@ void Window::initialize()
     if (SDL_Init(SDL_INIT_VIDEO) != 0)
 		WINDOW_LOG_ERROR(SDL_GetError());
 
-    SDL_WindowFlags flags;
+    Uint32 flags = SDL_WINDOW_ALLOW_HIGHDPI | SDL_WINDOW_RESIZABLE;
     switch (Hardware_API)
     {
 	case GraphicsAPI::e_opengl:
-		flags = SDL_WINDOW_OPENGL;
+		flags |= SDL_WINDOW_OPENGL;
 		break;
 	case GraphicsAPI::e_vulkan:
-		flags = SDL_WINDOW_VULKAN;
+		flags |= SDL_WINDOW_VULKAN;
 		break;
 	case GraphicsAPI::e_metal:
-		flags = SDL_WINDOW_METAL;
+		flags |= SDL_WINDOW_METAL;
 		break;
 	default:
-		flags = SDL_WINDOW_OPENGL;
+		flags |= SDL_WINDOW_OPENGL;
 		break;
     }
 
@@ -39,30 +40,24 @@ void Window::initialize()
         WINDOW_LOG_ERROR(SDL_GetError());
 }
 
-void Window::present() const
+void Window::present(WindowEvents& events) const
 {
-	bool is_running = true;
-	while(is_running)
+	SDL_Event event;
+	while (SDL_PollEvent(&event))
 	{
-		SDL_Event event;
-		while (SDL_PollEvent(&event))
+		switch (event.type)
 		{
-			switch (event.type)
-			{
-			case SDL_QUIT:
-				is_running = false;
-				break;
-			default:
-				break;
-			}
+		case SDL_QUIT:
+			events.quit = true;
+			break;
+		case SDL_WINDOWEVENT:
+			if (event.window.event == SDL_WINDOWEVENT_RESIZED)
+				events.framebuffer_resized = true;
+			break;
+		default:
+			break;
 		}
-		g_system_context->g_render_system->render();
 	}
-}
-
-NODISCARD SDL_Window* Window::get_window() const
-{
-	return m_window;
 }
 
 ENGINE_NAMESPACE_END
