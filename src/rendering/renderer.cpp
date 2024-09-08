@@ -12,11 +12,9 @@ void Renderer::initialize()
 	m_drawable->initialize();
 }
 
-void Renderer::render(const RenderInfos& info) const
+void Renderer::render(GlobalRuntimeInfo& global_info) const
 {
-	RHIRenderInfos rhi_info;
-	rhi_info.framebuffer_resized = info.framebuffer_resized;
-	m_drawable->draw(rhi_info);
+	m_drawable->draw(global_info);
 }
 
 ENGINE_NAMESPACE_END

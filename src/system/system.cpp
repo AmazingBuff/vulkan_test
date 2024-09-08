@@ -21,16 +21,14 @@ void System::initialize()
 
 void System::run()
 {
-	WindowEvents events;
-	RenderInfos render_infos;
-	while (!events.quit)
+	GlobalRuntimeInfo global_info;
+	while (!global_info.window_quit)
 	{
-		g_window_system->present(events);
-		render_infos.framebuffer_resized = events.framebuffer_resized;
-		g_render_system->render(render_infos);
+		g_window_system->present(global_info);
+		g_render_system->render(global_info);
 
 
-		events.framebuffer_resized = false;
+		global_info.window_resized = false;
 	}
 }
 

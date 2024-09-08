@@ -40,7 +40,7 @@ void Window::initialize()
         WINDOW_LOG_ERROR(SDL_GetError());
 }
 
-void Window::present(WindowEvents& events) const
+void Window::present(GlobalRuntimeInfo& global_info) const
 {
 	SDL_Event event;
 	while (SDL_PollEvent(&event))
@@ -48,11 +48,22 @@ void Window::present(WindowEvents& events) const
 		switch (event.type)
 		{
 		case SDL_QUIT:
-			events.quit = true;
+			global_info.window_quit = true;
 			break;
 		case SDL_WINDOWEVENT:
-			if (event.window.event == SDL_WINDOWEVENT_RESIZED)
-				events.framebuffer_resized = true;
+		{
+			switch (event.window.event)
+			{
+			case SDL_WINDOWEVENT_RESIZED:
+				global_info.window_resized = true;
+				break;
+			case SDL_WINDOWEVENT_MINIMIZED:
+				global_info.window_minimized = true;
+				break;
+			default:
+				break;
+			}
+		}
 			break;
 		default:
 			break;

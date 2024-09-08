@@ -4,19 +4,13 @@
 #define SDL_MAIN_HANDLED
 #include <SDL2/SDL.h>
 #include "rendering/rhi/interface.h"
+#include "system/structure.h"
 
 ENGINE_NAMESPACE_BEGIN
 
 static const char* Window_Title = "Vulkan Window";
 static constexpr int Window_Width = 960;
 static constexpr int Window_Height = 540;
-
-struct WindowEvents
-{
-	bool framebuffer_resized = false;
-	bool quit = false;
-};
-
 
 class Window final
 {
@@ -25,7 +19,7 @@ public:
 	~Window();
 	void initialize();
 	// return false if the window is closed
-	void present(WindowEvents& events) const;
+	void present(GlobalRuntimeInfo& global_info) const;
 private:
 	SDL_Window* m_window = nullptr;
 

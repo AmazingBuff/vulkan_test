@@ -39,14 +39,14 @@ void Drawable::initialize()
 	m_pipeline->initialize();
 }
 
-void Drawable::draw(const RHIRenderInfos& info)
+void Drawable::draw(GlobalRuntimeInfo& global_info)
 {
 	// wait for previous frame
 	m_command_buffer->wait();
 	// acquire next image
 	if (!m_swap_chain->acquire_next_image())
 	{
-		recreate_swap_chain();
+		recreate_swap_chain(global_info);
 		return;
 	}
 
@@ -63,19 +63,23 @@ void Drawable::draw(const RHIRenderInfos& info)
 	m_command_buffer->submit();
 
 	// present
-	if(!m_device->present() || info.framebuffer_resized)
-		recreate_swap_chain();
+	if(!m_device->present() || global_info.window_resized)
+		recreate_swap_chain(global_info);
 	
 	// refresh frame
 	m_command_buffer->refresh_frame();
 }
 
-void Drawable::recreate_swap_chain()
+void Drawable::recreate_swap_chain(GlobalRuntimeInfo& global_info)
 {
 	// minimization
 	SDL_Event event;
-	while (m_swap_chain->is_minimization())
+	while (global_info.window_minimized)
+	{
 		SDL_WaitEvent(&event);
+		if(event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_RESTORED)
+			global_info.window_minimized = false;
+	}
 
 	m_device->wait_idle();
 	m_swap_chain = std::make_shared<SwapChain>();

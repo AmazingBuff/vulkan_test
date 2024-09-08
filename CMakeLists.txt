@@ -7,6 +7,7 @@ project(
 
 find_package(Vulkan REQUIRED)
 find_package(SDL2 REQUIRED)
+find_package(Eigen3 REQUIRED)
 
 file(GLOB_RECURSE HEADER_FILES src/*.h)
 file(GLOB_RECURSE SOURCE_FILES src/*.cpp)
@@ -45,6 +46,7 @@ target_link_libraries(
     PRIVATE
     ${Vulkan_LIBRARIES}
     ${SDL2_LIBRARIES}
+    Eigen3::Eigen
 )
 
 target_compile_features(
@@ -52,8 +54,6 @@ target_compile_features(
     PRIVATE
     cxx_std_23
 )
-
-
 
 target_compile_definitions(
     ${PROJECT_NAME}

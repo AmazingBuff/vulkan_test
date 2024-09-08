@@ -1,4 +1,5 @@
 #include "pipeline.h"
+#include "description_sets.h"
 #include "system/system.h"
 #include "rendering/renderer.h"
 #include "rendering/drawable.h"
@@ -176,12 +177,15 @@ void VK_CLASS(Pipeline)::create_pipeline()
 		.pDynamicStates = dynamic_states.data()
 	};
 
+	auto& binding_description = VK_CLASS(Vertex)::m_binding_description;
+	auto& attribute_descriptions = VK_CLASS(Vertex)::m_attribute_descriptions;
+
 	VkPipelineVertexInputStateCreateInfo vertex_input_info{
 		.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO,
-		.vertexBindingDescriptionCount = 0,
-		.pVertexBindingDescriptions = nullptr,
-		.vertexAttributeDescriptionCount = 0,
-		.pVertexAttributeDescriptions = nullptr
+		.vertexBindingDescriptionCount = 1,
+		.pVertexBindingDescriptions = &binding_description,
+		.vertexAttributeDescriptionCount = static_cast<uint32_t>(attribute_descriptions.size()),
+		.pVertexAttributeDescriptions = attribute_descriptions.data()
 	};
 
 	VkPipelineInputAssemblyStateCreateInfo input_assembly_info{

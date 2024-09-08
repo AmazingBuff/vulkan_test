@@ -1,15 +1,9 @@
 #pragma once
 #include "rendering/rhi/rhi.h"
 #include "rhi/interface.h"
+#include "system/structure.h"
 
 ENGINE_NAMESPACE_BEGIN
-
-struct RHIRenderInfos
-{
-	bool framebuffer_resized = false;
-};
-
-
 
 class Drawable
 {
@@ -17,7 +11,7 @@ public:
 	Drawable() = default;
 	~Drawable();
 	void initialize();
-	void draw(const RHIRenderInfos& info);
+	void draw(GlobalRuntimeInfo& global_info);
 public:
 	// these can be fecthed diectly from the renderer
 	std::shared_ptr<Instance>											m_instance;
@@ -33,7 +27,7 @@ public:
 	std::shared_ptr<Pipeline>											m_pipeline;
 	//std::unordered_map<std::string, std::shared_ptr<Pipeline>>			m_pipelines;
 private:
-	void recreate_swap_chain();
+	void recreate_swap_chain(GlobalRuntimeInfo& global_info);
 };
 
 
