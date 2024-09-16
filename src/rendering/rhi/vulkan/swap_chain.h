@@ -53,8 +53,6 @@ public:
 	NODISCARD bool acquire_next_image();
 	// must acquire next image first
 	NODISCARD const std::shared_ptr<VK_CLASS(Framebuffer)>& current_frame_buffer() const;
-	//
-	NODISCARD bool is_minimization() const;
 private:
 	void choose_swap_chain_details();
 	void create_swap_chain();

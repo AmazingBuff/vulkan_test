@@ -84,26 +84,6 @@ void VK_CLASS(SwapChain)::create_frame_buffers(const std::shared_ptr<VK_CLASS(Re
 	}
 }
 
-NODISCARD bool VK_CLASS(SwapChain)::is_minimization() const
-{
-	SwapChainSupportDetails support_details = query_swap_chain_support(g_system_context->g_render_system->m_drawable->m_physical_device->m_device, g_system_context->g_render_system->m_drawable->m_instance->m_surface);
-
-	VkExtent2D extent;
-	if (support_details.capabilities->currentExtent.width != std::numeric_limits<uint32_t>::max())
-		extent = support_details.capabilities->currentExtent;
-	else
-	{
-		int width, height;
-		SDL_Vulkan_GetDrawableSize(g_system_context->g_window_system->m_window, &width, &height);
-		VkExtent2D actual_extent{ static_cast<uint32_t>(width), static_cast<uint32_t>(height) };
-		actual_extent.width = std::clamp(actual_extent.width, m_support_details.capabilities->minImageExtent.width, m_support_details.capabilities->maxImageExtent.width);
-		actual_extent.height = std::clamp(actual_extent.height, m_support_details.capabilities->minImageExtent.height, m_support_details.capabilities->maxImageExtent.height);
-		extent = actual_extent;
-	}
-
-	return extent.width == 0 || extent.height == 0;
-}
-
 void VK_CLASS(SwapChain)::initialize()
 {
 	choose_swap_chain_details();

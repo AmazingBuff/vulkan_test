@@ -2,6 +2,7 @@
 
 #include "types.h"
 #include "utils/util.h"
+#include "benchmark/buffer.h"
 #include "rendering/render_types.h"
 
 ENGINE_NAMESPACE_BEGIN
@@ -59,6 +60,7 @@ private:
 private:
 	std::shared_ptr<VK_CLASS(PipelineLayout)>	m_pipeline_layout;
 	std::shared_ptr<VK_CLASS(RenderPass)>		m_render_pass;
+	std::shared_ptr<VK_CLASS(VertexBuffer)>		m_vertex_buffer;
 private:
 	VK_TYPE_INIT(VkPipeline,					m_pipeline);
 

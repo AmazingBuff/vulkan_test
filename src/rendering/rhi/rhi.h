@@ -27,6 +27,11 @@ enum class RHIFlag : uint8_t
 	e_command_buffer,
 	e_semaphore,
 	e_fence,
+	e_buffer,
+	e_vertex_buffer,
+	e_index_buffer,
+	e_uniform_buffer,
+	e_pipeline_resources,
 	e_unknown
 };
 

@@ -91,7 +91,10 @@ void VK_CLASS(PhysicalDevice)::pick_physical_device()
 	}
 
 	if (candidates.rbegin()->first > 0)
-		*this = candidates.rbegin()->second;
+	{
+		*this = std::move(candidates.rbegin()->second);
+		vkGetPhysicalDeviceMemoryProperties(m_device, &m_memory_properties);
+	}
 	else
 		ASSERT(candidates.rbegin()->first > 0);
 }

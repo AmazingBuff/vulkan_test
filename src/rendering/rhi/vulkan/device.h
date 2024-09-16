@@ -32,6 +32,7 @@ public:
 public:
 	VkPhysicalDeviceProperties			m_properties{};
 	VkPhysicalDeviceFeatures			m_features{};
+	VkPhysicalDeviceMemoryProperties	m_memory_properties{};
 	QueueFamilyIndices					m_indices;
 private:
 	void pick_physical_device();
@@ -69,6 +70,8 @@ private:
 	friend class VK_CLASS(CommandBuffer);
 	friend class VK_CLASS(Semaphore);
 	friend class VK_CLASS(Fence);
+	friend class VK_CLASS(Buffer);
+	friend class VK_CLASS(VertexBuffer);
 };
 
 ENGINE_NAMESPACE_END

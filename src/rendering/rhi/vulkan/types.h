@@ -42,5 +42,7 @@ class VK_CLASS(Framebuffer);
 class VK_CLASS(CommandBuffer);
 class VK_CLASS(Semaphore);
 class VK_CLASS(Fence);
+class VK_CLASS(Buffer);
+class VK_CLASS(VertexBuffer);
 
 ENGINE_NAMESPACE_END

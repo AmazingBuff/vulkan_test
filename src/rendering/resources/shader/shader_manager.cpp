@@ -72,9 +72,11 @@ NODISCARD const ShaderResource& ShaderManager::get_shader_resource(const std::st
 		return it->second;
 	else
 	{
-		RENDERING_LOG_ERROR("Shader resource not found: %s", name.c_str());
+		RENDERING_LOG_ERROR("shader resource not found: " + name);
 		return {};
 	}
 }
+
+#undef SHADER_PATH
 
 ENGINE_NAMESPACE_END

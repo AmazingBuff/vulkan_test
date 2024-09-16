@@ -1,0 +1,24 @@
+render_pass:
+    attachments:
+        descriptions:
+            -color:
+                format: rgba8
+                samples: 1
+                load_op: clear
+                store_op: store
+        references:
+            -color:
+                attachment: 0
+    subpasses:
+        descriptions:
+            -main:
+                color_attachments: [color]
+        dependencies:
+            -main:
+                src_subpass: external
+                dst_subpass: 0
+                src_stage_mask: color_attachment_output
+                dst_stage_mask: color_attachment_output
+                src_access_mask: 0
+                dst_access_mask: color_attachment_write                
+     

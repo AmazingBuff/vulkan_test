@@ -9,10 +9,32 @@ find_package(Vulkan REQUIRED)
 find_package(SDL2 REQUIRED)
 find_package(Eigen3 REQUIRED)
 
+include(FetchContent)
+
+FetchContent_Declare(
+    yaml-cpp
+    GIT_REPOSITORY https://github.com/jbeder/yaml-cpp.git
+    GIT_TAG da82fd982c260e7f335ce5acbceff24b270544d1
+)
+FetchContent_MakeAvailable(yaml-cpp)
+
+FetchContent_Declare(
+    fmt
+    GIT_REPOSITORY https://github.com/fmtlib/fmt
+    GIT_TAG 527e98e3f873562b640377ad8f3c6088ac34e01d
+)
+FetchContent_MakeAvailable(fmt)
+
 file(GLOB_RECURSE HEADER_FILES src/*.h)
 file(GLOB_RECURSE SOURCE_FILES src/*.cpp)
 
-set(THIRD_PARTY_INCLUDE_DIRS ext)
+set(THIRD_PARTY_INCLUDE_DIRS 
+    ext/reflect-cpp/include
+    ext/traits
+)
+
+add_subdirectory(ext/reflect-cpp)
+set(REFLECTCPP_YAML ON)
 
 add_executable(
     ${PROJECT_NAME}
@@ -47,6 +69,9 @@ target_link_libraries(
     ${Vulkan_LIBRARIES}
     ${SDL2_LIBRARIES}
     Eigen3::Eigen
+    yaml-cpp::yaml-cpp
+    fmt::fmt
+    reflectcpp
 )
 
 target_compile_features(

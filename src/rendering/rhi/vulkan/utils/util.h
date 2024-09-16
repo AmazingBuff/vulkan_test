@@ -17,6 +17,7 @@ struct SwapChainSupportDetails
 	}
 };
 
+SwapChainSupportDetails query_swap_chain_support(VkPhysicalDevice physical_device, VkSurfaceKHR surface);
 
 
 const char* vk_result_convert(VkResult res);
@@ -37,8 +38,6 @@ const char* vk_result_convert(VkResult res);
 #else
 #define VK_CHECK_RESULT(expr) (expr)
 #endif
-
-SwapChainSupportDetails query_swap_chain_support(VkPhysicalDevice physical_device, VkSurfaceKHR surface);
 
 template<typename F, typename... Args>
 	requires(!std::is_same_v<typename Trait::function_traits<std::decay_t<F>>::return_type, void>)
