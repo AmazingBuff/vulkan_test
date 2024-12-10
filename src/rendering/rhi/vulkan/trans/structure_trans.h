@@ -6,7 +6,7 @@ ENGINE_NAMESPACE_BEGIN
 
 struct AttachmentDescription
 {
-    std::string				type;
+	AttachmentType			type;
 	Format					format;
 	SampleCountFlags		samples;
 	AttachmentLoadOp		load_op;
@@ -19,14 +19,14 @@ struct AttachmentDescription
 
 struct AttachmentReference
 {
-	std::string				type;
+	AttachmentType			type;
 	uint32_t				attachment;
 	ImageLayout				layout;
 };
 
 struct SubpassDescription
 {
-	std::string							type;
+	std::string							name;
 	PipelineBindPoint					pipeline_bind_point;
 	std::vector<AttachmentReference>	input_attachments;
 	std::vector<AttachmentReference>	color_attachments;
@@ -37,7 +37,7 @@ struct SubpassDescription
 
 struct SubpassDependency
 {
-	std::string				type;
+	std::string				name;
 	uint32_t				src_subpass;
 	uint32_t				dst_subpass;
 	PipelineStageFlags		src_stage_mask;

@@ -13,6 +13,7 @@ private:
 };
 
 
+
 template<typename T>
 	requires std::is_enum_v<T>
 class Enum
@@ -24,15 +25,6 @@ public:
 	Enum(const T& value);
 	Enum(const Enum& other);
 	Enum(Enum&& other) noexcept;
-
-	// bit op
-	NODISCARD constexpr Enum& operator|=(const Enum& value);
-	NODISCARD constexpr Enum& operator&=(const Enum& value);
-	NODISCARD constexpr Enum& operator^=(const Enum& value);
-	NODISCARD constexpr Enum operator|(const Enum& value) const;
-	NODISCARD constexpr Enum operator&(const Enum& value) const;
-	NODISCARD constexpr Enum operator^(const Enum& value) const;
-	NODISCARD constexpr Enum operator~() const;
 
 	// compare
 	NODISCARD constexpr bool operator==(const Enum& value) const;
@@ -47,6 +39,28 @@ public:
 	NODISCARD constexpr operator type() const;
 private:
 	type m_value;
+};
+
+template<typename T>
+    requires std::is_enum_v<T>
+class BitFlag : public Enum<T>
+{
+	using type = std::underlying_type_t<T>;
+public:
+    BitFlag() = default;
+	BitFlag(const type& other);
+    BitFlag(const T& value);
+	BitFlag(const BitFlag& other);
+    BitFlag(BitFlag&& other) noexcept;
+
+    // bit op
+    NODISCARD constexpr BitFlag& operator|=(const BitFlag& value);
+    NODISCARD constexpr BitFlag& operator&=(const BitFlag& value);
+    NODISCARD constexpr BitFlag& operator^=(const BitFlag& value);
+    NODISCARD constexpr BitFlag operator|(const BitFlag& value) const;
+    NODISCARD constexpr BitFlag operator&(const BitFlag& value) const;
+    NODISCARD constexpr BitFlag operator^(const BitFlag& value) const;
+    NODISCARD constexpr BitFlag operator~() const;
 };
 
 

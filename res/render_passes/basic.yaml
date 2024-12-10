@@ -1,20 +1,22 @@
 render_pass:
     attachments:
         descriptions:
-            -color:
+            -   type: color
                 format: rgba8
                 samples: 1
                 load_op: clear
                 store_op: store
         references:
-            -color:
+            -   type: color
                 attachment: 0
+                layout: color_attachment_optimal
     subpasses:
         descriptions:
-            -main:
-                color_attachments: [color]
+            -   name: main
+                color_attachments: 
+                    - color
         dependencies:
-            -main:
+            -   name: main
                 src_subpass: external
                 dst_subpass: 0
                 src_stage_mask: color_attachment_output

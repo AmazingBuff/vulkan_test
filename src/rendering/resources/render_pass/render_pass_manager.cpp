@@ -1,8 +1,7 @@
 #include "render_pass_manager.h"
 #include "rendering/utils/util.h"
 #include "rendering/rhi/vulkan/trans/structure_trans.h"
-#include <rfl.hpp>
-#include <rfl/yaml.hpp>
+#include <yaml-cpp/yaml.h>
 
 ENGINE_NAMESPACE_BEGIN
 
@@ -34,7 +33,14 @@ void RenderPassManager::load_render_pass_files()
 		if (file_name.find(".yaml") == std::string::npos)
 			continue;
         YAML::Node config = YAML::LoadFile(file.path().generic_string());
-		int j = 0;
+
+        const std::string attachment_descriptions = YAML::Dump(config["render_pass"]["attachments"]["descriptions"]);
+        const std::string attachment_references = YAML::Dump(config["render_pass"]["attachments"]["references"]);
+        const std::string subpass_descriptions = YAML::Dump(config["render_pass"]["subpasses"]["descriptions"]);
+        const std::string subpass_dependencies = YAML::Dump(config["render_pass"]["subpasses"]["dependencies"]);
+
+        //auto attachment_descriptions_vector = rfl::yaml::read<std::vector<AttachmentDescription>>(attachment_descriptions);
+
         //resources.attachments = config["attachments"].as<std::vector<AttachmentDescription>>();
 	}
 }

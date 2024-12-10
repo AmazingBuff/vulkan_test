@@ -67,7 +67,7 @@ enum class DependencyFlagBits
 };
 
 
-enum class Format
+enum class FormatEnum
 {
 	e_undefined						=	VK_FORMAT_UNDEFINED,
 	e_r4g4_unorm_pack8				=	VK_FORMAT_R4G4_UNORM_PACK8,
@@ -202,20 +202,20 @@ enum class Format
 	e_d32_sfloat_s8_uint			=	VK_FORMAT_D32_SFLOAT_S8_UINT,
 };
 
-enum class AttachmentLoadOp
+enum class AttachmentLoadOpEnum
 {
 	e_load			=	VK_ATTACHMENT_LOAD_OP_LOAD,
 	e_clear			=	VK_ATTACHMENT_LOAD_OP_CLEAR,
 	e_dont_care		=	VK_ATTACHMENT_LOAD_OP_DONT_CARE
 };
 
-enum class AttachmentStoreOp
+enum class AttachmentStoreOpEnum
 {
 	e_store			=	VK_ATTACHMENT_STORE_OP_STORE,
 	e_dont_care		=	VK_ATTACHMENT_STORE_OP_DONT_CARE
 };
 
-enum class ImageLayout
+enum class ImageLayoutEnum
 {
 	e_undefined										=	VK_IMAGE_LAYOUT_UNDEFINED,
 	e_general										=	VK_IMAGE_LAYOUT_GENERAL,
@@ -237,10 +237,20 @@ enum class ImageLayout
 	e_present_src_khr								=	VK_IMAGE_LAYOUT_PRESENT_SRC_KHR
 };
 
-enum class PipelineBindPoint
+enum class PipelineBindPointEnum
 {
 	e_graphics	=	VK_PIPELINE_BIND_POINT_GRAPHICS,
 	e_compute	=	VK_PIPELINE_BIND_POINT_COMPUTE
+};
+
+
+// self
+enum class AttachmentTypeEnum
+{
+    e_color,
+    e_depth,
+    e_stencil,
+    e_depth_stencil
 };
 
 ENGINE_NAMESPACE_END

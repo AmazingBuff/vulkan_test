@@ -11,18 +11,25 @@ enum class PipelineStageFlagBits;
 enum class AccessFlagBits;
 enum class DependencyFlagBits;
 
-using SampleCountFlags = Enum<SampleCountFlagBits>;
-using PipelineStageFlags = Enum<PipelineStageFlagBits>;
-using AccessFlags = Enum<AccessFlagBits>;
-using DependencyFlags = Enum<DependencyFlagBits>;
+using SampleCountFlags = BitFlag<SampleCountFlagBits>;
+using PipelineStageFlags = BitFlag<PipelineStageFlagBits>;
+using AccessFlags = BitFlag<AccessFlagBits>;
+using DependencyFlags = BitFlag<DependencyFlagBits>;
 
-enum class Format;
-enum class AttachmentLoadOp;
-enum class AttachmentStoreOp;
-enum class ImageLayout;
-enum class PipelineBindPoint;
+enum class FormatEnum;
+enum class AttachmentLoadOpEnum;
+enum class AttachmentStoreOpEnum;
+enum class ImageLayoutEnum;
+enum class PipelineBindPointEnum;
+
+using Format = Enum<FormatEnum>;
+using AttachmentLoadOp = Enum<AttachmentLoadOpEnum>;
+using AttachmentStoreOp = Enum<AttachmentStoreOpEnum>;
+using ImageLayout = Enum<ImageLayoutEnum>;
+using PipelineBindPoint = Enum<PipelineBindPointEnum>;
 
 // self define
-
+enum class AttachmentTypeEnum;
+using AttachmentType = Enum<AttachmentTypeEnum>;
 
 ENGINE_NAMESPACE_END
