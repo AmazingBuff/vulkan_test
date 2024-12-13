@@ -8,12 +8,12 @@
 
 ENGINE_NAMESPACE_BEGIN
 
-static VkShaderModule create_shader_module(VkDevice device, const std::vector<char>& code)
+static VkShaderModule create_shader_module(VkDevice device, const std::shared_ptr<std::vector<char>>& code)
 {
 	VkShaderModuleCreateInfo create_info{
 		.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO,
-		.codeSize = code.size(),
-		.pCode = reinterpret_cast<const uint32_t*>(code.data())
+		.codeSize = code->size(),
+		.pCode = reinterpret_cast<const uint32_t*>(code->data())
 	};
 
 	VkShaderModule shader_module;

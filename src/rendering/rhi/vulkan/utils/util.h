@@ -1,7 +1,7 @@
 #pragma once
 #include "rendering/rhi/vulkan/types.h"
 #include "base/util.h"
-#include <traits/func.h>
+#include <func.h>
 
 ENGINE_NAMESPACE_BEGIN
 
@@ -11,7 +11,7 @@ struct SwapChainSupportDetails
 	std::vector<VkSurfaceFormatKHR>				formats;
 	std::vector<VkPresentModeKHR>				present_modes;
 
-	NODISCARD constexpr operator bool() const
+	NODISCARD constexpr explicit operator bool() const
 	{
 		return capabilities.has_value() && !formats.empty() && !present_modes.empty();
 	}
@@ -40,28 +40,24 @@ const char* vk_result_convert(VkResult res);
 #endif
 
 template<typename F, typename... Args>
-	requires(!std::is_same_v<typename Trait::function_traits<std::decay_t<F>>::return_type, void>)
-inline auto vkEnumerateProperties(F&& func, Args&&... args)
+auto vkEnumerateProperties(F&& func, Args&&... args)
 {
 	using type = std::remove_pointer_t<typename Trait::tail_type_t<typename Trait::function_traits<std::decay_t<F>>::argument_type>>;
 	uint32_t count = 0;
-	VK_CHECK_RESULT(Trait::invoke(std::forward<F>(func), std::forward<Args>(args)..., &count, nullptr));
-	std::vector<type> properties(count);
-	VK_CHECK_RESULT(Trait::invoke(std::forward<F>(func), std::forward<Args>(args)..., &count, properties.data()));
+	std::vector<type> properties;
+	if constexpr (!std::is_same_v<typename Trait::function_traits<std::decay_t<F>>::return_type, void>)
+	{
+		VK_CHECK_RESULT(Trait::invoke(std::forward<F>(func), std::forward<Args>(args)..., &count, nullptr));
+		properties.resize(count);
+		VK_CHECK_RESULT(Trait::invoke(std::forward<F>(func), std::forward<Args>(args)..., &count, properties.data()));
+	}
+	else
+	{
+		Trait::invoke(std::forward<F>(func), std::forward<Args>(args)..., &count, nullptr);
+		properties.resize(count);
+		Trait::invoke(std::forward<F>(func), std::forward<Args>(args)..., &count, properties.data());
+	}
 	return properties;
 }
-
-template<typename F, typename... Args>
-	requires(std::is_same_v<typename Trait::function_traits<std::decay_t<F>>::return_type, void>)
-inline auto vkEnumerateProperties(F&& func, Args&&... args)
-{
-	using type = std::remove_pointer_t<typename Trait::tail_type_t<typename Trait::function_traits<std::decay_t<F>>::argument_type>>;
-	uint32_t count = 0;
-	Trait::invoke(std::forward<F>(func), std::forward<Args>(args)..., &count, nullptr);
-	std::vector<type> properties(count);
-	Trait::invoke(std::forward<F>(func), std::forward<Args>(args)..., &count, properties.data());
-	return properties;
-}
-
 
 ENGINE_NAMESPACE_END

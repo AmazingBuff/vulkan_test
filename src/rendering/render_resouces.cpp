@@ -14,12 +14,12 @@ void RenderResources::initialize()
     m_render_pass_manager->initialize();
 }
 
-NODISCARD const ShaderResource& RenderResources::get_shader_resource(const std::string& name)
+NODISCARD const ShaderResource& RenderResources::get_shader_resource(const std::string& name) const
 {
 	return m_shader_manager->get_shader_resource(name);
 }
 
-NODISCARD const RenderPassResource& RenderResources::get_render_pass_resource(const std::string& name)
+NODISCARD const RenderPassResource& RenderResources::get_render_pass_resource(const std::string& name) const
 {
     return m_render_pass_manager->get_render_pass_resource(name);
 }

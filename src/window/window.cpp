@@ -2,7 +2,6 @@
 #include "utils/util.h"
 #include "rendering/rhi/rhi.h"
 #include "system/system.h"
-#include "rendering/renderer.h"
 #include <SDL2/SDL_vulkan.h>
 
 ENGINE_NAMESPACE_BEGIN

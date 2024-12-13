@@ -12,7 +12,7 @@ struct RenderPassResource
 	std::vector<SubpassDescription>			subpasses;
 	std::vector<SubpassDependency>			dependencies;
 
-	NODISCARD constexpr operator bool() const
+	NODISCARD constexpr explicit operator bool() const
 	{
 		return !attachments.empty() && !attachment_references.empty() && !subpasses.empty();
 	}

@@ -1,10 +1,8 @@
 #pragma once
 
 #include "base/macro.h"
-#include "base/template.h"
 
 ENGINE_NAMESPACE_BEGIN
-
 class Window;
 class Renderer;
 

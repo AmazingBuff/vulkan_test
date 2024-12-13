@@ -5,9 +5,9 @@
 
 ENGINE_NAMESPACE_BEGIN
 
-class ShaderResource;
+struct ShaderResource;
 class ShaderManager;
-class RenderPassResource;
+struct RenderPassResource;
 class RenderPassManager;
 
 ENGINE_NAMESPACE_END

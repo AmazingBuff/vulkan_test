@@ -1,11 +1,14 @@
 #pragma once
 
+#include "macro.h"
+
+AMAZING_NAMESPACE_BEGIN
+
 template<typename T>
 class Singleton
 {
 public:
 	static T& get_instance();
-private:
 	Singleton() = delete;
 	~Singleton() = delete;
 	Singleton(const Singleton&) = delete;
@@ -21,8 +24,8 @@ class Enum
 	using type = std::underlying_type_t<T>;
 public:
 	Enum();
-	Enum(const type& value);
-	Enum(const T& value);
+	explicit Enum(const type& value);
+	explicit Enum(const T& value);
 	Enum(const Enum& other);
 	Enum(Enum&& other) noexcept;
 
@@ -35,8 +38,8 @@ public:
 	NODISCARD constexpr bool operator<=(const Enum& value) const;
 
 	// transform
-	NODISCARD constexpr operator T() const;
-	NODISCARD constexpr operator type() const;
+	NODISCARD constexpr explicit operator T() const;
+	NODISCARD constexpr explicit operator type() const;
 private:
 	type m_value;
 };
@@ -48,8 +51,8 @@ class BitFlag : public Enum<T>
 	using type = std::underlying_type_t<T>;
 public:
     BitFlag() = default;
-	BitFlag(const type& other);
-    BitFlag(const T& value);
+	explicit BitFlag(const type& value);
+    explicit BitFlag(const T& value);
 	BitFlag(const BitFlag& other);
     BitFlag(BitFlag&& other) noexcept;
 
@@ -63,6 +66,6 @@ public:
     NODISCARD constexpr BitFlag operator~() const;
 };
 
-
-
 #include "template.inl"
+
+AMAZING_NAMESPACE_END

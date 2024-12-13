@@ -20,7 +20,7 @@ static int rate_score(VkPhysicalDevice device, VK_CLASS(PhysicalDevice)& physica
 	else if (physical_device.m_properties.deviceType == VK_PHYSICAL_DEVICE_TYPE_CPU)
 		score += 100;
 
-	score += physical_device.m_properties.limits.maxImageDimension2D;
+	score += static_cast<int>(physical_device.m_properties.limits.maxImageDimension2D);
 
 	if (!physical_device.m_features.geometryShader)
 		return 0;
@@ -92,7 +92,7 @@ void VK_CLASS(PhysicalDevice)::pick_physical_device()
 
 	if (candidates.rbegin()->first > 0)
 	{
-		*this = std::move(candidates.rbegin()->second);
+		*this = candidates.rbegin()->second;
 		vkGetPhysicalDeviceMemoryProperties(m_device, &m_memory_properties);
 	}
 	else
@@ -145,14 +145,14 @@ void VK_CLASS(Device)::create_logical_device()
 	std::vector<const char*> layers;
 #if defined(_DEBUG) || defined(DEBUG)
 	std::vector<VkLayerProperties> layer_properties = vkEnumerateProperties(vkEnumerateInstanceLayerProperties);
-	if (std::any_of(layer_properties.begin(), layer_properties.end(),
-		[&layer_properties](const VkLayerProperties& property) -> bool
-		{
-			if (std::strcmp(property.layerName, Validation_Layers) == 0)
-				return true;
-			else
-				return false;
-		}))
+	if (std::ranges::any_of(layer_properties,
+	                        [](const VkLayerProperties& property) -> bool
+	                        {
+		                        if (std::strcmp(property.layerName, Validation_Layers) == 0)
+			                        return true;
+		                        else
+			                        return false;
+	                        }))
 		layers.push_back(Validation_Layers);
 #endif
 	

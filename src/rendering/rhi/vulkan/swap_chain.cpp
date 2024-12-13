@@ -95,31 +95,31 @@ void VK_CLASS(SwapChain)::choose_swap_chain_details()
 {
 	m_support_details = query_swap_chain_support(g_system_context->g_render_system->m_drawable->m_physical_device->m_device, g_system_context->g_render_system->m_drawable->m_instance->m_surface);
 
-	if (!std::any_of(m_support_details.formats.begin(), m_support_details.formats.end(),
-		[&](const VkSurfaceFormatKHR& available_format) -> bool
-		{
-			if (available_format.format == VK_FORMAT_B8G8R8A8_SRGB &&
-				available_format.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR)
-			{
-				m_details.format = available_format;
-				return true;
-			}
-			else
-				return false;
-		}))
+	if (!std::ranges::any_of(m_support_details.formats,
+	                         [&](const VkSurfaceFormatKHR& available_format) -> bool
+	                         {
+		                         if (available_format.format == VK_FORMAT_B8G8R8A8_SRGB &&
+			                         available_format.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR)
+		                         {
+			                         m_details.format = available_format;
+			                         return true;
+		                         }
+		                         else
+			                         return false;
+	                         }))
 		m_details.format = m_support_details.formats[0];
 
-	if (!std::any_of(m_support_details.present_modes.begin(), m_support_details.present_modes.end(),
-		[&](const VkPresentModeKHR& available_present_mode) -> bool
-		{
-			if (available_present_mode == VK_PRESENT_MODE_MAILBOX_KHR)
-			{
-				m_details.present_mode = available_present_mode;
-				return true;
-			}
-			else
-				return false;
-		}))
+	if (!std::ranges::any_of(m_support_details.present_modes,
+	                         [&](const VkPresentModeKHR& available_present_mode) -> bool
+	                         {
+		                         if (available_present_mode == VK_PRESENT_MODE_MAILBOX_KHR)
+		                         {
+			                         m_details.present_mode = available_present_mode;
+			                         return true;
+		                         }
+		                         else
+			                         return false;
+	                         }))
 		m_details.present_mode = VK_PRESENT_MODE_FIFO_KHR;
 
 	if (m_support_details.capabilities->currentExtent.width != std::numeric_limits<uint32_t>::max())

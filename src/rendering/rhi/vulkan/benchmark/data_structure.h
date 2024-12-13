@@ -5,9 +5,8 @@
 
 ENGINE_NAMESPACE_BEGIN
 
-class VK_CLASS(Vertex) : public Vertex
+struct VK_CLASS(Vertex) : Vertex
 {
-public:
 	NODISCARD static VkVertexInputBindingDescription get_binding_description();
 	NODISCARD static std::array<VkVertexInputAttributeDescription, 3> get_attribute_descriptions();
 };

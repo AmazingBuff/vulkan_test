@@ -39,7 +39,7 @@ void ShaderManager::load_shader_files()
 			auto it = ShaderTypeMap.find(file_name);
 			if (it == ShaderTypeMap.end())
 				continue;
-			std::vector<char> shader = read_file(dir.path().generic_string());
+			auto shader = read_file(dir.path().generic_string());
 			switch (it->second)
 			{
 			case ShaderType::e_vertex:
@@ -68,13 +68,10 @@ void ShaderManager::initialize()
 NODISCARD const ShaderResource& ShaderManager::get_shader_resource(const std::string& name)
 {
 	auto it = m_shader_resources.find(name);
-	if (it != m_shader_resources.end())
-		return it->second;
-	else
-	{
+	if (it == m_shader_resources.end())
 		RENDERING_LOG_ERROR("shader resource not found: " + name);
-		return {};
-	}
+
+	return it->second;
 }
 
 #undef SHADER_PATH

@@ -1,10 +1,14 @@
 #include "render_pass_manager.h"
 #include "rendering/utils/util.h"
 #include "rendering/rhi/vulkan/trans/structure_trans.h"
+#include "base/enum_string/enum_to_string.h"
 #include <yaml-cpp/yaml.h>
+#include <rfl.hpp>
+
+#include "rendering/rhi/vulkan/trans/enum_trans.h"
+#include "rendering/rhi/vulkan/trans/enum_map.h"
 
 ENGINE_NAMESPACE_BEGIN
-
 #define RENDER_PASS_PATH SOURCES_DIR"/res/render_passes/"
 
 void RenderPassManager::initialize()
@@ -15,13 +19,10 @@ void RenderPassManager::initialize()
 const RenderPassResource& RenderPassManager::get_render_pass_resource(const std::string& name)
 {
 	auto it = m_render_pass_resources.find(name);
-	if (it != m_render_pass_resources.end())
-		return it->second;
-	else
-	{
+	if (it == m_render_pass_resources.end())
 		RENDERING_LOG_ERROR("render pass resource not found: " + name);
-		return {};
-	}
+
+	return it->second;
 }
 
 void RenderPassManager::load_render_pass_files()
@@ -39,9 +40,10 @@ void RenderPassManager::load_render_pass_files()
         const std::string subpass_descriptions = YAML::Dump(config["render_pass"]["subpasses"]["descriptions"]);
         const std::string subpass_dependencies = YAML::Dump(config["render_pass"]["subpasses"]["dependencies"]);
 
-        //auto attachment_descriptions_vector = rfl::yaml::read<std::vector<AttachmentDescription>>(attachment_descriptions);
+		const auto& d = config["render_pass"]["attachments"]["descriptions"];
 
-        //resources.attachments = config["attachments"].as<std::vector<AttachmentDescription>>();
+
+
 	}
 }
 

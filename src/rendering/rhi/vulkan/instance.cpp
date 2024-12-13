@@ -85,14 +85,14 @@ void VK_CLASS(Instance)::create_instance()
 	std::vector<const char*> layers;
 #if defined(_DEBUG) || defined(DEBUG)
 	std::vector<VkLayerProperties> layer_properties = vkEnumerateProperties(vkEnumerateInstanceLayerProperties);
-	if (std::any_of(layer_properties.begin(), layer_properties.end(),
-		[&layer_properties](const VkLayerProperties& property) -> bool
-		{
-			if (std::strcmp(property.layerName, Validation_Layers) == 0)
-				return true;
-			else
-				return false;
-		}))
+	if (std::ranges::any_of(layer_properties,
+	                        [](const VkLayerProperties& property) -> bool
+	                        {
+		                        if (std::strcmp(property.layerName, Validation_Layers) == 0)
+			                        return true;
+		                        else
+			                        return false;
+	                        }))
 	{
 		layers.push_back(Validation_Layers);
 		extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);

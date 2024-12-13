@@ -13,7 +13,7 @@ public:
 	void initialize();
 	void draw(GlobalRuntimeInfo& global_info);
 public:
-	// these can be fecthed diectly from the renderer
+	// these can be fetched directly from the renderer
 	std::shared_ptr<Instance>											m_instance;
 	std::shared_ptr<PhysicalDevice>										m_physical_device;
 	std::shared_ptr<Device>												m_device;

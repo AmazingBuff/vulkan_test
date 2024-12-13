@@ -17,6 +17,7 @@ static uint32_t find_memory_type(uint32_t type_filter, VkMemoryPropertyFlags pro
 	}
 
 	RENDERING_LOG_ERROR("failed to find suitable memory type!");
+	return std::numeric_limits<uint32_t>::max();
 }
 
 

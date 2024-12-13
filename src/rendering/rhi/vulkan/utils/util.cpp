@@ -68,7 +68,7 @@ SwapChainSupportDetails query_swap_chain_support(VkPhysicalDevice physical_devic
     SwapChainSupportDetails support_details;
     VkSurfaceCapabilitiesKHR capabilities;
     VK_CHECK_RESULT(vkGetPhysicalDeviceSurfaceCapabilitiesKHR(physical_device, surface, &capabilities));
-    support_details.capabilities = std::move(capabilities);
+    support_details.capabilities = capabilities;
     support_details.formats = vkEnumerateProperties(vkGetPhysicalDeviceSurfaceFormatsKHR, physical_device, surface);
     support_details.present_modes = vkEnumerateProperties(vkGetPhysicalDeviceSurfacePresentModesKHR, physical_device, surface);
     return support_details;

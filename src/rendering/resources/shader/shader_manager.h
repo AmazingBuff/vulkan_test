@@ -6,13 +6,13 @@ ENGINE_NAMESPACE_BEGIN
 
 struct ShaderResource
 {
-	std::vector<char> vertex_shader;
-	std::vector<char> fragment_shader;
+	std::shared_ptr<std::vector<char>> vertex_shader;
+	std::shared_ptr<std::vector<char>> fragment_shader;
 	// more for geometry shader, tessellation shader, compute shader, etc.
 
-	NODISCARD constexpr operator bool() const
+	NODISCARD explicit operator bool() const
 	{
-		return !vertex_shader.empty() && !fragment_shader.empty();
+		return !vertex_shader && !fragment_shader && !vertex_shader->empty() && !fragment_shader->empty();
 	}
 };
 

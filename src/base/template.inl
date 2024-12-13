@@ -1,5 +1,5 @@
 template<typename T>
-inline T& Singleton<T>::get_instance()
+T& Singleton<T>::get_instance()
 {
 	static T instance;
 	return instance;
@@ -8,76 +8,76 @@ inline T& Singleton<T>::get_instance()
 
 template<typename T>
 	requires std::is_enum_v<T>
-inline Enum<T>::Enum() : m_value(type()) {}
+Enum<T>::Enum() : m_value(type()) {}
 
 template<typename T>
 	requires std::is_enum_v<T>
-inline Enum<T>::Enum(const type& value) : m_value(value) {}
+Enum<T>::Enum(const type& value) : m_value(value) {}
 
 template<typename T>
 	requires std::is_enum_v<T>
-inline Enum<T>::Enum(const T& value) : m_value(static_cast<type>(value)) {}
+Enum<T>::Enum(const T& value) : m_value(static_cast<type>(value)) {}
 
 template<typename T>
 	requires std::is_enum_v<T>
-inline Enum<T>::Enum(const Enum& other) : m_value(other.m_value) {}
+Enum<T>::Enum(const Enum& other) : m_value(other.m_value) {}
 
 template<typename T>
 	requires std::is_enum_v<T>
-inline Enum<T>::Enum(Enum&& other) noexcept : m_value(std::move(other.m_value)) {}
+Enum<T>::Enum(Enum&& other) noexcept : m_value(std::move(other.m_value)) {}
 
 template<typename T>
 	requires std::is_enum_v<T>
-inline constexpr bool Enum<T>::operator==(const Enum& value) const
+constexpr bool Enum<T>::operator==(const Enum& value) const
 {
 	return m_value == value.m_value;
 }
 
 template<typename T>
 	requires std::is_enum_v<T>
-inline constexpr bool Enum<T>::operator!=(const Enum& value) const
+constexpr bool Enum<T>::operator!=(const Enum& value) const
 {
 	return m_value != value.m_value;
 }
 
 template<typename T>
 	requires std::is_enum_v<T>
-inline constexpr bool Enum<T>::operator>(const Enum& value) const
+constexpr bool Enum<T>::operator>(const Enum& value) const
 {
 	return m_value > value.m_value;
 }
 
 template<typename T>
 	requires std::is_enum_v<T>
-inline constexpr bool Enum<T>::operator>=(const Enum& value) const
+constexpr bool Enum<T>::operator>=(const Enum& value) const
 {
 	return m_value >= value.m_value;
 }
 
 template<typename T>
 	requires std::is_enum_v<T>
-inline constexpr bool Enum<T>::operator<(const Enum& value) const
+constexpr bool Enum<T>::operator<(const Enum& value) const
 {
 	return m_value < value.m_value;
 }
 
 template<typename T>
 	requires std::is_enum_v<T>
-inline constexpr bool Enum<T>::operator<=(const Enum& value) const
+constexpr bool Enum<T>::operator<=(const Enum& value) const
 {
 	return m_value <= value.m_value;
 }
 
 template<typename T>
 	requires std::is_enum_v<T>
-inline constexpr Enum<T>::operator T() const
+constexpr Enum<T>::operator T() const
 {
 	return static_cast<T>(m_value);
 }
 
 template<typename T>
 	requires std::is_enum_v<T>
-inline constexpr Enum<T>::operator type() const
+constexpr Enum<T>::operator type() const
 {
 	return m_value;
 }
@@ -87,23 +87,23 @@ inline constexpr Enum<T>::operator type() const
 
 template<typename T>
 	requires std::is_enum_v<T>
-inline BitFlag<T>::BitFlag(const type& value) : Enum<T>(value) {}
+BitFlag<T>::BitFlag(const type& value) : Enum<T>(value) {}
 
 template<typename T>
 	requires std::is_enum_v<T>
-inline BitFlag<T>::BitFlag(const T& value) : Enum<T>(value) {}
+BitFlag<T>::BitFlag(const T& value) : Enum<T>(value) {}
 
 template<typename T>
 	requires std::is_enum_v<T>
-inline BitFlag<T>::BitFlag(const BitFlag& other) : Enum<T>(static_cast<Enum<T>>(other)) {}
+BitFlag<T>::BitFlag(const BitFlag& other) : Enum<T>(static_cast<Enum<T>>(other)) {}
 
 template<typename T>
 	requires std::is_enum_v<T>
-inline BitFlag<T>::BitFlag(BitFlag&& other) noexcept : Enum<T>(static_cast<Enum<T>>(other)) {}
+BitFlag<T>::BitFlag(BitFlag&& other) noexcept : Enum<T>(static_cast<Enum<T>>(other)) {}
 
 template<typename T>
 	requires std::is_enum_v<T>
-inline constexpr BitFlag<T>& BitFlag<T>::operator|=(const BitFlag& value)
+constexpr BitFlag<T>& BitFlag<T>::operator|=(const BitFlag& value)
 {
 	*this |= value;
 	return *this;
@@ -111,7 +111,7 @@ inline constexpr BitFlag<T>& BitFlag<T>::operator|=(const BitFlag& value)
 
 template<typename T>
 	requires std::is_enum_v<T>
-inline constexpr BitFlag<T>& BitFlag<T>::operator&=(const BitFlag& value)
+constexpr BitFlag<T>& BitFlag<T>::operator&=(const BitFlag& value)
 {
 	*this &= value;
 	return *this;
@@ -119,7 +119,7 @@ inline constexpr BitFlag<T>& BitFlag<T>::operator&=(const BitFlag& value)
 
 template<typename T>
 	requires std::is_enum_v<T>
-inline constexpr BitFlag<T>& BitFlag<T>::operator^=(const BitFlag& value)
+constexpr BitFlag<T>& BitFlag<T>::operator^=(const BitFlag& value)
 {
 	*this ^= value;
 	return *this;
@@ -127,28 +127,28 @@ inline constexpr BitFlag<T>& BitFlag<T>::operator^=(const BitFlag& value)
 
 template<typename T>
 	requires std::is_enum_v<T>
-inline constexpr BitFlag<T> BitFlag<T>::operator|(const BitFlag& value) const
+constexpr BitFlag<T> BitFlag<T>::operator|(const BitFlag& value) const
 {
 	return BitFlag(*this | value);
 }
 
 template<typename T>
 	requires std::is_enum_v<T>
-inline constexpr BitFlag<T> BitFlag<T>::operator&(const BitFlag& value) const
+constexpr BitFlag<T> BitFlag<T>::operator&(const BitFlag& value) const
 {
 	return BitFlag(*this & value);
 }
 
 template<typename T>
 	requires std::is_enum_v<T>
-inline constexpr BitFlag<T> BitFlag<T>::operator^(const BitFlag& value) const
+constexpr BitFlag<T> BitFlag<T>::operator^(const BitFlag& value) const
 {
 	return BitFlag(*this ^ value);
 }
 
 template<typename T>
 	requires std::is_enum_v<T>
-inline constexpr BitFlag<T> BitFlag<T>::operator~() const
+constexpr BitFlag<T> BitFlag<T>::operator~() const
 {
 	return BitFlag(~*this);
 }

@@ -368,5 +368,8 @@ FodyWeavers.xsd
 # Build file
 build/
 
+# idea
+.idea/
+
 # Executable program
 *.exe

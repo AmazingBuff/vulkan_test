@@ -3,6 +3,8 @@
 #include <fmt/format.h>
 #include "util.h"
 
+AMAZING_NAMESPACE_BEGIN
+
 class Logger
 {
 public:
@@ -32,16 +34,17 @@ void Logger::log(const Level& level, const char* loc, const std::string& message
 		break;
 	case Level::e_error:
 		fatal_error(message);
-		break;
 	}
 }
 
 #if defined(_DEBUG) || defined(DEBUG)
-#define LOG_INFO(loc, ...)		Logger::log(Logger::Level::e_info, loc, __VA_ARGS__)
-#define LOG_WARNING(loc, ...)	Logger::log(Logger::Level::e_warning, loc, __VA_ARGS__)
-#define LOG_ERROR(loc, ...)		Logger::log(Logger::Level::e_error, loc, __VA_ARGS__)
+#define LOG_INFO(loc, ...)		Logger::log(Logger::Level::e_info, loc __VA_OPT__(,) __VA_ARGS__)
+#define LOG_WARNING(loc, ...)	Logger::log(Logger::Level::e_warning, loc __VA_OPT__(,) __VA_ARGS__)
+#define LOG_ERROR(loc, ...)		Logger::log(Logger::Level::e_error, loc __VA_OPT__(,) __VA_ARGS__)
 #else
 #define LOG_INFO(loc, message)
 #define LOG_WARNING(loc, message)
 #define LOG_ERROR(loc, message)
 #endif
+
+AMAZING_NAMESPACE_END

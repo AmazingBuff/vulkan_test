@@ -13,14 +13,14 @@ include(FetchContent)
 
 FetchContent_Declare(
     yaml-cpp
-    GIT_REPOSITORY https://github.com/jbeder/yaml-cpp.git
+    GIT_REPOSITORY https://bgithub.xyz/jbeder/yaml-cpp.git
     GIT_TAG da82fd982c260e7f335ce5acbceff24b270544d1
 )
 FetchContent_MakeAvailable(yaml-cpp)
 
 FetchContent_Declare(
     fmt
-    GIT_REPOSITORY https://github.com/fmtlib/fmt
+    GIT_REPOSITORY https://bgithub.xyz/fmtlib/fmt
     GIT_TAG 527e98e3f873562b640377ad8f3c6088ac34e01d
 )
 FetchContent_MakeAvailable(fmt)
@@ -29,7 +29,8 @@ file(GLOB_RECURSE HEADER_FILES src/*.h)
 file(GLOB_RECURSE SOURCE_FILES src/*.cpp)
 
 set(THIRD_PARTY_INCLUDE_DIRS 
-    ext/traits
+    ext/traits/include
+    ext/reflect-cpp/include
 )
 
 add_executable(
@@ -81,3 +82,12 @@ target_compile_definitions(
     VULKAN_RHI
     SOURCES_DIR="${CMAKE_CURRENT_SOURCE_DIR}"
 )
+
+if (MSVC)
+    # make __VA_OPT__ valid in msvc
+    target_compile_options(
+        ${PROJECT_NAME}
+        PRIVATE
+        /Zc:preprocessor
+    )
+endif ()
