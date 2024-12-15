@@ -9,34 +9,58 @@
 
 ENGINE_NAMESPACE_BEGIN
 
-#define STRING_ENUM(enum, string) {#string, enum##::##e_##string}
-#define STRING_ENUM_MAP(enum) enum##_Map
+#define STRING_ENUM(string, enum) {#string, enum##::##e_##string}
+#define STRING_ENUM_MAP(enum) enum##_String_To_Enum_Map
+
+#define ENUM_STRING(enum, string) {enum##::##e_##string, #string}
+#define ENUM_STRING_MAP(enum) enum##_Enum_To_String_Map
 
 template <typename Enum>
-Enum string_enum(const std::string& str);
+Enum string_to_enum(const std::string& str);
 
-#define STRING_TO_ENUM(enum)                            \
+template <typename Enum>
+std::string enum_to_string(const Enum& e);
+
+#define STRING_ENUM_FUNC(enum)                          \
 template <>                                             \
-enum string_enum<enum>(const std::string& str)          \
+enum string_to_enum<enum>(const std::string& str)       \
 {                                                       \
     auto it = STRING_ENUM_MAP(enum).find(str);          \
     if (it != STRING_ENUM_MAP(enum).end())              \
         return it->second;                              \
     return enum();                                      \
+}                                                       \
+template <>                                             \
+std::string enum_to_string(const enum& e)               \
+{                                                       \
+    auto it = ENUM_STRING_MAP(enum).find(e);            \
+    if (it != ENUM_STRING_MAP(enum).end())              \
+        return it->second;                              \
+    return "";                                          \
 }
+
 
 #define PARENS ()
 
-#define FOR_EACH(enum, ...)                                     \
-__VA_OPT__(EXPAND(FOR_EACH_HELPER(enum, __VA_ARGS__)))
-#define FOR_EACH_HELPER(enum, str, ...)                         \
-STRING_ENUM(enum, str),                                         \
-__VA_OPT__(FOR_EACH_AGAIN PARENS (enum, __VA_ARGS__))
+#define FOR_EACH_STRING(enum, ...)                                      \
+__VA_OPT__(EXPAND(FOR_EACH_STRING_HELPER(enum, __VA_ARGS__)))
+#define FOR_EACH_STRING_HELPER(enum, str, ...)                          \
+STRING_ENUM(str, enum),                                                 \
+__VA_OPT__(FOR_EACH_STRING_AGAIN PARENS (enum, __VA_ARGS__))
 
-#define FOR_EACH_AGAIN() FOR_EACH_HELPER
+#define FOR_EACH_STRING_AGAIN() FOR_EACH_STRING_HELPER
+
+#define FOR_EACH_ENUM(enum, ...)                                        \
+__VA_OPT__(EXPAND(FOR_EACH_ENUM_HELPER(enum, __VA_ARGS__)))
+#define FOR_EACH_ENUM_HELPER(enum, str, ...)                            \
+ENUM_STRING(enum, str),                                                 \
+__VA_OPT__(FOR_EACH_ENUM_AGAIN PARENS (enum, __VA_ARGS__))
+
+#define FOR_EACH_ENUM_AGAIN() FOR_EACH_ENUM_HELPER
 
 #define GENERATE_ENUM_MAP(enum, ...)    \
-const static std::unordered_map<std::string, enum> STRING_ENUM_MAP(enum) = { FOR_EACH(enum, __VA_ARGS__) };
+const static std::unordered_map<std::string, enum> STRING_ENUM_MAP(enum) = { FOR_EACH_STRING(enum, __VA_ARGS__) };\
+const static std::unordered_map<enum, std::string> ENUM_STRING_MAP(enum) = { FOR_EACH_ENUM(enum, __VA_ARGS__) };
 
 GENERATE_ENUM_MAP(SampleCountFlagBits, 1, 2, 4, 8, 16, 32, 64)
 GENERATE_ENUM_MAP(PipelineStageFlagBits,
@@ -247,23 +271,30 @@ GENERATE_ENUM_MAP(AttachmentTypeEnum,
                   depth_stencil)
 
 
-STRING_TO_ENUM(SampleCountFlagBits)
-STRING_TO_ENUM(PipelineStageFlagBits)
-STRING_TO_ENUM(AccessFlagBits)
-STRING_TO_ENUM(DependencyFlagBits)
-STRING_TO_ENUM(FormatEnum)
-STRING_TO_ENUM(AttachmentLoadOpEnum)
-STRING_TO_ENUM(AttachmentStoreOpEnum)
-STRING_TO_ENUM(ImageLayoutEnum)
-STRING_TO_ENUM(PipelineBindPointEnum)
-STRING_TO_ENUM(AttachmentTypeEnum)
+STRING_ENUM_FUNC(SampleCountFlagBits)
+STRING_ENUM_FUNC(PipelineStageFlagBits)
+STRING_ENUM_FUNC(AccessFlagBits)
+STRING_ENUM_FUNC(DependencyFlagBits)
+STRING_ENUM_FUNC(FormatEnum)
+STRING_ENUM_FUNC(AttachmentLoadOpEnum)
+STRING_ENUM_FUNC(AttachmentStoreOpEnum)
+STRING_ENUM_FUNC(ImageLayoutEnum)
+STRING_ENUM_FUNC(PipelineBindPointEnum)
+STRING_ENUM_FUNC(AttachmentTypeEnum)
 
 
 #undef GENERATE_ENUM_MAP
-#undef FOR_EACH
-#undef FOR_EACH_HELPER
-#undef FOR_EACH_AGAIN()
+#undef FOR_EACH_ENUM_AGAIN()
+#undef FOR_EACH_ENUM_HELPER
+#undef FOR_EACH_ENUM
+#undef FOR_EACH_STRING_AGAIN()
+#undef FOR_EACH_STRING_HELPER
+#undef FOR_EACH_STRING
 #undef PARENS
+
+#undef ENUM_STRING_MAP
+#undef ENUM_STRING
+#undef STRING_ENUM_FUNC
 #undef STRING_ENUM_MAP
 #undef STRING_ENUM
 

@@ -7,14 +7,15 @@ render_pass:
                 load_op: clear
                 store_op: store
         references:
-            -   type: color
-                attachment: 0
+            -   &first
+                type: color      
+                attachment: 0    
                 layout: color_attachment_optimal
     subpasses:
         descriptions:
             -   name: main
                 color_attachments: 
-                    - color
+                    - *first
         dependencies:
             -   name: main
                 src_subpass: external
