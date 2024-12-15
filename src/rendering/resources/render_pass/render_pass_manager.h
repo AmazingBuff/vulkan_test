@@ -5,16 +5,37 @@
 
 ENGINE_NAMESPACE_BEGIN
 
-struct RenderPassResource
+// self
+struct Attachments
 {
-	std::vector<AttachmentDescription>		attachments;
-	std::vector<AttachmentReference>		attachment_references;
-	std::vector<SubpassDescription>			subpasses;
+	std::vector<AttachmentDescription>		descriptions;
+	std::vector<AttachmentReference>		references;
+
+	NODISCARD constexpr explicit operator bool() const
+	{
+		return !descriptions.empty() && !references.empty();
+	}
+};
+
+struct Subpasses
+{
+	std::vector<SubpassDescription>			descriptions;
 	std::vector<SubpassDependency>			dependencies;
 
 	NODISCARD constexpr explicit operator bool() const
 	{
-		return !attachments.empty() && !attachment_references.empty() && !subpasses.empty();
+		return !descriptions.empty();
+	}
+};
+
+struct RenderPassResource
+{
+	Attachments		attachments;
+	Subpasses		subpasses;
+
+	NODISCARD constexpr explicit operator bool() const
+	{
+		return !attachments && !subpasses;
 	}
 };
 

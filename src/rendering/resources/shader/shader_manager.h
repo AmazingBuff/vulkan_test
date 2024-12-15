@@ -12,7 +12,7 @@ struct ShaderResource
 
 	NODISCARD explicit operator bool() const
 	{
-		return !vertex_shader && !fragment_shader && !vertex_shader->empty() && !fragment_shader->empty();
+		return vertex_shader && fragment_shader && !vertex_shader->empty() && !fragment_shader->empty();
 	}
 };
 

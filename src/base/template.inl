@@ -1,3 +1,4 @@
+#include "template.h"
 template<typename T>
 T& Singleton<T>::get_instance()
 {
@@ -16,7 +17,7 @@ Enum<T>::Enum(const type& value) : m_value(value) {}
 
 template<typename T>
 	requires std::is_enum_v<T>
-Enum<T>::Enum(const T& value) : m_value(static_cast<type>(value)) {}
+Enum<T>::Enum(const T& value) : m_value(std::to_underlying(value)) {}
 
 template<typename T>
 	requires std::is_enum_v<T>
@@ -66,6 +67,23 @@ template<typename T>
 constexpr bool Enum<T>::operator<=(const Enum& value) const
 {
 	return m_value <= value.m_value;
+}
+
+template<typename T>
+	requires std::is_enum_v<T>
+Enum<T>& Enum<T>::operator=(const T& value)
+{
+    m_value = std::to_underlying(value);
+    return *this;
+}
+
+template<typename T>
+	requires std::is_enum_v<T>
+Enum<T>& Enum<T>::operator=(const Enum& value)
+{
+	if (value != *this)
+		m_value = value.m_value;
+	return *this;
 }
 
 template<typename T>

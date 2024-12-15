@@ -37,6 +37,9 @@ public:
 	NODISCARD constexpr bool operator<(const Enum& value) const;
 	NODISCARD constexpr bool operator<=(const Enum& value) const;
 
+    NODISCARD Enum& operator=(const T& value);
+    NODISCARD Enum& operator=(const Enum& value);
+
 	// transform
 	NODISCARD constexpr explicit operator T() const;
 	NODISCARD constexpr explicit operator type() const;
