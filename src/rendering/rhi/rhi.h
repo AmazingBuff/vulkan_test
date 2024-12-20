@@ -43,7 +43,13 @@ class RHI
 public:
 	RHI() = default;
 	virtual ~RHI() = default;
-	virtual void initialize() = 0;
+
+	template<typename Self, typename... Args>
+	void init(this Self&& self, Args&&... args)
+	{
+		self.initialize(std::forward<Args>(args)...);
+	}
+
 	NODISCARD virtual constexpr RHIFlag flag() const = 0;
 };
 

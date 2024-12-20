@@ -4,14 +4,6 @@
 
 ENGINE_NAMESPACE_BEGIN
 
-#ifdef HIGH_PRECISION_FLOAT
-using Float = double;
-#else
-using Float = float;
-#endif // HIGH_PRECISION
-
-
-
 struct GlobalRuntimeInfo
 {
 	// window

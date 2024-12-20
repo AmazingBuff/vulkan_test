@@ -12,7 +12,7 @@ public:
 		std::optional<uint32_t> graphics_family;
 		std::optional<uint32_t> present_family;
 
-		NODISCARD constexpr operator bool() const
+		NODISCARD constexpr explicit operator bool() const
 		{
 			return graphics_family.has_value() && present_family.has_value();
 		}
@@ -27,8 +27,9 @@ public:
 public:
 	VK_CLASS(PhysicalDevice)() = default;
 	~VK_CLASS(PhysicalDevice)() override = default;
-	void initialize() override;
 	NODISCARD constexpr RHIFlag flag() const override;
+
+	void initialize();
 public:
 	VkPhysicalDeviceProperties			m_properties{};
 	VkPhysicalDeviceFeatures			m_features{};
@@ -49,9 +50,9 @@ class VK_CLASS(Device) final : public RHI
 public:
 	VK_CLASS(Device)() = default;
 	~VK_CLASS(Device)() override;
-	void initialize() override;
 	NODISCARD constexpr RHIFlag flag() const override;
 
+	void initialize();
 	// return false means that a new swap chain need to be created
 	NODISCARD bool present() const;
 	void wait_idle() const;
@@ -72,6 +73,8 @@ private:
 	friend class VK_CLASS(Fence);
 	friend class VK_CLASS(Buffer);
 	friend class VK_CLASS(VertexBuffer);
+
+	friend class VK_CLASS(PipelineResources);
 };
 
 ENGINE_NAMESPACE_END

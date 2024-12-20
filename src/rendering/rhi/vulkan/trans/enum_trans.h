@@ -66,6 +66,45 @@ enum class DependencyFlagBits
 	e_view_local = VK_DEPENDENCY_VIEW_LOCAL_BIT
 };
 
+enum class ShaderStageFlagBits
+{
+	e_vertex					=	VK_SHADER_STAGE_VERTEX_BIT,
+	e_tessellation_control		=	VK_SHADER_STAGE_TESSELLATION_CONTROL_BIT,
+	e_tessellation_evaluation	=	VK_SHADER_STAGE_TESSELLATION_EVALUATION_BIT,
+	e_geometry	                =	VK_SHADER_STAGE_GEOMETRY_BIT,
+	e_fragment	                =	VK_SHADER_STAGE_FRAGMENT_BIT,
+	e_compute	                =	VK_SHADER_STAGE_COMPUTE_BIT,
+	e_all_graphics				=	VK_SHADER_STAGE_ALL_GRAPHICS,
+	e_all						=	VK_SHADER_STAGE_ALL,
+	// ray tracing ext
+	e_raygen					=	VK_SHADER_STAGE_RAYGEN_BIT_KHR,
+	e_any_hit					=	VK_SHADER_STAGE_ANY_HIT_BIT_KHR,
+	e_closest_hit				=	VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR,
+	e_miss						=	VK_SHADER_STAGE_MISS_BIT_KHR,
+	e_intersection				=	VK_SHADER_STAGE_INTERSECTION_BIT_KHR,
+	e_callable					=	VK_SHADER_STAGE_CALLABLE_BIT_KHR,
+	e_task						=	VK_SHADER_STAGE_TASK_BIT_EXT,
+	e_mesh						=	VK_SHADER_STAGE_MESH_BIT_EXT,
+	e_subpass_shading			=	VK_SHADER_STAGE_SUBPASS_SHADING_BIT_HUAWEI,
+	e_cluster_culling			=	VK_SHADER_STAGE_CLUSTER_CULLING_BIT_HUAWEI,
+};
+
+enum class CullModeFlagBits
+{
+	e_none				=	VK_CULL_MODE_NONE,
+	e_front				=	VK_CULL_MODE_FRONT_BIT,
+	e_back				=	VK_CULL_MODE_BACK_BIT,
+	e_front_and_back	=	VK_CULL_MODE_FRONT_AND_BACK,
+};
+
+enum class ColorComponentFlagBits
+{
+	e_r				=	VK_COLOR_COMPONENT_R_BIT,
+	e_g				=	VK_COLOR_COMPONENT_G_BIT,
+	e_b				=	VK_COLOR_COMPONENT_B_BIT,
+	e_a				=	VK_COLOR_COMPONENT_A_BIT,
+};
+
 
 enum class FormatEnum
 {
@@ -241,6 +280,232 @@ enum class PipelineBindPointEnum
 {
 	e_graphics	=	VK_PIPELINE_BIND_POINT_GRAPHICS,
 	e_compute	=	VK_PIPELINE_BIND_POINT_COMPUTE
+};
+
+enum class DynamicStateEnum
+{
+	e_viewport				                    =	VK_DYNAMIC_STATE_VIEWPORT,
+	e_scissor				                    =	VK_DYNAMIC_STATE_SCISSOR,
+	e_line_width			                    =	VK_DYNAMIC_STATE_LINE_WIDTH,
+	e_depth_bias				                =	VK_DYNAMIC_STATE_DEPTH_BIAS,
+	e_blend_constants			                =	VK_DYNAMIC_STATE_BLEND_CONSTANTS,
+	e_depth_bounds					            =	VK_DYNAMIC_STATE_DEPTH_BOUNDS,
+	e_stencil_compare_mask		                =	VK_DYNAMIC_STATE_STENCIL_COMPARE_MASK,
+	e_stencil_write_mask		                =	VK_DYNAMIC_STATE_STENCIL_WRITE_MASK,
+	e_stencil_reference		                    =	VK_DYNAMIC_STATE_STENCIL_REFERENCE,
+	e_cull_mode				                    =	VK_DYNAMIC_STATE_CULL_MODE,
+	e_front_face				                =	VK_DYNAMIC_STATE_FRONT_FACE,
+	e_primitive_topology		                =	VK_DYNAMIC_STATE_PRIMITIVE_TOPOLOGY,
+	e_viewport_with_count		                =	VK_DYNAMIC_STATE_VIEWPORT_WITH_COUNT,
+	e_scissor_with_count		                =	VK_DYNAMIC_STATE_SCISSOR_WITH_COUNT,
+	e_vertex_input_binding_stride	            =	VK_DYNAMIC_STATE_VERTEX_INPUT_BINDING_STRIDE,
+	e_depth_test_enable			                =	VK_DYNAMIC_STATE_DEPTH_TEST_ENABLE,
+	e_depth_write_enable						=	VK_DYNAMIC_STATE_DEPTH_WRITE_ENABLE,
+	e_depth_compare_op							=	VK_DYNAMIC_STATE_DEPTH_COMPARE_OP,
+	e_depth_bounds_test_enable		            =	VK_DYNAMIC_STATE_DEPTH_BOUNDS_TEST_ENABLE,
+	e_stencil_test_enable			            =	VK_DYNAMIC_STATE_STENCIL_TEST_ENABLE,
+	e_stencil_op				                =	VK_DYNAMIC_STATE_STENCIL_OP,
+	e_rasterizer_discard_enable	                =	VK_DYNAMIC_STATE_RASTERIZER_DISCARD_ENABLE,
+	e_depth_bias_enable			                =	VK_DYNAMIC_STATE_DEPTH_BIAS_ENABLE,
+	e_primitive_restart_enable		            =	VK_DYNAMIC_STATE_PRIMITIVE_RESTART_ENABLE,
+
+	e_viewport_w_scaling		                =	VK_DYNAMIC_STATE_VIEWPORT_W_SCALING_NV,
+	e_discard_rectangle					        =	VK_DYNAMIC_STATE_DISCARD_RECTANGLE_EXT,
+	e_discard_rectangle_enable		            =	VK_DYNAMIC_STATE_DISCARD_RECTANGLE_ENABLE_EXT,
+	e_discard_rectangle_mode			        = 	VK_DYNAMIC_STATE_DISCARD_RECTANGLE_MODE_EXT,
+	e_sample_locations			                =	VK_DYNAMIC_STATE_SAMPLE_LOCATIONS_EXT,
+	e_ray_tracing_pipeline_stack_size	        =	VK_DYNAMIC_STATE_RAY_TRACING_PIPELINE_STACK_SIZE_KHR,
+	e_viewport_shading_rate_palette		        =	VK_DYNAMIC_STATE_VIEWPORT_SHADING_RATE_PALETTE_NV,
+	e_viewport_coarse_sample_order		        =	VK_DYNAMIC_STATE_VIEWPORT_COARSE_SAMPLE_ORDER_NV,
+	e_exclusive_scissor_enable			        =	VK_DYNAMIC_STATE_EXCLUSIVE_SCISSOR_ENABLE_NV,
+	e_exclusive_scissor					        =	VK_DYNAMIC_STATE_EXCLUSIVE_SCISSOR_NV,
+	e_fragment_shading_rate				        =	VK_DYNAMIC_STATE_FRAGMENT_SHADING_RATE_KHR,
+	e_vertex_input						        =	VK_DYNAMIC_STATE_VERTEX_INPUT_EXT,
+	e_patch_control_points				        =	VK_DYNAMIC_STATE_PATCH_CONTROL_POINTS_EXT,
+	e_logic_op							        =	VK_DYNAMIC_STATE_LOGIC_OP_EXT,
+	e_color_write_enable					    =	VK_DYNAMIC_STATE_COLOR_WRITE_ENABLE_EXT,
+	e_depth_clamp_enable					    =	VK_DYNAMIC_STATE_DEPTH_CLAMP_ENABLE_EXT,
+	e_polygon_mode						        =	VK_DYNAMIC_STATE_POLYGON_MODE_EXT,
+	e_rasterization_samples				        =	VK_DYNAMIC_STATE_RASTERIZATION_SAMPLES_EXT,
+	e_sample_mask							    =	VK_DYNAMIC_STATE_SAMPLE_MASK_EXT,
+	e_alpha_to_coverage_enable			        =	VK_DYNAMIC_STATE_ALPHA_TO_COVERAGE_ENABLE_EXT,
+	e_alpha_to_one_enable				        =	VK_DYNAMIC_STATE_ALPHA_TO_ONE_ENABLE_EXT,
+	e_logic_op_enable						    =	VK_DYNAMIC_STATE_LOGIC_OP_ENABLE_EXT,
+	e_color_blend_enable					    =	VK_DYNAMIC_STATE_COLOR_BLEND_ENABLE_EXT,
+	e_color_blend_equation					    =	VK_DYNAMIC_STATE_COLOR_BLEND_EQUATION_EXT,
+	e_color_write_mask						    =	VK_DYNAMIC_STATE_COLOR_WRITE_ENABLE_EXT,
+	e_tessellation_domain_origin		        =	VK_DYNAMIC_STATE_TESSELLATION_DOMAIN_ORIGIN_EXT,
+	e_rasterization_stream				        =	VK_DYNAMIC_STATE_RASTERIZATION_STREAM_EXT,
+	e_conservative_rasterization_mode		    =	VK_DYNAMIC_STATE_CONSERVATIVE_RASTERIZATION_MODE_EXT,
+	e_extra_primitive_overestimation_size	    = 	VK_DYNAMIC_STATE_EXTRA_PRIMITIVE_OVERESTIMATION_SIZE_EXT,
+	e_depth_clip_enable						    =	VK_DYNAMIC_STATE_DEPTH_CLIP_ENABLE_EXT,
+	e_sample_locations_enable				    =	VK_DYNAMIC_STATE_SAMPLE_LOCATIONS_ENABLE_EXT,
+	e_color_blend_advanced					    =	VK_DYNAMIC_STATE_COLOR_BLEND_ADVANCED_EXT,
+	e_provoking_vertex_mode 				    =	VK_DYNAMIC_STATE_PROVOKING_VERTEX_MODE_EXT,
+	e_line_rasterization_mode				    =	VK_DYNAMIC_STATE_LINE_RASTERIZATION_MODE_EXT,
+	e_line_stipple_enable					    =	VK_DYNAMIC_STATE_LINE_STIPPLE_ENABLE_EXT,
+	e_depth_clip_negative_one_to_one	        =	VK_DYNAMIC_STATE_DEPTH_CLIP_NEGATIVE_ONE_TO_ONE_EXT,
+	e_viewport_w_scaling_enable			        =	VK_DYNAMIC_STATE_VIEWPORT_W_SCALING_ENABLE_NV,
+	e_viewport_swizzle						    =	VK_DYNAMIC_STATE_VIEWPORT_SWIZZLE_NV,
+	e_coverage_to_color_enable				    =	VK_DYNAMIC_STATE_COVERAGE_TO_COLOR_ENABLE_NV,
+	e_coverage_to_color_location			    =	VK_DYNAMIC_STATE_COVERAGE_TO_COLOR_LOCATION_NV,
+	e_coverage_modulation_mode			        =	VK_DYNAMIC_STATE_COVERAGE_MODULATION_MODE_NV,
+	e_coverage_modulation_table_enable	        =	VK_DYNAMIC_STATE_COVERAGE_MODULATION_TABLE_ENABLE_NV,
+	e_coverage_modulation_table			        =	VK_DYNAMIC_STATE_COVERAGE_MODULATION_TABLE_NV,
+	e_representative_fragment_test_enable	    =	VK_DYNAMIC_STATE_REPRESENTATIVE_FRAGMENT_TEST_ENABLE_NV,
+	e_coverage_reduction_mode			        =	VK_DYNAMIC_STATE_COVERAGE_REDUCTION_MODE_NV,
+	e_attachment_feedback_loop_enable	        =	VK_DYNAMIC_STATE_ATTACHMENT_FEEDBACK_LOOP_ENABLE_EXT,
+	e_line_stipple						        =	VK_DYNAMIC_STATE_LINE_STIPPLE_KHR,
+	e_depth_clamp_range					        =	VK_DYNAMIC_STATE_DEPTH_CLAMP_RANGE_EXT,
+};
+
+enum class PrimitiveTopologyEnum
+{
+	e_point_list		                =   VK_PRIMITIVE_TOPOLOGY_POINT_LIST,
+	e_line_list			                =   VK_PRIMITIVE_TOPOLOGY_LINE_LIST,
+	e_line_strip		                =   VK_PRIMITIVE_TOPOLOGY_LINE_STRIP,
+	e_triangle_list		                =   VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST,
+	e_triangle_strip	                =   VK_PRIMITIVE_TOPOLOGY_TRIANGLE_STRIP,
+	e_line_list_with_adjacency	        =   VK_PRIMITIVE_TOPOLOGY_LINE_LIST_WITH_ADJACENCY,
+	e_line_strip_with_adjacency         =   VK_PRIMITIVE_TOPOLOGY_LINE_STRIP_WITH_ADJACENCY,
+	e_triangle_list_with_adjacency	    =   VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST_WITH_ADJACENCY,
+	e_triangle_strip_with_adjacency     =   VK_PRIMITIVE_TOPOLOGY_TRIANGLE_STRIP_WITH_ADJACENCY,
+	e_patch_list						=   VK_PRIMITIVE_TOPOLOGY_PATCH_LIST,
+};
+
+enum class PolygonModeEnum
+{
+	e_fill				= 	VK_POLYGON_MODE_FILL,
+	e_line				= 	VK_POLYGON_MODE_LINE,
+	e_point 			= 	VK_POLYGON_MODE_POINT,
+	e_fill_rectangle	= 	VK_POLYGON_MODE_FILL_RECTANGLE_NV,
+};
+
+enum class FrontFaceEnum
+{
+	e_counter_clockwise		=	VK_FRONT_FACE_COUNTER_CLOCKWISE,
+	e_clockwise				=	VK_FRONT_FACE_CLOCKWISE,
+};
+
+enum class CompareOpEnum
+{
+	e_never					=	VK_COMPARE_OP_NEVER,
+	e_less					=	VK_COMPARE_OP_LESS,
+	e_equal					=	VK_COMPARE_OP_EQUAL,
+	e_less_or_equal			=	VK_COMPARE_OP_LESS_OR_EQUAL,
+	e_greater				=	VK_COMPARE_OP_GREATER,
+	e_not_equal				=	VK_COMPARE_OP_NOT_EQUAL,
+	e_greater_or_equal		=	VK_COMPARE_OP_GREATER_OR_EQUAL,
+	e_always				=	VK_COMPARE_OP_ALWAYS,
+};
+
+enum class StencilOpEnum
+{
+	e_keep					=	VK_STENCIL_OP_KEEP,
+	e_zero					=	VK_STENCIL_OP_ZERO,
+	e_replace				=	VK_STENCIL_OP_REPLACE,
+	e_increment_and_clamp	=	VK_STENCIL_OP_INCREMENT_AND_CLAMP,
+	e_decrement_and_clamp	=	VK_STENCIL_OP_DECREMENT_AND_CLAMP,
+	e_invert				=	VK_STENCIL_OP_INVERT,
+	e_increment_and_wrap	=	VK_STENCIL_OP_INCREMENT_AND_WRAP,
+	e_decrement_and_wrap	=	VK_STENCIL_OP_DECREMENT_AND_WRAP,
+};
+
+enum class BlendFactorEnum
+{
+	e_zero						=	VK_BLEND_FACTOR_ZERO,
+	e_one						=	VK_BLEND_FACTOR_ONE,
+	e_src_color					=	VK_BLEND_FACTOR_SRC_COLOR,
+	e_one_minus_src_color		=	VK_BLEND_FACTOR_ONE_MINUS_SRC_COLOR,
+	e_dst_color					=	VK_BLEND_FACTOR_DST_COLOR,
+	e_one_minus_dst_color		=	VK_BLEND_FACTOR_ONE_MINUS_DST_COLOR,
+	e_src_alpha					=	VK_BLEND_FACTOR_SRC_ALPHA,
+	e_one_minus_src_alpha		=	VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA,
+	e_dst_alpha					=	VK_BLEND_FACTOR_DST_ALPHA,
+	e_one_minus_dst_alpha		=	VK_BLEND_FACTOR_ONE_MINUS_DST_ALPHA,
+	e_constant_color			=	VK_BLEND_FACTOR_CONSTANT_COLOR,
+	e_one_minus_constant_color	=	VK_BLEND_FACTOR_ONE_MINUS_CONSTANT_COLOR,
+	e_constant_alpha			=	VK_BLEND_FACTOR_CONSTANT_ALPHA,
+	e_one_minus_constant_alpha	=	VK_BLEND_FACTOR_ONE_MINUS_CONSTANT_ALPHA,
+	e_src_alpha_saturate		=	VK_BLEND_FACTOR_SRC_ALPHA_SATURATE,
+	e_src1_color				=	VK_BLEND_FACTOR_SRC1_COLOR,
+	e_one_minus_src1_color		=	VK_BLEND_FACTOR_ONE_MINUS_SRC1_COLOR,
+	e_src1_alpha				=	VK_BLEND_FACTOR_SRC1_ALPHA,
+	e_one_minus_src1_alpha		=	VK_BLEND_FACTOR_ONE_MINUS_SRC1_ALPHA,
+};
+
+enum class BlendOpEnum
+{
+	e_add					=	VK_BLEND_OP_ADD,
+	e_subtract				=	VK_BLEND_OP_SUBTRACT,
+	e_reverse_subtract		=	VK_BLEND_OP_REVERSE_SUBTRACT,
+	e_min					=	VK_BLEND_OP_MIN,
+	e_max					=	VK_BLEND_OP_MAX,
+	e_zero					=	VK_BLEND_OP_ZERO_EXT,
+	e_src					=	VK_BLEND_OP_SRC_EXT,
+	e_dst					=	VK_BLEND_OP_DST_EXT,
+	e_src_over				=	VK_BLEND_OP_SRC_OVER_EXT,
+	e_dst_over				=	VK_BLEND_OP_DST_OVER_EXT,
+	e_src_in				=	VK_BLEND_OP_SRC_IN_EXT,
+	e_dst_in				=	VK_BLEND_OP_DST_IN_EXT,
+	e_src_out				=	VK_BLEND_OP_SRC_OUT_EXT,
+	e_dst_out				=	VK_BLEND_OP_DST_OUT_EXT,
+	e_src_atop				=	VK_BLEND_OP_SRC_ATOP_EXT,
+	e_dst_atop				=	VK_BLEND_OP_DST_ATOP_EXT,
+	e_xor					=	VK_BLEND_OP_XOR_EXT,
+	e_multiply				=	VK_BLEND_OP_MULTIPLY_EXT,
+	e_screen				=	VK_BLEND_OP_SCREEN_EXT,
+	e_overlay				=	VK_BLEND_OP_OVERLAY_EXT,
+	e_darken				=	VK_BLEND_OP_DARKEN_EXT,
+	e_lighten				=	VK_BLEND_OP_LIGHTEN_EXT,
+	e_colordodge			=	VK_BLEND_OP_COLORDODGE_EXT,
+	e_colorburn				=	VK_BLEND_OP_COLORBURN_EXT,
+	e_hardlight				=	VK_BLEND_OP_HARDLIGHT_EXT,
+	e_softlight				=	VK_BLEND_OP_SOFTLIGHT_EXT,
+	e_difference			=	VK_BLEND_OP_DIFFERENCE_EXT,
+	e_exclusion				=	VK_BLEND_OP_EXCLUSION_EXT,
+	e_invert					=	VK_BLEND_OP_INVERT_EXT,
+	e_lineardodge				=	VK_BLEND_OP_LINEARDODGE_EXT,
+	e_linearburn				=	VK_BLEND_OP_LINEARBURN_EXT,
+	e_vividlight				=	VK_BLEND_OP_VIVIDLIGHT_EXT,
+	e_linearlight				=	VK_BLEND_OP_LINEARLIGHT_EXT,
+	e_pinlight					=	VK_BLEND_OP_PINLIGHT_EXT,
+	e_hardmix					=	VK_BLEND_OP_HARDMIX_EXT,
+	e_hsl_hue					=	VK_BLEND_OP_HSL_HUE_EXT,
+	e_hsl_saturation			=	VK_BLEND_OP_HSL_SATURATION_EXT,
+	e_hsl_color					=	VK_BLEND_OP_HSL_COLOR_EXT,
+	e_hsl_luminosity			=	VK_BLEND_OP_HSL_LUMINOSITY_EXT,
+	e_plus						=	VK_BLEND_OP_PLUS_EXT,
+	e_plus_clamped				=	VK_BLEND_OP_PLUS_CLAMPED_EXT,
+	e_plus_clamped_alpha		=	VK_BLEND_OP_PLUS_CLAMPED_ALPHA_EXT,
+	e_plus_darker				=	VK_BLEND_OP_PLUS_DARKER_EXT,
+	e_minus						=	VK_BLEND_OP_MINUS_EXT,
+	e_minus_clamped				=	VK_BLEND_OP_MINUS_CLAMPED_EXT,
+	e_contrast					=	VK_BLEND_OP_CONTRAST_EXT,
+	e_invert_ovg				=	VK_BLEND_OP_INVERT_OVG_EXT,
+	e_red						=	VK_BLEND_OP_RED_EXT,
+	e_green						=	VK_BLEND_OP_GREEN_EXT,
+	e_blue						=	VK_BLEND_OP_BLUE_EXT,
+};
+
+enum class LogicOpEnum
+{
+	e_clear 			=	VK_LOGIC_OP_CLEAR,
+	e_and				= 	VK_LOGIC_OP_AND,
+	e_and_reverse		= 	VK_LOGIC_OP_AND_REVERSE,
+	e_copy				= 	VK_LOGIC_OP_COPY,
+	e_and_inverted		= 	VK_LOGIC_OP_AND_INVERTED,
+	e_no_op				= 	VK_LOGIC_OP_NO_OP,
+	e_xor				= 	VK_LOGIC_OP_XOR,
+	e_or				= 	VK_LOGIC_OP_OR,
+	e_nor				= 	VK_LOGIC_OP_NOR,
+	e_equivalent		= 	VK_LOGIC_OP_EQUIVALENT,
+	e_invert			= 	VK_LOGIC_OP_INVERT,
+	e_or_reverse		= 	VK_LOGIC_OP_OR_REVERSE,
+	e_copy_inverted 	= 	VK_LOGIC_OP_COPY_INVERTED,
+	e_or_inverted		= 	VK_LOGIC_OP_OR_INVERTED,
+	e_nand				= 	VK_LOGIC_OP_NAND,
+	e_set				= 	VK_LOGIC_OP_SET,
 };
 
 

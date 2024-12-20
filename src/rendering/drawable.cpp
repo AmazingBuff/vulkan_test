@@ -11,32 +11,30 @@ Drawable::~Drawable()
 void Drawable::initialize()
 {
 	m_instance = std::make_shared<Instance>();
-	m_instance->initialize();
+	m_instance->init();
 
 	m_physical_device = std::make_shared<PhysicalDevice>();
-	m_physical_device->initialize();
+	m_physical_device->init();
 
 	m_device = std::make_shared<Device>();
-	m_device->initialize();
+	m_device->init();
 
 	m_command_buffer = std::make_shared<CommandBuffer>();
-	m_command_buffer->initialize();
+	m_command_buffer->init();
 
 	m_swap_chain = std::make_shared<SwapChain>();
-	m_swap_chain->initialize();
+	m_swap_chain->init();
 
 	m_pipeline_layout = std::make_shared<PipelineLayout>();
-	m_pipeline_layout->initialize();
+	m_pipeline_layout->init();
 
 	m_render_pass = std::make_shared<RenderPass>();
-	m_render_pass->initialize();
+	m_render_pass->init("basic");
 
 	m_swap_chain->create_frame_buffers(m_render_pass);
 
 	m_pipeline = std::make_shared<Pipeline>();
-	m_pipeline->set_pipeline_layout(m_pipeline_layout);
-	m_pipeline->set_render_pass(m_render_pass);
-	m_pipeline->initialize();
+	m_pipeline->init(m_pipeline_layout, m_render_pass);
 }
 
 void Drawable::draw(GlobalRuntimeInfo& global_info)
@@ -83,7 +81,7 @@ void Drawable::recreate_swap_chain(GlobalRuntimeInfo& global_info)
 
 	m_device->wait_idle();
 	m_swap_chain = std::make_shared<SwapChain>();
-	m_swap_chain->initialize();
+	m_swap_chain->init();
 	m_swap_chain->create_frame_buffers(m_render_pass);
 }
 

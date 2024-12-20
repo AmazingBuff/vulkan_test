@@ -47,7 +47,7 @@ public:
 	~RenderPassManager() = default;
 
 	void initialize();
-	NODISCARD const RenderPassResource& get_render_pass_resource(const std::string& name);
+	NODISCARD const RenderPassResource& get_render_pass_resource(const std::string_view& name);
 private:
 	void load_render_pass_files();
 private:

@@ -1,0 +1,83 @@
+pipeline:
+    shader_stage:
+        -   type: vertex
+            name: main
+            module: triangle
+        -   type: fragment
+            name: main
+            module: triangle
+    dynamic_stage:
+        -   viewport
+        -   scissor
+    input_assembly_state:
+            topology: triangle_list
+            primitive_restart_enable: 0
+    viewport_stage:
+            viewport:
+                -   x: 0.0
+                    y: 0.0
+                    width: internal
+                    height: internal
+                    min_depth: 0.0
+                    max_depth: 1.0
+            scissor:
+                -   offset:
+                        x: 0
+                        y: 0
+                    extent:
+                        width: internal
+                        height: internal
+    rasterization_state:
+        depth_clamp_enable: 0
+        rasterizer_discard_enable: 0
+        polygon_mode: fill
+        cull_mode: back
+        front_face: clockwise
+        depth_bias_enable: 0
+        depth_bias_constant_factor: 0.0
+        depth_bias_clamp: 0.0
+        depth_bias_slope_factor: 0.0
+        line_width: 1.0
+    multisample_state:
+        rasterization_samples: 1
+        sample_shading_enable: 0
+        min_sample_shading: 1.0
+        alpha_to_coverage_enable: 0
+        alpha_to_one_enable: 0
+    depth_stencil_state:
+        depth_test_enable: 0
+        depth_write_enable: 0
+        depth_compare_op: less
+        depth_bounds_test_enable: 0
+        stencil_test_enable: 0
+        front:
+            fail_op: keep
+            pass_op: keep
+            depth_fail_op: keep
+            compare_op: less
+            compare_mask: 0
+            write_mask: 0
+            reference: 0
+        back:
+            fail_op: keep
+            pass_op: keep
+            depth_fail_op: keep
+            compare_op: less
+            compare_mask: 0
+            write_mask: 0
+            reference: 0
+        min_depth_bounds: 0.0
+        max_depth_bounds: 1.0
+    color_blend_state:
+        logic_op_enable: 0
+        logic_op: copy
+        color_blend_attachments:
+            -   blend_enable: 0
+                src_color_blend_factor: src_alpha
+                dst_color_blend_factor: one_minus_src_alpha
+                color_blend_op: add
+                src_alpha_blend_factor: one
+                dst_alpha_blend_factor: zero
+                alpha_blend_op: add
+                color_write_mask: r | g | b | a
+        blend_constants: [0.0, 0.0, 0.0, 0.0]

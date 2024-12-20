@@ -5,6 +5,9 @@
 #include "rendering/drawable.h"
 #include "rendering/render_resouces.h"
 #include "rendering/resources/shader/shader_manager.h"
+#include "rendering/resources/render_pass/render_pass_manager.h"
+#include "rendering/rhi/vulkan/trans/enum_trans.h"
+#include "rendering/rhi/vulkan/trans/structure_trans.h"
 
 ENGINE_NAMESPACE_BEGIN
 
@@ -19,6 +22,109 @@ static VkShaderModule create_shader_module(VkDevice device, const std::shared_pt
 	VkShaderModule shader_module;
 	VK_CHECK_RESULT(vkCreateShaderModule(device, &create_info, nullptr, &shader_module));
 	return shader_module;
+}
+
+static VkRenderPass transfer_render_pass(VkDevice device, const RenderPassResource& render_pass_resource)
+{
+	std::vector<VkAttachmentDescription> attachments;
+	std::vector<VkSubpassDescription> subpasses;
+	std::vector<VkSubpassDependency> dependencies;
+
+	for (auto& attachment : render_pass_resource.attachments.descriptions)
+	{
+		VkAttachmentDescription description{
+			.format			= static_cast<VkFormat>(static_cast<int>(attachment.format)),
+			.samples		= static_cast<VkSampleCountFlagBits>(static_cast<int>(attachment.samples)),
+			.loadOp			= static_cast<VkAttachmentLoadOp>(static_cast<int>(attachment.load_op)),
+			.storeOp		= static_cast<VkAttachmentStoreOp>(static_cast<int>(attachment.store_op)),
+			.stencilLoadOp	= static_cast<VkAttachmentLoadOp>(static_cast<int>(attachment.stencil_load_op)),
+			.stencilStoreOp = static_cast<VkAttachmentStoreOp>(static_cast<int>(attachment.stencil_store_op)),
+			.initialLayout	= static_cast<VkImageLayout>(static_cast<int>(attachment.initial_layout)),
+			.finalLayout	= static_cast<VkImageLayout>(static_cast<int>(attachment.final_layout)),
+		};
+		attachments.emplace_back(description);
+	}
+
+	for (auto& dependency : render_pass_resource.subpasses.dependencies)
+	{
+		VkSubpassDependency depend{
+			.srcSubpass = dependency.src_subpass,
+			.dstSubpass = dependency.dst_subpass,
+			.srcStageMask = static_cast<VkPipelineStageFlags>(static_cast<int>(dependency.src_stage_mask)),
+			.dstStageMask = static_cast<VkPipelineStageFlags>(static_cast<int>(dependency.dst_stage_mask)),
+			.srcAccessMask = static_cast<VkAccessFlags>(static_cast<int>(dependency.src_access_mask)),
+			.dstAccessMask = static_cast<VkAccessFlags>(static_cast<int>(dependency.dst_access_mask)),
+			.dependencyFlags = static_cast<VkDependencyFlags>(static_cast<int>(dependency.dependency_flags)),
+		};
+		dependencies.emplace_back(depend);
+	}
+
+	struct VkAttachmentReferences
+	{
+		std::vector<VkAttachmentReference> input_attachments;
+		std::vector<VkAttachmentReference> color_attachments;
+		std::vector<VkAttachmentReference> resolve_attachments;
+		VkAttachmentReference depth_stencil_attachment{};
+	};
+	// make sure VkSubpassDescription must be valid before create render pass
+	std::vector<VkAttachmentReferences> references(render_pass_resource.subpasses.descriptions.size());
+	for (size_t i = 0; i < render_pass_resource.subpasses.descriptions.size(); ++i)
+	{
+		auto& subpass = render_pass_resource.subpasses.descriptions[i];
+		auto& reference = references[i];
+
+		for (auto& input : subpass.input_attachments)
+			reference.input_attachments.emplace_back(input.attachment, static_cast<VkImageLayout>(static_cast<int>(input.layout)));
+
+		for (auto& color : subpass.color_attachments)
+			reference.color_attachments.emplace_back(color.attachment, static_cast<VkImageLayout>(static_cast<int>(color.layout)));
+
+		for (auto& resolve : subpass.resolve_attachments)
+			reference.resolve_attachments.emplace_back(resolve.attachment, static_cast<VkImageLayout>(static_cast<int>(resolve.layout)));
+
+		ASSERT(reference.resolve_attachments.empty() || reference.resolve_attachments.size() == reference.color_attachments.size());
+
+		VkSubpassDescription description {
+			.pipelineBindPoint = static_cast<VkPipelineBindPoint>(static_cast<int>(subpass.pipeline_bind_point)),
+			.inputAttachmentCount = static_cast<uint32_t>(reference.input_attachments.size()),
+			.pInputAttachments = reference.input_attachments.data(),
+			.colorAttachmentCount = static_cast<uint32_t>(reference.color_attachments.size()),
+			.pColorAttachments = reference.color_attachments.data(),
+			.pResolveAttachments = reference.resolve_attachments.data(),
+			.pDepthStencilAttachment = nullptr,
+			.preserveAttachmentCount = static_cast<uint32_t>(subpass.preserve_attachments.size()),
+			.pPreserveAttachments = subpass.preserve_attachments.data()
+		};
+
+		if (subpass.depth_stencil_attachment)
+		{
+			reference.depth_stencil_attachment = { subpass.depth_stencil_attachment.value().attachment,
+				static_cast<VkImageLayout>(static_cast<int>(subpass.depth_stencil_attachment.value().layout)) };
+
+			description.pDepthStencilAttachment = &reference.depth_stencil_attachment;
+		}
+
+		subpasses.emplace_back(description);
+	}
+
+	VkRenderPassCreateInfo render_pass_info{
+		.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO,
+		.attachmentCount = static_cast<uint32_t>(attachments.size()),
+		.pAttachments = attachments.data(),
+		.subpassCount = static_cast<uint32_t>(subpasses.size()),
+		.pSubpasses = subpasses.data(),
+		.dependencyCount = static_cast<uint32_t>(dependencies.size()),
+		.pDependencies = dependencies.data()
+	};
+
+	VkRenderPass render_pass;
+	VK_CHECK_RESULT(vkCreateRenderPass(device, &render_pass_info, nullptr, &render_pass));
+	return render_pass;
+}
+
+static VkPipeline transfer_pipeline(VkDevice device, const PipelineResources& pipeline_resources)
+{
+	return nullptr;
 }
 
 
@@ -56,9 +162,9 @@ VK_CLASS(RenderPass)::~VK_CLASS(RenderPass)()
 	vkDestroyRenderPass(g_system_context->g_render_system->m_drawable->m_device->m_device, m_render_pass, nullptr);
 }
 
-void VK_CLASS(RenderPass)::initialize()
+void VK_CLASS(RenderPass)::initialize(const std::string_view& name)
 {
-	create_render_pass();
+	create_render_pass(name);
 }
 
 
@@ -67,53 +173,13 @@ constexpr NODISCARD RHIFlag VK_CLASS(RenderPass)::flag() const
 	return RHIFlag::e_render_pass;
 }
 
-void VK_CLASS(RenderPass)::create_render_pass()
+void VK_CLASS(RenderPass)::create_render_pass(const std::string_view& name)
 {
 	auto device = g_system_context->g_render_system->m_drawable->m_device->m_device;
 	auto swap_chain = g_system_context->g_render_system->m_drawable->m_swap_chain;
 
-	VkAttachmentDescription color_attachment{
-		.format = swap_chain->m_details.format.value().format,
-		.samples = VK_SAMPLE_COUNT_1_BIT,
-		.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR,
-		.storeOp = VK_ATTACHMENT_STORE_OP_STORE,
-		.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE,
-		.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE,
-		.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED,
-		.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR
-	};
-
-	VkAttachmentReference color_attachment_ref{
-		.attachment = 0,
-		.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL
-	};
-
-	VkSubpassDescription subpass{
-		.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS,
-		.colorAttachmentCount = 1,
-		.pColorAttachments = &color_attachment_ref
-	};
-
-	VkSubpassDependency dependency{
-		.srcSubpass = VK_SUBPASS_EXTERNAL,
-		.dstSubpass = 0,
-		.srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
-		.dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
-		.srcAccessMask = 0,
-		.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT
-	};
-
-	VkRenderPassCreateInfo render_pass_info{
-		.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO,
-		.attachmentCount = 1,
-		.pAttachments = &color_attachment,
-		.subpassCount = 1,
-		.pSubpasses = &subpass,
-		.dependencyCount = 1,
-		.pDependencies = &dependency
-	};
-
-	VK_CHECK_RESULT(vkCreateRenderPass(device, &render_pass_info, nullptr, &m_render_pass));
+	auto& render_pass = g_system_context->g_render_system->m_render_resources->get_render_pass_resource(name);
+	m_render_pass = transfer_render_pass(device, render_pass);
 }
 
 
@@ -123,19 +189,9 @@ VK_CLASS(Pipeline)::~VK_CLASS(Pipeline)()
 	vkDestroyPipeline(g_system_context->g_render_system->m_drawable->m_device->m_device, m_pipeline, nullptr);
 }
 
-void VK_CLASS(Pipeline)::set_render_pass(const std::shared_ptr<VK_CLASS(RenderPass)>& render_pass)
+void VK_CLASS(Pipeline)::initialize(const std::shared_ptr<VK_CLASS(PipelineLayout)>& pipeline_layout, const std::shared_ptr<VK_CLASS(RenderPass)>& render_pass)
 {
-	m_render_pass = render_pass;
-}
-
-void VK_CLASS(Pipeline)::set_pipeline_layout(const std::shared_ptr<VK_CLASS(PipelineLayout)>& pipeline_layout)
-{
-	m_pipeline_layout = pipeline_layout;
-}
-
-void VK_CLASS(Pipeline)::initialize()
-{
-	create_pipeline();
+	create_pipeline(pipeline_layout, render_pass);
 }
 
 NODISCARD constexpr RHIFlag VK_CLASS(Pipeline)::flag() const
@@ -143,7 +199,7 @@ NODISCARD constexpr RHIFlag VK_CLASS(Pipeline)::flag() const
 	return RHIFlag::e_pipeline;
 }
 
-void VK_CLASS(Pipeline)::create_pipeline()
+void VK_CLASS(Pipeline)::create_pipeline(const std::shared_ptr<VK_CLASS(PipelineLayout)>& pipeline_layout, const std::shared_ptr<VK_CLASS(RenderPass)>& render_pass)
 {
 	auto device = g_system_context->g_render_system->m_drawable->m_device->m_device;
 	// todo: design a shader, pipeline layout and render pass manager which read configuration from a yaml file
@@ -275,8 +331,8 @@ void VK_CLASS(Pipeline)::create_pipeline()
 		.pDepthStencilState = nullptr,
 		.pColorBlendState = &color_blending_info,
 		.pDynamicState = &dynamic_state_info,
-		.layout = m_pipeline_layout->m_pipeline_layout,
-		.renderPass = m_render_pass->m_render_pass,
+		.layout = pipeline_layout->m_pipeline_layout,
+		.renderPass = render_pass->m_render_pass,
 		.subpass = 0,
 		.basePipelineHandle = VK_NULL_HANDLE,
 		.basePipelineIndex = -1

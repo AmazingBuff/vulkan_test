@@ -71,11 +71,11 @@ void RenderPassManager::initialize()
 	load_render_pass_files();
 }
 
-const RenderPassResource& RenderPassManager::get_render_pass_resource(const std::string& name)
+const RenderPassResource& RenderPassManager::get_render_pass_resource(const std::string_view& name)
 {
-	auto it = m_render_pass_resources.find(name);
+	auto it = m_render_pass_resources.find(name.data());
 	if (it == m_render_pass_resources.end())
-		RENDERING_LOG_ERROR("render pass resource not found: " + name);
+		RENDERING_LOG_ERROR("render pass resource not found: " + std::string(name));
 
 	return it->second;
 }

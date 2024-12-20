@@ -2,7 +2,7 @@ render_pass:
     attachments:
         descriptions:
             -   type: color
-                format: rgba8
+                format: r8g8b8a8_unorm
                 samples: 1
                 load_op: clear
                 store_op: store
@@ -22,6 +22,5 @@ render_pass:
                 dst_subpass: 0
                 src_stage_mask: color_attachment_output
                 dst_stage_mask: color_attachment_output
-                src_access_mask: 0
                 dst_access_mask: color_attachment_write                
      
