@@ -4,60 +4,22 @@
 
 namespace rfl
 {
-    // self
-    template <>
-    struct Reflector<Amazing::Engine::Attachments>
-    {
-        struct ReflType
-        {
-            std::vector<Amazing::Engine::AttachmentDescription>		descriptions;
-            std::vector<Amazing::Engine::AttachmentReference>		references;
-        };
-        static Amazing::Engine::Attachments to(const ReflType& v) noexcept
-        {
-            return { v.descriptions, v.references };
-        }
-        static ReflType from(const Amazing::Engine::Attachments& v)
-        {
-            return { v.descriptions, v.references };
-        }
-    };
-
-    template <>
-    struct Reflector<Amazing::Engine::Subpasses>
-    {
-        struct ReflType
-        {
-            std::vector<Amazing::Engine::SubpassDescription>	descriptions;
-            std::vector<Amazing::Engine::SubpassDependency>		dependencies;
-        };
-        static Amazing::Engine::Subpasses to(const ReflType& v) noexcept
-        {
-            return { v.descriptions, v.dependencies };
-        }
-        static ReflType from(const Amazing::Engine::Subpasses& v)
-        {
-            return { v.descriptions, v.dependencies };
-        }
-    };
-
     template <>
     struct Reflector<Amazing::Engine::RenderPassResource>
     {
         struct ReflType
         {
-            Amazing::Engine::Attachments		attachments;
-            Amazing::Engine::Subpasses		    subpasses;
+            Amazing::Engine::RenderPassState   render_pass;
         };
 
         static Amazing::Engine::RenderPassResource to(const ReflType& v) noexcept
         {
-            return { v.attachments, v.subpasses};
+            return { std::make_shared<Amazing::Engine::RenderPassState>(v.render_pass) };
         }
 
         static ReflType from(const Amazing::Engine::RenderPassResource& v)
         {
-            return { v.attachments, v.subpasses};
+            return { *v.render_pass };
         }
     };
 }
@@ -90,7 +52,7 @@ void RenderPassManager::load_render_pass_files()
         const std::string name = file_name.substr(0, file_name.find(".yaml"));
 
         YAML::Node config = YAML::LoadFile(file.path().generic_string());
-        RenderPassResource resource = rfl::yaml::read<RenderPassResource, rfl::DefaultIfMissing>(config["render_pass"]).value();
+        RenderPassResource resource = rfl::yaml::read<RenderPassResource, rfl::DefaultIfMissing>(config).value();
         m_render_pass_resources.emplace(name, resource);
     }
 }

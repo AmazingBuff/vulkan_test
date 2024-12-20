@@ -61,8 +61,8 @@ namespace rfl
     {
         struct ReflType
         {
-            Amazing::Engine::Offset2D   offset;
-            Amazing::Engine::Extent2D   extent;
+            Amazing::Engine::Offset2D                       offset;
+            std::optional < Amazing::Engine::Extent2D>      extent;
         };
 
         static Amazing::Engine::Rect2D to(const ReflType& v) noexcept
@@ -81,12 +81,12 @@ namespace rfl
     {
         struct ReflType
         {
-            float    x;
-            float    y;
-            float    width;
-            float    height;
-            float    min_depth;
-            float    max_depth;
+            float                   x;
+            float                   y;
+            std::optional<float>    width;
+            std::optional<float>    height;
+            float                   min_depth;
+            float                   max_depth;
         };
 
         static Amazing::Engine::Viewport to(const ReflType& v) noexcept
@@ -272,6 +272,63 @@ namespace rfl
         }
     };
 
+    // self
+    template <>
+    struct Reflector<Amazing::Engine::Attachments>
+    {
+        struct ReflType
+        {
+            std::vector<Amazing::Engine::AttachmentDescription>		descriptions;
+            std::vector<Amazing::Engine::AttachmentReference>		references;
+        };
+        static Amazing::Engine::Attachments to(const ReflType& v) noexcept
+        {
+            return { v.descriptions, v.references };
+        }
+        static ReflType from(const Amazing::Engine::Attachments& v)
+        {
+            return { v.descriptions, v.references };
+        }
+    };
+
+    template <>
+    struct Reflector<Amazing::Engine::Subpasses>
+    {
+        struct ReflType
+        {
+            std::vector<Amazing::Engine::SubpassDescription>	descriptions;
+            std::vector<Amazing::Engine::SubpassDependency>		dependencies;
+        };
+        static Amazing::Engine::Subpasses to(const ReflType& v) noexcept
+        {
+            return { v.descriptions, v.dependencies };
+        }
+        static ReflType from(const Amazing::Engine::Subpasses& v)
+        {
+            return { v.descriptions, v.dependencies };
+        }
+    };
+
+    template <>
+    struct Reflector<Amazing::Engine::RenderPassState>
+    {
+        struct ReflType
+        {
+            Amazing::Engine::Attachments		attachments;
+            Amazing::Engine::Subpasses		    subpasses;
+        };
+
+        static Amazing::Engine::RenderPassState to(const ReflType& v) noexcept
+        {
+            return { v.attachments, v.subpasses };
+        }
+
+        static ReflType from(const Amazing::Engine::RenderPassState& v)
+        {
+            return { v.attachments, v.subpasses };
+        }
+    };
+
 
     // pipeline
     template <>
@@ -298,37 +355,12 @@ namespace rfl
     };
 
     template <>
-    struct Reflector<Amazing::Engine::PipelineDynamicState>
-    {
-        struct ReflType
-        {
-            std::vector<std::string>	dynamic_states;
-        };
-
-        static Amazing::Engine::PipelineDynamicState to(const ReflType& v) noexcept
-        {
-            std::vector<Amazing::Engine::DynamicState> dynamic_states;
-            for (auto& dynamic_state : v.dynamic_states)
-                dynamic_states.emplace_back(Amazing::Engine::string_to_enum<Amazing::Engine::DynamicStateEnum>(dynamic_state));
-            return { dynamic_states };
-        }
-
-        static ReflType from(const Amazing::Engine::PipelineDynamicState& v)
-        {
-            std::vector<std::string> dynamic_states;
-            for (auto& dynamic_state : v.dynamic_states)
-                dynamic_states.emplace_back(Amazing::Engine::enum_to_string(static_cast<Amazing::Engine::DynamicStateEnum>(dynamic_state)));
-            return { dynamic_states };
-        }
-    };
-
-    template <>
     struct Reflector<Amazing::Engine::PipelineInputAssemblyState>
     {
         struct ReflType
         {
-            std::string	                topology;
-            Amazing::Engine::Bool		primitive_restart_enable;
+            std::string	    topology;
+            uint32_t	    primitive_restart_enable;
         };
 
         static Amazing::Engine::PipelineInputAssemblyState to(const ReflType& v) noexcept
@@ -365,33 +397,190 @@ namespace rfl
     };
 
     template <>
-  struct Reflector<Amazing::Engine::PipelineRasterizerState>
+    struct Reflector<Amazing::Engine::PipelineRasterizationState>
     {
         struct ReflType
         {
-            Amazing::Engine::Bool		depth_clamp_enable;
-            Amazing::Engine::Bool		rasterizer_discard_enable;
-            PolygonMode		polygon_mode;
-            CullModeFlags	cull_mode;
-            FrontFace		front_face;
-            Amazing::Engine::Bool		depth_bias_enable;
-            float			            depth_bias_constant_factor;
-            float			            depth_bias_clamp;
-            float			            depth_bias_slope_factor;
-            float			            line_width;
+            uint32_t		        depth_clamp_enable;
+            uint32_t		        rasterizer_discard_enable;
+            std::string             polygon_mode;
+            std::string             cull_mode;
+            std::string             front_face;
+            uint32_t		        depth_bias_enable;
+            float			        depth_bias_constant_factor;
+            float			        depth_bias_clamp;
+            float			        depth_bias_slope_factor;
+            float			        line_width;
         };
 
-        static Amazing::Engine::PipelineRasterizerState to(const ReflType& v) noexcept
+        static Amazing::Engine::PipelineRasterizationState to(const ReflType& v) noexcept
         {
-            return { v.viewports, v.scissors };
+            REFLECTOR_TO_ENUM(PolygonMode, v, polygon_mode);
+            REFLECTOR_TO_ENUM(CullModeFlags, v, cull_mode);
+            REFLECTOR_TO_ENUM(FrontFace, v, front_face);
+            return { v.depth_clamp_enable, v.rasterizer_discard_enable, polygon_mode, cull_mode, front_face, v.depth_bias_enable, v.depth_bias_constant_factor, v.depth_bias_clamp, v.depth_bias_slope_factor, v.line_width };
         }
 
-        static ReflType from(const Amazing::Engine::PipelineRasterizerState& v)
+        static ReflType from(const Amazing::Engine::PipelineRasterizationState& v)
         {
-            return { v.viewports, v.scissors };
+            REFLECTOR_FROM_ENUM(PolygonMode, v, polygon_mode);
+            REFLECTOR_FROM_ENUM(CullModeFlags, v, cull_mode);
+            REFLECTOR_FROM_ENUM(FrontFace, v, front_face);
+            return { v.depth_clamp_enable, v.rasterizer_discard_enable, polygon_mode, cull_mode, front_face, v.depth_bias_enable, v.depth_bias_constant_factor, v.depth_bias_clamp, v.depth_bias_slope_factor, v.line_width };
         }
     };
 
+    template <>
+    struct Reflector<Amazing::Engine::PipelineMultisampleState>
+    {
+        struct ReflType
+        {
+            std::string	        rasterization_samples;
+            uint32_t			sample_shading_enable;
+            float				min_sample_shading;
+            // std::vector<uint32_t>	sample_mask;
+            uint32_t			alpha_to_coverage_enable;
+            uint32_t			alpha_to_one_enable;
+        };
+
+        static Amazing::Engine::PipelineMultisampleState to(const ReflType& v) noexcept
+        {
+            REFLECTOR_TO_ENUM(SampleCountFlags, v, rasterization_samples);
+            return { rasterization_samples, v.sample_shading_enable, v.min_sample_shading, v.alpha_to_coverage_enable, v.alpha_to_one_enable };
+        }
+
+        static ReflType from(const Amazing::Engine::PipelineMultisampleState& v)
+        {
+            REFLECTOR_FROM_ENUM(SampleCountFlags, v, rasterization_samples);
+            return { rasterization_samples, v.sample_shading_enable, v.min_sample_shading, v.alpha_to_coverage_enable, v.alpha_to_one_enable };
+        }
+    };
+
+    template <>
+    struct Reflector<Amazing::Engine::PipelineDepthStencilState>
+    {
+        struct ReflType
+        {
+            uint32_t		                        depth_test_enable;
+            uint32_t		                        depth_write_enable;
+            std::string		                        depth_compare_op;
+            uint32_t		                        depth_bounds_test_enable;
+            uint32_t		                        stencil_test_enable;
+            Amazing::Engine::StencilOpState         front;
+            Amazing::Engine::StencilOpState         back;
+            float			                        min_depth_bounds;
+            float			                        max_depth_bounds;
+        };
+
+        static Amazing::Engine::PipelineDepthStencilState to(const ReflType& v) noexcept
+        {
+            REFLECTOR_TO_ENUM(CompareOp, v, depth_compare_op);
+            return { v.depth_test_enable, v.depth_write_enable, depth_compare_op, v.depth_bounds_test_enable, v.stencil_test_enable, v.front, v.back, v.min_depth_bounds, v.max_depth_bounds };
+        }
+
+        static ReflType from(const Amazing::Engine::PipelineDepthStencilState& v)
+        {
+            REFLECTOR_FROM_ENUM(CompareOp, v, depth_compare_op);
+            return { v.depth_test_enable, v.depth_write_enable, depth_compare_op, v.depth_bounds_test_enable, v.stencil_test_enable, v.front, v.back, v.min_depth_bounds, v.max_depth_bounds };
+        }
+    };
+
+    template <>
+    struct Reflector<Amazing::Engine::PipelineColorBlendAttachmentState>
+    {
+        struct ReflType
+        {
+            uint32_t		blend_enable;
+            std::string	    src_color_blend_factor;
+            std::string	    dst_color_blend_factor;
+            std::string	    color_blend_op;
+            std::string	    src_alpha_blend_factor;
+            std::string	    dst_alpha_blend_factor;
+            std::string	    alpha_blend_op;
+            std::string 	color_write_mask;
+        };
+
+        static Amazing::Engine::PipelineColorBlendAttachmentState to(const ReflType& v) noexcept
+        {
+            REFLECTOR_TO_ENUM(BlendFactor, v, src_color_blend_factor);
+            REFLECTOR_TO_ENUM(BlendFactor, v, dst_color_blend_factor);
+            REFLECTOR_TO_ENUM(BlendOp, v, color_blend_op);
+            REFLECTOR_TO_ENUM(BlendFactor, v, src_alpha_blend_factor);
+            REFLECTOR_TO_ENUM(BlendFactor, v, dst_alpha_blend_factor);
+            REFLECTOR_TO_ENUM(BlendOp, v, alpha_blend_op);
+            REFLECTOR_TO_ENUM(ColorComponentFlags, v, color_write_mask);
+            return { v.blend_enable, src_color_blend_factor, dst_color_blend_factor, color_blend_op, src_alpha_blend_factor, dst_alpha_blend_factor, alpha_blend_op, color_write_mask };
+        }
+
+        static ReflType from(const Amazing::Engine::PipelineColorBlendAttachmentState& v)
+        {
+            REFLECTOR_FROM_ENUM(BlendFactor, v, src_color_blend_factor);
+            REFLECTOR_FROM_ENUM(BlendFactor, v, dst_color_blend_factor);
+            REFLECTOR_FROM_ENUM(BlendOp, v, color_blend_op);
+            REFLECTOR_FROM_ENUM(BlendFactor, v, src_alpha_blend_factor);
+            REFLECTOR_FROM_ENUM(BlendFactor, v, dst_alpha_blend_factor);
+            REFLECTOR_FROM_ENUM(BlendOp, v, alpha_blend_op);
+            REFLECTOR_FROM_ENUM(ColorComponentFlags, v, color_write_mask);
+            return { v.blend_enable, src_color_blend_factor, dst_color_blend_factor, color_blend_op, src_alpha_blend_factor, dst_alpha_blend_factor, alpha_blend_op, color_write_mask };
+        }
+    };
+
+    template <>
+    struct Reflector<Amazing::Engine::PipelineColorBlendState>
+    {
+        struct ReflType
+        {
+            uint32_t												            logic_op_enable;
+            std::string 											            logic_op;
+            std::vector<Amazing::Engine::PipelineColorBlendAttachmentState>		color_blend_attachments;
+            std::array<float, 4>								                blend_constants;
+        };
+
+        static Amazing::Engine::PipelineColorBlendState to(const ReflType& v) noexcept
+        {
+            REFLECTOR_TO_ENUM(LogicOp, v, logic_op);
+            return { v.logic_op_enable, logic_op, v.color_blend_attachments, v.blend_constants };
+        }
+
+        static ReflType from(const Amazing::Engine::PipelineColorBlendState& v)
+        {
+            REFLECTOR_FROM_ENUM(LogicOp, v, logic_op);
+            return { v.logic_op_enable, logic_op, v.color_blend_attachments, v.blend_constants };
+        }
+    };
+
+    // self
+    template <>
+    struct Reflector<Amazing::Engine::PipelineStates>
+    {
+        struct ReflType
+        {
+            std::vector<Amazing::Engine::PipelineShaderState>	            shader_state;
+            std::vector<std::string>			                            dynamic_state;
+            std::optional<Amazing::Engine::PipelineInputAssemblyState>		input_assembly_state;
+            std::optional<Amazing::Engine::PipelineViewportState>			viewport_state;
+            std::optional<Amazing::Engine::PipelineRasterizationState>		rasterization_state;
+            std::optional<Amazing::Engine::PipelineMultisampleState>		multisample_state;
+            std::optional<Amazing::Engine::PipelineDepthStencilState>		depth_stencil_state;
+            std::optional<Amazing::Engine::PipelineColorBlendState>			color_blend_state;
+        };
+
+        static Amazing::Engine::PipelineStates to(const ReflType& v) noexcept
+        {
+            std::vector<Amazing::Engine::DynamicState> dynamic_states;
+            for (auto& dynamic_state : v.dynamic_state)
+                dynamic_states.emplace_back(Amazing::Engine::string_to_enum<Amazing::Engine::DynamicStateEnum>(dynamic_state));
+            return { v.shader_state, dynamic_states, v.input_assembly_state, v.viewport_state, v.rasterization_state, v.multisample_state, v.depth_stencil_state, v.color_blend_state };
+        }
+
+        static ReflType from(const Amazing::Engine::PipelineStates& v)
+        {
+            std::vector<std::string> dynamic_states;
+            for (auto& dynamic_state : v.dynamic_state)
+                dynamic_states.emplace_back(Amazing::Engine::enum_to_string(static_cast<Amazing::Engine::DynamicStateEnum>(dynamic_state)));
+            return { v.shader_state, dynamic_states, v.input_assembly_state, v.viewport_state, v.rasterization_state, v.multisample_state, v.depth_stencil_state, v.color_blend_state };
+        }
+    };
 
 
 #undef REFLECTOR_TO_ENUM

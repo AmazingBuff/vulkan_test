@@ -22,25 +22,25 @@ Enum string_to_enum(const std::string& str);
 template <typename Enum>
 std::string enum_to_string(const Enum& e);
 
-#define STRING_ENUM_FUNC(enum)                          \
-template <>                                             \
-enum string_to_enum<enum>(const std::string& str)       \
-{                                                       \
-    auto it = STRING_ENUM_MAP(enum).find(str);          \
-    if (it != STRING_ENUM_MAP(enum).end())              \
-        return it->second;                              \
-    if (!str.empty() && str != "0")                     \
-        LOG_ERROR("String To Enum", "no match enum!");  \
-    return enum();                                      \
-}                                                       \
-template <>                                             \
-std::string enum_to_string(const enum& e)               \
-{                                                       \
-    auto it = ENUM_STRING_MAP(enum).find(e);            \
-    if (it != ENUM_STRING_MAP(enum).end())              \
-        return it->second;                              \
-    LOG_ERROR("Enum To String", "no match string!");    \
-    return "";                                          \
+#define STRING_ENUM_FUNC(enum)                              \
+template <>                                                 \
+inline enum string_to_enum<enum>(const std::string& str)    \
+{                                                           \
+    auto it = STRING_ENUM_MAP(enum).find(str);              \
+    if (it != STRING_ENUM_MAP(enum).end())                  \
+        return it->second;                                  \
+    if (!str.empty() && str != "0")                         \
+        LOG_ERROR("String To Enum", "no match enum!");      \
+    return enum();                                          \
+}                                                           \
+template <>                                                 \
+inline std::string enum_to_string(const enum& e)            \
+{                                                           \
+    auto it = ENUM_STRING_MAP(enum).find(e);                \
+    if (it != ENUM_STRING_MAP(enum).end())                  \
+        return it->second;                                  \
+    LOG_ERROR("Enum To String", "no match string!");        \
+    return "";                                              \
 }
 
 

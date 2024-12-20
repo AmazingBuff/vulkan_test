@@ -1,32 +1,27 @@
 pipeline:
-    shader_stage:
+    shader_state:
         -   type: vertex
             name: main
             module: triangle
         -   type: fragment
             name: main
             module: triangle
-    dynamic_stage:
+    dynamic_state:
         -   viewport
         -   scissor
     input_assembly_state:
             topology: triangle_list
             primitive_restart_enable: 0
-    viewport_stage:
-            viewport:
+    viewport_state:
+            viewports:
                 -   x: 0.0
                     y: 0.0
-                    width: internal
-                    height: internal
                     min_depth: 0.0
                     max_depth: 1.0
-            scissor:
+            scissors:
                 -   offset:
                         x: 0
                         y: 0
-                    extent:
-                        width: internal
-                        height: internal
     rasterization_state:
         depth_clamp_enable: 0
         rasterizer_discard_enable: 0
@@ -79,5 +74,5 @@ pipeline:
                 src_alpha_blend_factor: one
                 dst_alpha_blend_factor: zero
                 alpha_blend_op: add
-                color_write_mask: r | g | b | a
+                color_write_mask: r
         blend_constants: [0.0, 0.0, 0.0, 0.0]

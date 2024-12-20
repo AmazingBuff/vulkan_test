@@ -1,7 +1,5 @@
 #pragma once
 
-#include "enums.h"
-
 ENGINE_NAMESPACE_BEGIN
 
 struct Offset2D;
@@ -15,16 +13,19 @@ struct AttachmentDescription;
 struct AttachmentReference;
 struct SubpassDescription;
 struct SubpassDependency;
+struct Attachments;
+struct Subpasses;
+struct RenderPassState;
 
 // pipeline
 struct PipelineShaderState;
-struct PipelineDynamicState;
 struct PipelineInputAssemblyState;
 struct PipelineViewportState;
-struct PipelineRasterizerState;
+struct PipelineRasterizationState;
 struct PipelineMultisampleState;
 struct PipelineDepthStencilState;
 struct PipelineColorBlendAttachmentState;
 struct PipelineColorBlendState;
+struct PipelineStates;
 
 ENGINE_NAMESPACE_END
