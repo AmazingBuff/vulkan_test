@@ -9,5 +9,7 @@ struct ShaderResource;
 class ShaderManager;
 struct RenderPassResource;
 class RenderPassManager;
+struct PipelineResource;
+class PipelineManager;
 
 ENGINE_NAMESPACE_END

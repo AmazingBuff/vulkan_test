@@ -1,6 +1,5 @@
 #pragma once
 
-#include "base/geometry.h"
 #include "rendering/rhi/enums.h"
 
 ENGINE_NAMESPACE_BEGIN
@@ -21,18 +20,18 @@ struct Extent2D
 
 struct Rect2D
 {
-	Offset2D	offset;
-	Extent2D	extent;
+	Offset2D					offset;
+	std::optional<Extent2D>		extent;
 };
 
 struct Viewport
 {
-	float    x;
-	float    y;
-	float    width;
-	float    height;
-	float    min_depth;
-	float    max_depth;
+	float					x;
+	float					y;
+	std::optional<float>    width;
+	std::optional<float>    height;
+	float					min_depth;
+	float					max_depth;
 };
 
 struct StencilOpState
@@ -90,6 +89,40 @@ struct SubpassDependency
 	DependencyFlags			dependency_flags;
 };
 
+// self
+struct Attachments
+{
+	std::vector<AttachmentDescription>		descriptions;
+	std::vector<AttachmentReference>		references;
+
+	NODISCARD constexpr explicit operator bool() const
+	{
+		return !descriptions.empty() && !references.empty();
+	}
+};
+
+struct Subpasses
+{
+	std::vector<SubpassDescription>			descriptions;
+	std::vector<SubpassDependency>			dependencies;
+
+	NODISCARD constexpr explicit operator bool() const
+	{
+		return !descriptions.empty();
+	}
+};
+
+struct RenderPassState
+{
+	Attachments		attachments;
+	Subpasses		subpasses;
+
+	NODISCARD constexpr explicit operator bool() const
+	{
+		return !attachments && !subpasses;
+	}
+};
+
 
 // pipeline
 struct PipelineShaderState
@@ -97,11 +130,6 @@ struct PipelineShaderState
 	ShaderStageFlags	stage;
 	std::string			module;
 	std::string			name;
-};
-
-struct PipelineDynamicState
-{
-	std::vector<DynamicState>	dynamic_states;
 };
 
 struct PipelineInputAssemblyState
@@ -116,7 +144,7 @@ struct PipelineViewportState
 	std::vector<Rect2D>		scissors;
 };
 
-struct PipelineRasterizerState
+struct PipelineRasterizationState
 {
 	Bool			depth_clamp_enable;
 	Bool			rasterizer_discard_enable;
@@ -132,12 +160,12 @@ struct PipelineRasterizerState
 
 struct PipelineMultisampleState
 {
-	SampleCountFlags rasterization_samples;
-	Bool			sample_shading_enable;
-	float			min_sample_shading;
+	SampleCountFlags	rasterization_samples;
+	Bool				sample_shading_enable;
+	float				min_sample_shading;
 	// std::vector<uint32_t>	sample_mask;
-	Bool			alpha_to_coverage_enable;
-	Bool			alpha_to_one_enable;
+	Bool				alpha_to_coverage_enable;
+	Bool				alpha_to_one_enable;
 };
 
 struct PipelineDepthStencilState
@@ -169,8 +197,25 @@ struct PipelineColorBlendState
 {
 	Bool												logic_op_enable;
 	LogicOp 											logic_op;
-	std::vector<PipelineColorBlendAttachmentState>		attachments;
+	std::vector<PipelineColorBlendAttachmentState>		color_blend_attachments;
 	std::array<float, 4>								blend_constants;
+};
+
+struct PipelineStates
+{
+	std::vector<PipelineShaderState>				shader_state;
+	std::vector<DynamicState>						dynamic_state;
+	std::optional<PipelineInputAssemblyState>		input_assembly_state;
+	std::optional<PipelineViewportState>			viewport_state;
+	std::optional<PipelineRasterizationState>		rasterization_state;
+	std::optional<PipelineMultisampleState>			multisample_state;
+	std::optional<PipelineDepthStencilState>		depth_stencil_state;
+	std::optional<PipelineColorBlendState>			color_blend_state;
+
+	NODISCARD constexpr explicit operator bool() const
+	{
+		return !shader_state.empty();
+	}
 };
 
 

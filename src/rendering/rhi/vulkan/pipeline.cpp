@@ -4,10 +4,10 @@
 #include "rendering/renderer.h"
 #include "rendering/drawable.h"
 #include "rendering/render_resouces.h"
-#include "rendering/resources/shader/shader_manager.h"
-#include "rendering/resources/render_pass/render_pass_manager.h"
 #include "rendering/rhi/vulkan/trans/enum_trans.h"
 #include "rendering/rhi/vulkan/trans/structure_trans.h"
+#include "rendering/resources/shader/shader_manager.h"
+#include "rendering/resources/render_pass/render_pass_manager.h"
 
 ENGINE_NAMESPACE_BEGIN
 
@@ -30,7 +30,8 @@ static VkRenderPass transfer_render_pass(VkDevice device, const RenderPassResour
 	std::vector<VkSubpassDescription> subpasses;
 	std::vector<VkSubpassDependency> dependencies;
 
-	for (auto& attachment : render_pass_resource.attachments.descriptions)
+    auto& render_pass = render_pass_resource.render_pass;
+	for (auto& attachment : render_pass->attachments.descriptions)
 	{
 		VkAttachmentDescription description{
 			.format			= static_cast<VkFormat>(static_cast<int>(attachment.format)),
@@ -45,7 +46,7 @@ static VkRenderPass transfer_render_pass(VkDevice device, const RenderPassResour
 		attachments.emplace_back(description);
 	}
 
-	for (auto& dependency : render_pass_resource.subpasses.dependencies)
+	for (auto& dependency : render_pass->subpasses.dependencies)
 	{
 		VkSubpassDependency depend{
 			.srcSubpass = dependency.src_subpass,
@@ -67,10 +68,10 @@ static VkRenderPass transfer_render_pass(VkDevice device, const RenderPassResour
 		VkAttachmentReference depth_stencil_attachment{};
 	};
 	// make sure VkSubpassDescription must be valid before create render pass
-	std::vector<VkAttachmentReferences> references(render_pass_resource.subpasses.descriptions.size());
-	for (size_t i = 0; i < render_pass_resource.subpasses.descriptions.size(); ++i)
+	std::vector<VkAttachmentReferences> references(render_pass->subpasses.descriptions.size());
+	for (size_t i = 0; i < render_pass->subpasses.descriptions.size(); ++i)
 	{
-		auto& subpass = render_pass_resource.subpasses.descriptions[i];
+		auto& subpass = render_pass->subpasses.descriptions[i];
 		auto& reference = references[i];
 
 		for (auto& input : subpass.input_attachments)
@@ -117,9 +118,9 @@ static VkRenderPass transfer_render_pass(VkDevice device, const RenderPassResour
 		.pDependencies = dependencies.data()
 	};
 
-	VkRenderPass render_pass;
-	VK_CHECK_RESULT(vkCreateRenderPass(device, &render_pass_info, nullptr, &render_pass));
-	return render_pass;
+	VkRenderPass vk_render_pass;
+	VK_CHECK_RESULT(vkCreateRenderPass(device, &render_pass_info, nullptr, &vk_render_pass));
+	return vk_render_pass;
 }
 
 static VkPipeline transfer_pipeline(VkDevice device, const PipelineResources& pipeline_resources)

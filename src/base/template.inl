@@ -170,3 +170,12 @@ constexpr BitFlag<T> BitFlag<T>::operator~() const
 {
 	return BitFlag(~*this);
 }
+
+template<typename T>
+	requires std::is_enum_v<T>
+BitFlag<T>& BitFlag<T>::operator=(const BitFlag<T>& value)
+{
+	if (*this != value)
+        *this = value;
+    return *this;
+}
