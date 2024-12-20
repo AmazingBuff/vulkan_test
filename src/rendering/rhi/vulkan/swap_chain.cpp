@@ -15,27 +15,22 @@ VK_CLASS(Framebuffer)::~VK_CLASS(Framebuffer)()
 	vkDestroyFramebuffer(device, m_frame_buffer, nullptr);
 }
 
-void VK_CLASS(Framebuffer)::set_render_pass(const std::shared_ptr<VK_CLASS(RenderPass)>& render_pass)
-{
-	m_render_pass = render_pass;
-}
-
 constexpr NODISCARD RHIFlag VK_CLASS(Framebuffer)::flag() const
 {
 	return RHIFlag::e_framebuffer;
 }
 
-void VK_CLASS(Framebuffer)::initialize()
+void VK_CLASS(Framebuffer)::initialize(const std::shared_ptr<VK_CLASS(RenderPass)>& render_pass)
 {
-	create_frame_buffer();
+	create_frame_buffer(render_pass);
 }
 
-void VK_CLASS(Framebuffer)::create_frame_buffer()
+void VK_CLASS(Framebuffer)::create_frame_buffer(const std::shared_ptr<VK_CLASS(RenderPass)>& render_pass)
 {
 	auto& extent = g_system_context->g_render_system->m_drawable->m_swap_chain->m_details.extent.value();
 	VkFramebufferCreateInfo create_info{
 		.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO,
-		.renderPass = m_render_pass->m_render_pass,
+		.renderPass = render_pass->m_render_pass,
 		.attachmentCount = 1,
 		.pAttachments = &m_image_view,
 		.width = extent.width,
@@ -78,10 +73,7 @@ NODISCARD bool VK_CLASS(SwapChain)::acquire_next_image()
 void VK_CLASS(SwapChain)::create_frame_buffers(const std::shared_ptr<VK_CLASS(RenderPass)>& render_pass)
 {
 	for (auto& frame_buffer : m_frame_buffers)
-	{
-		frame_buffer->set_render_pass(render_pass);
-		frame_buffer->initialize();
-	}
+		frame_buffer->initialize(render_pass);
 }
 
 void VK_CLASS(SwapChain)::initialize()

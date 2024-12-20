@@ -92,6 +92,8 @@ if (MSVC)
         PRIVATE
         # make __VA_OPT__ valid in msvc
         /Zc:preprocessor
+        # disable alternative tokens
+        /Za
         # utf-8 source and execution character sets
         /utf-8
     )

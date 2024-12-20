@@ -9,12 +9,12 @@ ENGINE_NAMESPACE_BEGIN
 
 class VK_CLASS(PipelineLayout) final : public RHI
 {
-	public:
+public:
 	VK_CLASS(PipelineLayout)() = default;
-	~VK_CLASS(PipelineLayout)();
-	void initialize() override;
-
+	~VK_CLASS(PipelineLayout)() override;
 	NODISCARD constexpr RHIFlag flag() const override;
+
+	void initialize();
 private:
 	void create_pipeline_layout();
 private:
@@ -28,12 +28,12 @@ class VK_CLASS(RenderPass) final : public RHI
 {
 public:
 	VK_CLASS(RenderPass)() = default;
-	~VK_CLASS(RenderPass)();
-	void initialize() override;
-
+	~VK_CLASS(RenderPass)() override;
 	NODISCARD constexpr RHIFlag flag() const override;
+
+	void initialize(const std::string_view& name);
 private:
-	void create_render_pass();
+	void create_render_pass(const std::string_view& name);
 private:
 	VK_TYPE_INIT(VkRenderPass, m_render_pass);
 
@@ -48,19 +48,12 @@ class VK_CLASS(Pipeline) final : public RHI
 {
 public:
 	VK_CLASS(Pipeline)() = default;
-	~VK_CLASS(Pipeline)();
-	void set_pipeline_layout(const std::shared_ptr<VK_CLASS(PipelineLayout)>& pipeline_layout);
-	void set_render_pass(const std::shared_ptr<VK_CLASS(RenderPass)>& render_pass);
-	void initialize() override;
-
-
+	~VK_CLASS(Pipeline)() override;
 	NODISCARD constexpr RHIFlag flag() const override;
+
+	void initialize(const std::shared_ptr<VK_CLASS(PipelineLayout)>& pipeline_layout, const std::shared_ptr<VK_CLASS(RenderPass)>& render_pass);
 private:
-	void create_pipeline();
-private:
-	std::shared_ptr<VK_CLASS(PipelineLayout)>	m_pipeline_layout;
-	std::shared_ptr<VK_CLASS(RenderPass)>		m_render_pass;
-	std::shared_ptr<VK_CLASS(VertexBuffer)>		m_vertex_buffer;
+	void create_pipeline(const std::shared_ptr<VK_CLASS(PipelineLayout)>& pipeline_layout, const std::shared_ptr<VK_CLASS(RenderPass)>& render_pass);
 private:
 	VK_TYPE_INIT(VkPipeline,					m_pipeline);
 

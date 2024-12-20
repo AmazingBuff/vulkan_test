@@ -10,14 +10,11 @@ class VK_CLASS(Framebuffer) final : public RHI
 public:
 	VK_CLASS(Framebuffer)() = default;
 	~VK_CLASS(Framebuffer)() override;
-	void set_render_pass(const std::shared_ptr<VK_CLASS(RenderPass)>& render_pass);
-	void initialize() override;
-
 	NODISCARD constexpr RHIFlag flag() const override;
+
+	void initialize(const std::shared_ptr<VK_CLASS(RenderPass)>& render_pass);
 private:
-	void create_frame_buffer();
-private:
-	std::shared_ptr<VK_CLASS(RenderPass)> m_render_pass;
+	void create_frame_buffer(const std::shared_ptr<VK_CLASS(RenderPass)>& render_pass);
 private:
 	VK_TYPE_INIT(VkFramebuffer, m_frame_buffer);
 	VK_TYPE_INIT(VkImageView, m_image_view);
@@ -36,7 +33,7 @@ public:
 		std::optional<VkPresentModeKHR>			present_mode;
 		std::optional<VkExtent2D>				extent;
 
-		NODISCARD constexpr operator bool() const
+		NODISCARD constexpr explicit operator bool() const
 		{
 			return format.has_value() && present_mode.has_value() && extent.has_value();
 		}
@@ -44,10 +41,10 @@ public:
 
 public:
 	VK_CLASS(SwapChain)() = default;
-	~VK_CLASS(SwapChain)();
-	void initialize() override;
+	~VK_CLASS(SwapChain)() override;
 	NODISCARD constexpr RHIFlag flag() const override;
 
+	void initialize();
 	void create_frame_buffers(const std::shared_ptr<VK_CLASS(RenderPass)>& render_pass);
 	// return false means that a new swap chain need to be created
 	NODISCARD bool acquire_next_image();

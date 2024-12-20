@@ -45,4 +45,6 @@ class VK_CLASS(Fence);
 class VK_CLASS(Buffer);
 class VK_CLASS(VertexBuffer);
 
+class VK_CLASS(PipelineResources);
+
 ENGINE_NAMESPACE_END

@@ -11,16 +11,15 @@ class VK_CLASS(PipelineResources) : public RHI
 public:
 	VK_CLASS(PipelineResources)() = default;
 	~VK_CLASS(PipelineResources)() override = default;
-	void initialize() override;
 	NODISCARD constexpr RHIFlag flag() const override;
 
-public:
+	void initialize();
 	NODISCARD std::shared_ptr<VK_CLASS(Pipeline)> get_pipeline(const std::string & name) const;
 private:
-	void create_render_pass();
-	void create_pipeline_layout();
-	void create_pipelines();
-	void create_vertex_buffers();
+	void create_render_pass(const std::string_view& name);
+	void create_pipeline_layout(const std::string & name);
+	void create_pipelines(const std::string & name);
+	void create_vertex_buffers(const std::string & name);
 private:
 	std::unordered_map<std::string, std::shared_ptr<VK_CLASS(Pipeline)>>		m_pipelines;
 

@@ -46,3 +46,12 @@
 // only support 10 arguments for now
 #define COUNT_N(_1, _2, _3, _4 ,_5, _6, _7, _8, _9, _10, N, ...) N 
 #define COUNT(...) APPLY(COUNT_N, __VA_ARGS__, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1)
+
+
+
+
+#ifdef HIGH_PRECISION_FLOAT
+using Float = double;
+#else
+using Float = float;
+#endif // HIGH_PRECISION_FLOAT

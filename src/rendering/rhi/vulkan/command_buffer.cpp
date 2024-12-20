@@ -90,6 +90,11 @@ void VK_CLASS(CommandBuffer)::end_record_command() const
 	VK_CHECK_RESULT(vkEndCommandBuffer(m_command_buffers[m_current_frame]));
 }
 
+void VK_CLASS(CommandBuffer)::bind_vertex_buffers(const std::vector<std::shared_ptr<VK_CLASS(VertexBuffer)>>& vertex_buffers) const
+{
+
+}
+
 void VK_CLASS(CommandBuffer)::draw(uint32_t vertex_count, uint32_t instance_count, uint32_t first_vertex, uint32_t first_instance) const
 {
 	vkCmdDraw(m_command_buffers[m_current_frame], vertex_count, instance_count, first_vertex, first_instance);

@@ -11,9 +11,9 @@ class VK_CLASS(Semaphore) final : public RHI
 public:
 	VK_CLASS(Semaphore)() = default;
 	~VK_CLASS(Semaphore)() override;
-	void initialize() override;
-
 	NODISCARD constexpr RHIFlag flag() const override;
+
+	void initialize();
 private:
 	VK_TYPE_INIT(VkSemaphore, m_semaphore);
 
@@ -28,11 +28,11 @@ class VK_CLASS(Fence) final : public RHI
 public:
 	VK_CLASS(Fence)() = default;
 	~VK_CLASS(Fence)() override;
-	void initialize() override;
+	NODISCARD constexpr RHIFlag flag() const override;
+
+	void initialize();
 	void wait() const;
 	void reset() const;
-
-	NODISCARD constexpr RHIFlag flag() const override;
 private:
 	VK_TYPE_INIT(VkFence, m_fence);
 

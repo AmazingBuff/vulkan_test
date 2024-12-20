@@ -9,9 +9,9 @@ class VK_CLASS(Buffer) : public RHI
 public:
 	VK_CLASS(Buffer)() = default;
 	~VK_CLASS(Buffer)() override;
-	void initialize() override;
 	NODISCARD constexpr RHIFlag flag() const override;
 
+	virtual void initialize();
 protected:
 	VK_TYPE_INIT(VkBuffer, m_buffer);
 	VK_TYPE_INIT(VkDeviceMemory, m_buffer_memory);

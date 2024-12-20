@@ -10,7 +10,9 @@ class VK_CLASS(CommandBuffer) final : public RHI
 public:
 	VK_CLASS(CommandBuffer)() = default;
 	~VK_CLASS(CommandBuffer)() override;
-	void initialize() override;
+	NODISCARD constexpr RHIFlag flag() const override;
+
+	void initialize();
 	// wait for previous frame
 	void wait() const;
 	// reset command buffer and fence
@@ -20,10 +22,10 @@ public:
 	void end_render_pass() const;
 	void end_record_command() const;
 	void bind_pipeline(const std::shared_ptr<VK_CLASS(Pipeline)>&  pipeline) const;
+	void bind_vertex_buffers(const std::vector<std::shared_ptr<VK_CLASS(VertexBuffer)>>& vertex_buffers) const;
 	void draw(uint32_t vertex_count, uint32_t instance_count, uint32_t first_vertex, uint32_t first_instance) const;
 	void submit() const;
 	void refresh_frame();
-	NODISCARD constexpr RHIFlag flag() const override;
 private:
 	void create_command_pool();
 	void create_command_buffer();

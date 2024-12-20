@@ -28,5 +28,6 @@ using Pipeline = RHI_USING_CLASS(Pipeline);
 using CommandBuffer = RHI_USING_CLASS(CommandBuffer);
 using Semaphore = RHI_USING_CLASS(Semaphore);
 using Fence = RHI_USING_CLASS(Fence);
+using PipelineResources = RHI_USING_CLASS(PipelineResources);
 
 ENGINE_NAMESPACE_END

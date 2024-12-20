@@ -24,7 +24,7 @@ public:
 	~ShaderManager() = default;
 
 	void initialize();
-	NODISCARD const ShaderResource& get_shader_resource(const std::string& name);
+	NODISCARD const ShaderResource& get_shader_resource(const std::string_view& name);
 private:
 	void load_shader_files();
 private:

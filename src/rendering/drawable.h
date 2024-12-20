@@ -19,7 +19,7 @@ public:
 	std::shared_ptr<Device>												m_device;
 	std::shared_ptr<SwapChain>											m_swap_chain;
 	std::shared_ptr<CommandBuffer>										m_command_buffer;
-
+	std::shared_ptr<PipelineResources>									m_pipeline_resources;
 
 	// a temporary solution
 	std::shared_ptr<PipelineLayout>										m_pipeline_layout;
