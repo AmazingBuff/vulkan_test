@@ -204,13 +204,13 @@ struct PipelineColorBlendState
 struct PipelineStates
 {
 	std::vector<PipelineShaderState>				shader_state;
-	std::vector<DynamicState>						dynamic_state;
 	std::optional<PipelineInputAssemblyState>		input_assembly_state;
 	std::optional<PipelineViewportState>			viewport_state;
 	std::optional<PipelineRasterizationState>		rasterization_state;
 	std::optional<PipelineMultisampleState>			multisample_state;
 	std::optional<PipelineDepthStencilState>		depth_stencil_state;
 	std::optional<PipelineColorBlendState>			color_blend_state;
+	std::vector<DynamicState>						dynamic_state;
 
 	NODISCARD constexpr explicit operator bool() const
 	{

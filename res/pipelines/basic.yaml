@@ -1,14 +1,11 @@
 pipeline:
     shader_state:
-        -   type: vertex
+        -   stage: vertex
             name: main
             module: triangle
-        -   type: fragment
+        -   stage: fragment
             name: main
             module: triangle
-    dynamic_state:
-        -   viewport
-        -   scissor
     input_assembly_state:
             topology: triangle_list
             primitive_restart_enable: 0
@@ -76,3 +73,6 @@ pipeline:
                 alpha_blend_op: add
                 color_write_mask: r
         blend_constants: [0.0, 0.0, 0.0, 0.0]
+    dynamic_state:
+        -   viewport
+        -   scissor

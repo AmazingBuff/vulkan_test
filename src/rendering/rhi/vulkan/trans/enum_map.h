@@ -102,7 +102,8 @@ GENERATE_ENUM_MAP(AccessFlagBits,
                   host_read,
                   host_write,
                   memory_read,
-                  memory_write)
+                  memory_write,
+                  none)
 GENERATE_ENUM_MAP(DependencyFlagBits,
                   by_region,
                   device_group,
@@ -295,7 +296,7 @@ GENERATE_ENUM_MAP(ImageLayoutEnum,
                   stencil_read_only_optimal,
                   read_only_optimal,
                   attachment_optimal,
-                  present_src_khr)
+                  present_src)
 GENERATE_ENUM_MAP(PipelineBindPointEnum,
                   graphics,
                   compute)

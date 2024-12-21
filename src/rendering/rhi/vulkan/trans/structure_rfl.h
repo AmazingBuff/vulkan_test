@@ -556,13 +556,13 @@ namespace rfl
         struct ReflType
         {
             std::vector<Amazing::Engine::PipelineShaderState>	            shader_state;
-            std::vector<std::string>			                            dynamic_state;
             std::optional<Amazing::Engine::PipelineInputAssemblyState>		input_assembly_state;
             std::optional<Amazing::Engine::PipelineViewportState>			viewport_state;
             std::optional<Amazing::Engine::PipelineRasterizationState>		rasterization_state;
             std::optional<Amazing::Engine::PipelineMultisampleState>		multisample_state;
             std::optional<Amazing::Engine::PipelineDepthStencilState>		depth_stencil_state;
             std::optional<Amazing::Engine::PipelineColorBlendState>			color_blend_state;
+            std::vector<std::string>			                            dynamic_state;
         };
 
         static Amazing::Engine::PipelineStates to(const ReflType& v) noexcept
@@ -570,7 +570,7 @@ namespace rfl
             std::vector<Amazing::Engine::DynamicState> dynamic_states;
             for (auto& dynamic_state : v.dynamic_state)
                 dynamic_states.emplace_back(Amazing::Engine::string_to_enum<Amazing::Engine::DynamicStateEnum>(dynamic_state));
-            return { v.shader_state, dynamic_states, v.input_assembly_state, v.viewport_state, v.rasterization_state, v.multisample_state, v.depth_stencil_state, v.color_blend_state };
+            return { v.shader_state, v.input_assembly_state, v.viewport_state, v.rasterization_state, v.multisample_state, v.depth_stencil_state, v.color_blend_state, dynamic_states };
         }
 
         static ReflType from(const Amazing::Engine::PipelineStates& v)
@@ -578,7 +578,7 @@ namespace rfl
             std::vector<std::string> dynamic_states;
             for (auto& dynamic_state : v.dynamic_state)
                 dynamic_states.emplace_back(Amazing::Engine::enum_to_string(static_cast<Amazing::Engine::DynamicStateEnum>(dynamic_state)));
-            return { v.shader_state, dynamic_states, v.input_assembly_state, v.viewport_state, v.rasterization_state, v.multisample_state, v.depth_stencil_state, v.color_blend_state };
+            return { v.shader_state, v.input_assembly_state, v.viewport_state, v.rasterization_state, v.multisample_state, v.depth_stencil_state, v.color_blend_state, dynamic_states };
         }
     };
 
