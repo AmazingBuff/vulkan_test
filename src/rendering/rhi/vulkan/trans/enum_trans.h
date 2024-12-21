@@ -8,62 +8,63 @@ ENGINE_NAMESPACE_BEGIN
 // fork from vulkan
 enum class SampleCountFlagBits
 {
-	e_1 = VK_SAMPLE_COUNT_1_BIT,
-	e_2 = VK_SAMPLE_COUNT_2_BIT,
-	e_4 = VK_SAMPLE_COUNT_4_BIT,
-	e_8 = VK_SAMPLE_COUNT_8_BIT,
-	e_16 = VK_SAMPLE_COUNT_16_BIT,
-	e_32 = VK_SAMPLE_COUNT_32_BIT,
-	e_64 = VK_SAMPLE_COUNT_64_BIT
+	e_1		=	VK_SAMPLE_COUNT_1_BIT,
+	e_2		=	VK_SAMPLE_COUNT_2_BIT,
+	e_4		=	VK_SAMPLE_COUNT_4_BIT,
+	e_8		=	VK_SAMPLE_COUNT_8_BIT,
+	e_16	=	VK_SAMPLE_COUNT_16_BIT,
+	e_32	=	VK_SAMPLE_COUNT_32_BIT,
+	e_64	=	VK_SAMPLE_COUNT_64_BIT
 };
 
 enum class PipelineStageFlagBits
 {
-	e_top_of_pipe = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT,
-	e_draw_indirect = VK_PIPELINE_STAGE_DRAW_INDIRECT_BIT,
-	e_vertex_input = VK_PIPELINE_STAGE_VERTEX_INPUT_BIT,
-	e_vertex_shader = VK_PIPELINE_STAGE_VERTEX_SHADER_BIT,
-	e_tessellation_control_shader = VK_PIPELINE_STAGE_TESSELLATION_CONTROL_SHADER_BIT,
-	e_tessellation_evaluation_shader = VK_PIPELINE_STAGE_TESSELLATION_EVALUATION_SHADER_BIT,
-	e_geometry_shader = VK_PIPELINE_STAGE_GEOMETRY_SHADER_BIT,
-	e_fragment_shader = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
-	e_early_fragment_tests = VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT,
-	e_late_fragment_tests = VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT,
-	e_color_attachment_output = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
-	e_compute_shader = VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT,
-	e_transfer = VK_PIPELINE_STAGE_TRANSFER_BIT,
-	e_bottom_of_pipe = VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT,
-	e_host = VK_PIPELINE_STAGE_HOST_BIT,
-	e_all_graphics = VK_PIPELINE_STAGE_ALL_GRAPHICS_BIT,
-	e_all_commands = VK_PIPELINE_STAGE_ALL_COMMANDS_BIT
+	e_top_of_pipe						=	VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT,
+	e_draw_indirect						=	VK_PIPELINE_STAGE_DRAW_INDIRECT_BIT,
+	e_vertex_input						=	VK_PIPELINE_STAGE_VERTEX_INPUT_BIT,
+	e_vertex_shader						=	VK_PIPELINE_STAGE_VERTEX_SHADER_BIT,
+	e_tessellation_control_shader		=	VK_PIPELINE_STAGE_TESSELLATION_CONTROL_SHADER_BIT,
+	e_tessellation_evaluation_shader	=	VK_PIPELINE_STAGE_TESSELLATION_EVALUATION_SHADER_BIT,
+	e_geometry_shader					=	VK_PIPELINE_STAGE_GEOMETRY_SHADER_BIT,
+	e_fragment_shader					=	VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
+	e_early_fragment_tests				=	VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT,
+	e_late_fragment_tests				=	VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT,
+	e_color_attachment_output			=	VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
+	e_compute_shader					=	VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT,
+	e_transfer							=	VK_PIPELINE_STAGE_TRANSFER_BIT,
+	e_bottom_of_pipe					=	VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT,
+	e_host								=	VK_PIPELINE_STAGE_HOST_BIT,
+	e_all_graphics						=	VK_PIPELINE_STAGE_ALL_GRAPHICS_BIT,
+	e_all_commands						=	VK_PIPELINE_STAGE_ALL_COMMANDS_BIT
 };
 
 enum class AccessFlagBits
 {
-	e_indirect_command_read = VK_ACCESS_INDIRECT_COMMAND_READ_BIT,
-	e_index_read = VK_ACCESS_INDEX_READ_BIT,
-	e_vertex_attribute_read = VK_ACCESS_VERTEX_ATTRIBUTE_READ_BIT,
-	e_uniform_read = VK_ACCESS_UNIFORM_READ_BIT,
-	e_input_attachment_read = VK_ACCESS_INPUT_ATTACHMENT_READ_BIT,
-	e_shader_read = VK_ACCESS_SHADER_READ_BIT,
-	e_shader_write = VK_ACCESS_SHADER_WRITE_BIT,
-	e_color_attachment_read = VK_ACCESS_COLOR_ATTACHMENT_READ_BIT,
-	e_color_attachment_write = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT,
-	e_depth_stencil_attachment_read = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_READ_BIT,
-	e_depth_stencil_attachment_write = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT,
-	e_transfer_read = VK_ACCESS_TRANSFER_READ_BIT,
-	e_transfer_write = VK_ACCESS_TRANSFER_WRITE_BIT,
-	e_host_read = VK_ACCESS_HOST_READ_BIT,
-	e_host_write = VK_ACCESS_HOST_WRITE_BIT,
-	e_memory_read = VK_ACCESS_MEMORY_READ_BIT,
-	e_memory_write = VK_ACCESS_MEMORY_WRITE_BIT
+	e_indirect_command_read				=	VK_ACCESS_INDIRECT_COMMAND_READ_BIT,
+	e_index_read						=	VK_ACCESS_INDEX_READ_BIT,
+	e_vertex_attribute_read				=	VK_ACCESS_VERTEX_ATTRIBUTE_READ_BIT,
+	e_uniform_read						=	VK_ACCESS_UNIFORM_READ_BIT,
+	e_input_attachment_read				=	VK_ACCESS_INPUT_ATTACHMENT_READ_BIT,
+	e_shader_read						=	VK_ACCESS_SHADER_READ_BIT,
+	e_shader_write						=	VK_ACCESS_SHADER_WRITE_BIT,
+	e_color_attachment_read				=	VK_ACCESS_COLOR_ATTACHMENT_READ_BIT,
+	e_color_attachment_write			=	VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT,
+	e_depth_stencil_attachment_read		=	VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_READ_BIT,
+	e_depth_stencil_attachment_write	=	VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT,
+	e_transfer_read						=	VK_ACCESS_TRANSFER_READ_BIT,
+	e_transfer_write					=	VK_ACCESS_TRANSFER_WRITE_BIT,
+	e_host_read							=	VK_ACCESS_HOST_READ_BIT,
+	e_host_write						=	VK_ACCESS_HOST_WRITE_BIT,
+	e_memory_read						=	VK_ACCESS_MEMORY_READ_BIT,
+	e_memory_write						=	VK_ACCESS_MEMORY_WRITE_BIT,
+    e_none								=	VK_ACCESS_NONE,
 };
 
 enum class DependencyFlagBits
 {
-	e_by_region = VK_DEPENDENCY_BY_REGION_BIT,
-	e_device_group = VK_DEPENDENCY_DEVICE_GROUP_BIT,
-	e_view_local = VK_DEPENDENCY_VIEW_LOCAL_BIT
+	e_by_region		=	VK_DEPENDENCY_BY_REGION_BIT,
+	e_device_group	=	VK_DEPENDENCY_DEVICE_GROUP_BIT,
+	e_view_local	=	VK_DEPENDENCY_VIEW_LOCAL_BIT
 };
 
 enum class ShaderStageFlagBits
@@ -273,7 +274,7 @@ enum class ImageLayoutEnum
 	e_stencil_read_only_optimal						=	VK_IMAGE_LAYOUT_STENCIL_READ_ONLY_OPTIMAL,
 	e_read_only_optimal								=	VK_IMAGE_LAYOUT_READ_ONLY_OPTIMAL,
 	e_attachment_optimal							=	VK_IMAGE_LAYOUT_ATTACHMENT_OPTIMAL,
-	e_present_src_khr								=	VK_IMAGE_LAYOUT_PRESENT_SRC_KHR
+	e_present_src									=	VK_IMAGE_LAYOUT_PRESENT_SRC_KHR
 };
 
 enum class PipelineBindPointEnum

@@ -2,10 +2,14 @@ render_pass:
     attachments:
         descriptions:
             -   type: color
-                format: r8g8b8a8_unorm
+                format: b8g8r8a8_srgb
                 samples: 1
                 load_op: clear
                 store_op: store
+                stencil_load_op: dont_care
+                stencil_store_op: dont_care
+                initial_layout: undefined
+                final_layout: present_src
         references:
             -   &first
                 type: color      
@@ -22,5 +26,6 @@ render_pass:
                 dst_subpass: 0
                 src_stage_mask: color_attachment_output
                 dst_stage_mask: color_attachment_output
+                src_access_mask: none
                 dst_access_mask: color_attachment_write                
      
