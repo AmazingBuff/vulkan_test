@@ -10,10 +10,25 @@
 #include "rendering/resources/render_pass/render_pass_manager.h"
 #include "rendering/resources/pipeline/pipeline_manager.h"
 
+#include <spirv_glsl.hpp>
+
 ENGINE_NAMESPACE_BEGIN
 
 static VkShaderModule create_shader_module(VkDevice device, const std::shared_ptr<std::vector<char>>& code)
 {
+    spirv_cross::CompilerGLSL compiler(reinterpret_cast<const uint32_t*>(code->data()), code->size() / sizeof(uint32_t));
+	spirv_cross::ShaderResources resources = compiler.get_shader_resources();
+	for (auto& resource : resources.stage_inputs)
+	{
+        uint32_t set = compiler.get_decoration(resource.id, spv::DecorationDescriptorSet);
+        uint32_t binding = compiler.get_decoration(resource.id, spv::DecorationBinding);
+
+        VkVertexInputBindingDescription binding_description{};
+        binding_description.binding = binding;
+        binding_description.stride = compiler.get_declared_struct_size(compiler.get_type(resource.base_type_id));
+	}
+	
+
 	VkShaderModuleCreateInfo create_info{
 		.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO,
 		.codeSize = code->size(),

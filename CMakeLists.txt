@@ -33,6 +33,31 @@ set(THIRD_PARTY_INCLUDE_DIRS
     ext/reflect-cpp/include
     ext/yaml-cpp/include
     ext/fmt/include
+    ext/spirv_cross/include
+)
+
+set(THIRD_PARTY_LIB_DIRS
+    ext/reflect-cpp/lib/$<$<CONFIG:Debug>:Debug>$<$<CONFIG:Release>:Release>
+    ext/yaml-cpp/lib/$<$<CONFIG:Debug>:Debug>$<$<CONFIG:Release>:Release>
+    ext/fmt/lib/$<$<CONFIG:Debug>:Debug>$<$<CONFIG:Release>:Release>
+    ext/spirv_cross/lib/$<$<CONFIG:Debug>:Debug>$<$<CONFIG:Release>:Release>
+)
+
+set(THIRD_PARTY_LIBS
+    $<$<CONFIG:Debug>:
+    reflectcppd
+    yaml-cppd
+    fmtd
+    spirv-cross-cored
+    spirv-cross-glsld
+    >
+    $<$<CONFIG:Release>:
+    reflectcpp
+    yaml-cpp
+    fmt
+    spirv-cross-core
+    spirv-cross-glsl
+    >
 )
 
 add_executable(
@@ -60,6 +85,7 @@ target_link_directories(
     ${PROJECT_NAME}
     PRIVATE
     ${SDL2_LIBDIR}
+    ${THIRD_PARTY_LIB_DIRS}
 )
 
 target_link_libraries(
@@ -68,9 +94,7 @@ target_link_libraries(
     ${Vulkan_LIBRARIES}
     ${SDL2_LIBRARIES}
     Eigen3::Eigen
-    ${CMAKE_CURRENT_SOURCE_DIR}/ext/fmt/lib/$<$<CONFIG:Debug>:Debug/fmtd.lib>$<$<CONFIG:Release>:Release/fmt.lib>
-    ${CMAKE_CURRENT_SOURCE_DIR}/ext/yaml-cpp/lib/$<$<CONFIG:Debug>:Debug/yaml-cppd.lib>$<$<CONFIG:Release>:Release/yaml-cpp.lib>
-    ${CMAKE_CURRENT_SOURCE_DIR}/ext/reflect-cpp/lib/$<$<CONFIG:Debug>:Debug/reflectcppd.lib>$<$<CONFIG:Release>:Release/reflectcpp.lib>
+    ${THIRD_PARTY_LIBS} 
 )
 
 target_compile_features(
