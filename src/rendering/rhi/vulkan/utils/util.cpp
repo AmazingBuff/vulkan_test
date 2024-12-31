@@ -2,12 +2,11 @@
 
 ENGINE_NAMESPACE_BEGIN
 
-#define SWITCH_BRANCH(expr) case expr : return #expr
-
 const char* vk_result_convert(VkResult res)
 {
 	switch (res)
 	{
+#define SWITCH_BRANCH(expr) case expr : return #expr
     SWITCH_BRANCH(VK_SUCCESS);
     SWITCH_BRANCH(VK_NOT_READY);
     SWITCH_BRANCH(VK_TIMEOUT);
@@ -56,12 +55,11 @@ const char* vk_result_convert(VkResult res)
 	SWITCH_BRANCH(VK_ERROR_COMPRESSION_EXHAUSTED_EXT);
 	SWITCH_BRANCH(VK_INCOMPATIBLE_SHADER_BINARY_EXT);
 	SWITCH_BRANCH(VK_RESULT_MAX_ENUM);
+#undef SWITCH_BRANCH
 	default:
 		return nullptr;
 	}
 }
-
-#undef SWITCH_BRANCH
 
 SwapChainSupportDetails query_swap_chain_support(VkPhysicalDevice physical_device, VkSurfaceKHR surface)
 {

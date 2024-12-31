@@ -62,11 +62,6 @@ void VK_CLASS(PhysicalDevice)::initialize()
 	pick_physical_device();
 }
 
-constexpr RHIFlag VK_CLASS(PhysicalDevice)::flag() const
-{
-	return RHIFlag::e_physical_device;
-}
-
 void VK_CLASS(PhysicalDevice)::pick_physical_device()
 {
 	auto instance = g_system_context->g_render_system->m_drawable->m_instance;
@@ -96,11 +91,12 @@ void VK_CLASS(PhysicalDevice)::pick_physical_device()
 		vkGetPhysicalDeviceMemoryProperties(m_device, &m_memory_properties);
 	}
 	else
-		ASSERT(candidates.rbegin()->first > 0);
+		RENDERING_LOG_ERROR("no matched physical device!");
 }
 
 VK_CLASS(Device)::~VK_CLASS(Device)()
 {
+	vmaDestroyAllocator(m_allocator);
 	vkDestroyDevice(m_device, nullptr);
 }
 
@@ -133,11 +129,7 @@ void VK_CLASS(Device)::wait_idle() const
 void VK_CLASS(Device)::initialize()
 {
 	create_logical_device();
-}
-
-constexpr RHIFlag VK_CLASS(Device)::flag() const
-{
-	return RHIFlag::e_device;
+	create_vma_allocator();
 }
 
 void VK_CLASS(Device)::create_logical_device()
@@ -198,6 +190,62 @@ void VK_CLASS(Device)::create_logical_device()
 	VK_CHECK_RESULT(vkCreateDevice(physical_device->m_device, &device_create_info, nullptr, &m_device));
 	vkGetDeviceQueue(m_device, physical_device->m_indices.graphics_family.value(), 0, &m_graphics_queue);
 	vkGetDeviceQueue(m_device, physical_device->m_indices.present_family.value(), 0, &m_present_queue);
+}
+
+void VK_CLASS(Device)::create_vma_allocator()
+{
+	VmaVulkanFunctions functions{
+#define VMA_VULKAN_FUNCTION(name) name = name
+		.VMA_VULKAN_FUNCTION(vkGetInstanceProcAddr),
+		.VMA_VULKAN_FUNCTION(vkGetDeviceProcAddr),
+		.VMA_VULKAN_FUNCTION(vkGetPhysicalDeviceProperties),
+		.VMA_VULKAN_FUNCTION(vkGetPhysicalDeviceMemoryProperties),
+		.VMA_VULKAN_FUNCTION(vkAllocateMemory),
+		.VMA_VULKAN_FUNCTION(vkFreeMemory),
+		.VMA_VULKAN_FUNCTION(vkMapMemory),
+		.VMA_VULKAN_FUNCTION(vkUnmapMemory),
+		.VMA_VULKAN_FUNCTION(vkFlushMappedMemoryRanges),
+		.VMA_VULKAN_FUNCTION(vkInvalidateMappedMemoryRanges),
+		.VMA_VULKAN_FUNCTION(vkBindBufferMemory),
+		.VMA_VULKAN_FUNCTION(vkBindImageMemory),
+		.VMA_VULKAN_FUNCTION(vkGetBufferMemoryRequirements),
+		.VMA_VULKAN_FUNCTION(vkGetImageMemoryRequirements),
+		.VMA_VULKAN_FUNCTION(vkCreateBuffer),
+		.VMA_VULKAN_FUNCTION(vkDestroyBuffer),
+		.VMA_VULKAN_FUNCTION(vkCreateImage),
+		.VMA_VULKAN_FUNCTION(vkDestroyImage),
+		.VMA_VULKAN_FUNCTION(vkCmdCopyBuffer),
+#if VMA_DEDICATED_ALLOCATION || VMA_VULKAN_VERSION >= 1001000
+		.VMA_VULKAN_FUNCTION(vkGetBufferMemoryRequirements2KHR),
+		.VMA_VULKAN_FUNCTION(vkGetImageMemoryRequirements2KHR),
+#endif
+#if VMA_BIND_MEMORY2 || VMA_VULKAN_VERSION >= 1001000
+		.VMA_VULKAN_FUNCTION(vkBindBufferMemory2KHR),
+		.VMA_VULKAN_FUNCTION(vkBindImageMemory2KHR),
+#endif
+#if VMA_MEMORY_BUDGET || VMA_VULKAN_VERSION >= 1001000
+		.VMA_VULKAN_FUNCTION(vkGetPhysicalDeviceMemoryProperties2KHR),
+#endif
+#if VMA_KHR_MAINTENANCE4 || VMA_VULKAN_VERSION >= 1003000
+		.VMA_VULKAN_FUNCTION(vkGetDeviceBufferMemoryRequirements),
+		.VMA_VULKAN_FUNCTION(vkGetDeviceImageMemoryRequirements),
+#endif
+#undef VMA_VULKAN_FUNCTION
+	};
+
+	auto instance = g_system_context->g_render_system->m_drawable->m_instance;
+	auto physical_device = g_system_context->g_render_system->m_drawable->m_physical_device;
+
+	VmaAllocatorCreateInfo allocatorCreateInfo = {
+		.flags = VMA_ALLOCATOR_CREATE_EXTERNALLY_SYNCHRONIZED_BIT,
+		.physicalDevice = physical_device->m_device,
+		.device = m_device,
+		.pVulkanFunctions = &functions,
+		.instance = instance->m_instance,
+		.vulkanApiVersion = VK_API_VERSION_1_0,
+	};
+
+	VK_CHECK_RESULT(vmaCreateAllocator(&allocatorCreateInfo, &m_allocator));
 }
 
 ENGINE_NAMESPACE_END

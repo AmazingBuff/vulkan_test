@@ -24,7 +24,7 @@ pipeline:
         rasterizer_discard_enable: 0
         polygon_mode: fill
         cull_mode: back
-        front_face: clockwise
+        front_face: counter_clockwise
         depth_bias_enable: 0
         depth_bias_constant_factor: 0.0
         depth_bias_clamp: 0.0
@@ -71,8 +71,10 @@ pipeline:
                 src_alpha_blend_factor: one
                 dst_alpha_blend_factor: zero
                 alpha_blend_op: add
-                color_write_mask: r
+                color_write_mask: rgba
         blend_constants: [0.0, 0.0, 0.0, 0.0]
     dynamic_state:
         -   viewport
         -   scissor
+    layout: basic
+    render_pass: basic

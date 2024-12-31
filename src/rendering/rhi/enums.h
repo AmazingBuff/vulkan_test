@@ -5,7 +5,7 @@
 
 ENGINE_NAMESPACE_BEGIN
 
-// fork
+// fork from vulkan
 enum class SampleCountFlagBits;
 enum class PipelineStageFlagBits;
 enum class AccessFlagBits;

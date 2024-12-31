@@ -2,6 +2,8 @@
 #include "rendering/utils/util.h"
 #include "rendering/rhi/vulkan/trans/structure_rfl.h"
 
+#include <rfl/yaml.hpp>
+
 namespace rfl
 {
     template <>
@@ -9,12 +11,12 @@ namespace rfl
     {
         struct ReflType
         {
-            Amazing::Engine::RenderPassState   render_pass;
+            Amazing::Engine::RenderPassInfo   render_pass;
         };
 
         static Amazing::Engine::RenderPassResource to(const ReflType& v) noexcept
         {
-            return { std::make_shared<Amazing::Engine::RenderPassState>(v.render_pass) };
+            return { std::make_shared<Amazing::Engine::RenderPassInfo>(v.render_pass) };
         }
 
         static ReflType from(const Amazing::Engine::RenderPassResource& v)

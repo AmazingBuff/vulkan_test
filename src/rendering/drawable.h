@@ -1,5 +1,5 @@
 #pragma once
-#include "rendering/rhi/rhi.h"
+
 #include "rhi/interface.h"
 #include "system/structure.h"
 
@@ -20,14 +20,18 @@ public:
 	std::shared_ptr<SwapChain>											m_swap_chain;
 	std::shared_ptr<CommandBuffer>										m_command_buffer;
 	std::shared_ptr<PipelineResources>									m_pipeline_resources;
-
-	// a temporary solution
-	std::shared_ptr<PipelineLayout>										m_pipeline_layout;
-	std::shared_ptr<RenderPass>											m_render_pass;	
-	std::shared_ptr<Pipeline>											m_pipeline;
-	//std::unordered_map<std::string, std::shared_ptr<Pipeline>>			m_pipelines;
 private:
 	void recreate_swap_chain(GlobalRuntimeInfo& global_info);
+
+	// temporary
+	NODISCARD const std::shared_ptr<RenderPass>& current_render_pass() const;
+	NODISCARD const std::shared_ptr<Pipeline>& current_pipeline() const;
+	NODISCARD const std::shared_ptr<PipelineLayout>& current_pipeline_layout() const;
+	NODISCARD const std::shared_ptr<DescriptorSet>& current_descriptor_set() const;
+	NODISCARD const std::shared_ptr<Buffer>& current_vertex_buffers() const;
+	NODISCARD const std::shared_ptr<Buffer>& current_index_buffer() const;
+	NODISCARD std::vector<BufferInfo> current_vertex_infos() const;
+	NODISCARD BufferInfo current_index_info() const;
 };
 
 

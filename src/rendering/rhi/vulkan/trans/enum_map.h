@@ -136,7 +136,18 @@ GENERATE_ENUM_MAP(ColorComponentFlagBits,
                   r,
                   g,
                   b,
-                  a)
+                  a,
+                  rg,
+                  rb,
+                  ra,
+                  gb,
+                  ga,
+                  ba,
+                  rgb,
+                  rga,
+                  rba,
+                  gba,
+                  rgba)
 
 
 GENERATE_ENUM_MAP(FormatEnum,

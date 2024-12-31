@@ -1,6 +1,7 @@
 #pragma once
 
 #include "instance.h"
+#include "fork/vk_mem_alloc.h"
 
 ENGINE_NAMESPACE_BEGIN
 
@@ -27,7 +28,10 @@ public:
 public:
 	VK_CLASS(PhysicalDevice)() = default;
 	~VK_CLASS(PhysicalDevice)() override = default;
-	NODISCARD constexpr RHIFlag flag() const override;
+	NODISCARD constexpr RHIFlag flag() const override
+	{
+		return RHIFlag::e_physical_device;
+	}
 
 	void initialize();
 public:
@@ -50,7 +54,10 @@ class VK_CLASS(Device) final : public RHI
 public:
 	VK_CLASS(Device)() = default;
 	~VK_CLASS(Device)() override;
-	NODISCARD constexpr RHIFlag flag() const override;
+	NODISCARD constexpr RHIFlag flag() const override
+	{
+		return RHIFlag::e_device;
+	}
 
 	void initialize();
 	// return false means that a new swap chain need to be created
@@ -58,23 +65,26 @@ public:
 	void wait_idle() const;
 private:
 	void create_logical_device();
+	void create_vma_allocator();
 private:
-	VK_TYPE_INIT(VkDevice,		m_device);
-	VK_TYPE_INIT(VkQueue,		m_graphics_queue);
-	VK_TYPE_INIT(VkQueue,		m_present_queue);
+	VK_TYPE_INIT(VkDevice,			m_device);
+	VK_TYPE_INIT(VkQueue,			m_graphics_queue);
+	VK_TYPE_INIT(VkQueue,			m_present_queue);
+	VK_TYPE_INIT(VmaAllocator,		m_allocator);
 
 	friend class VK_CLASS(SwapChain);
 	friend class VK_CLASS(PipelineLayout);
+	friend class VK_CLASS(DescriptorSet);
 	friend class VK_CLASS(RenderPass);
 	friend class VK_CLASS(Pipeline);
+	friend class VK_CLASS(PipelineResources);
 	friend class VK_CLASS(Framebuffer);
 	friend class VK_CLASS(CommandBuffer);
 	friend class VK_CLASS(Semaphore);
 	friend class VK_CLASS(Fence);
 	friend class VK_CLASS(Buffer);
-	friend class VK_CLASS(VertexBuffer);
-
-	friend class VK_CLASS(PipelineResources);
+	friend class VK_CLASS(UniformBuffer);
+	friend class VK_CLASS(Image);
 };
 
 ENGINE_NAMESPACE_END

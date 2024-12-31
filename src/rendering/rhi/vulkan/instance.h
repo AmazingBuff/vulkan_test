@@ -10,7 +10,10 @@ class VK_CLASS(Instance) final : public RHI
 public:
 	VK_CLASS(Instance)() = default;
 	~VK_CLASS(Instance)() override;
-	NODISCARD constexpr RHIFlag flag() const override;
+	NODISCARD constexpr RHIFlag flag() const override
+	{
+		return RHIFlag::e_instance;
+	}
 
 	void initialize() ;
 private:

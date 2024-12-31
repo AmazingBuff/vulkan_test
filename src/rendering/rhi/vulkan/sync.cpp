@@ -11,11 +11,6 @@ VK_CLASS(Semaphore)::~VK_CLASS(Semaphore)()
 	vkDestroySemaphore(g_system_context->g_render_system->m_drawable->m_device->m_device, m_semaphore, nullptr);
 }
 
-constexpr NODISCARD RHIFlag VK_CLASS(Semaphore)::flag() const
-{
-	return RHIFlag::e_semaphore;
-}
-
 void VK_CLASS(Semaphore)::initialize()
 {
 	VkSemaphoreCreateInfo semaphore_create_info{
@@ -40,11 +35,6 @@ void VK_CLASS(Fence)::reset() const
 void VK_CLASS(Fence)::wait() const
 {
 	VK_CHECK_RESULT(vkWaitForFences(g_system_context->g_render_system->m_drawable->m_device->m_device, 1, &m_fence, VK_TRUE, UINT64_MAX));
-}
-
-constexpr NODISCARD RHIFlag VK_CLASS(Fence)::flag() const
-{
-	return RHIFlag::e_fence;
 }
 
 void VK_CLASS(Fence)::initialize()

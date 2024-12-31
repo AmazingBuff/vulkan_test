@@ -1,13 +1,14 @@
 #pragma once
 
 #include "rendering/resources/resource_types.h"
-#include "rendering/rhi/structs.h"
 
 ENGINE_NAMESPACE_BEGIN
 
+struct PipelineInfo;
+
 struct PipelineResource
 {
-	std::shared_ptr<PipelineStates>	pipeline;
+	std::shared_ptr<PipelineInfo>	pipeline;
 };
 
 

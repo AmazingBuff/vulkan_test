@@ -65,7 +65,7 @@ void ShaderManager::initialize()
 	load_shader_files();
 }
 
-NODISCARD const ShaderResource& ShaderManager::get_shader_resource(const std::string_view& name)
+const ShaderResource& ShaderManager::get_shader_resource(const std::string_view& name)
 {
 	auto it = m_shader_resources.find(name.data());
 	if (it == m_shader_resources.end())

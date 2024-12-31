@@ -1,13 +1,14 @@
 #pragma once
 
 #include "rendering/resources/resource_types.h"
-#include "rendering/rhi/structs.h"
 
 ENGINE_NAMESPACE_BEGIN
 
+struct RenderPassInfo;
+
 struct RenderPassResource
 {
-	std::shared_ptr<RenderPassState>	render_pass;
+	std::shared_ptr<RenderPassInfo>	render_pass;
 };
 
 class RenderPassManager

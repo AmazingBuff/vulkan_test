@@ -45,18 +45,27 @@ struct StencilOpState
 	uint32_t	reference;
 };
 
+
+// pipeline layout
+struct PipelineLayoutInfo
+{
+	std::string 	vertex_shader;
+	std::string 	fragment_shader;
+};
+
+
 // render pass
 struct AttachmentDescription
 {
-	AttachmentType			type;
-	Format					format;
-	SampleCountFlags		samples;
-	AttachmentLoadOp		load_op;
-	AttachmentStoreOp		store_op;
-	AttachmentLoadOp		stencil_load_op;
-	AttachmentStoreOp		stencil_store_op;
-	ImageLayout				initial_layout;
-	ImageLayout				final_layout;
+	AttachmentType				type;
+	std::optional<Format>		format;
+	SampleCountFlags			samples;
+	AttachmentLoadOp			load_op;
+	AttachmentStoreOp			store_op;
+	AttachmentLoadOp			stencil_load_op;
+	AttachmentStoreOp			stencil_store_op;
+	ImageLayout					initial_layout;
+	ImageLayout					final_layout;
 };
 
 struct AttachmentReference
@@ -112,7 +121,7 @@ struct Subpasses
 	}
 };
 
-struct RenderPassState
+struct RenderPassInfo
 {
 	Attachments		attachments;
 	Subpasses		subpasses;
@@ -201,7 +210,7 @@ struct PipelineColorBlendState
 	std::array<float, 4>								blend_constants;
 };
 
-struct PipelineStates
+struct PipelineInfo
 {
 	std::vector<PipelineShaderState>				shader_state;
 	std::optional<PipelineInputAssemblyState>		input_assembly_state;
@@ -211,10 +220,12 @@ struct PipelineStates
 	std::optional<PipelineDepthStencilState>		depth_stencil_state;
 	std::optional<PipelineColorBlendState>			color_blend_state;
 	std::vector<DynamicState>						dynamic_state;
+	std::string                                     layout;
+	std::string                                     render_pass;
 
 	NODISCARD constexpr explicit operator bool() const
 	{
-		return !shader_state.empty();
+		return !shader_state.empty() && render_pass.empty();
 	}
 };
 

@@ -1,5 +1,4 @@
 #include "pipeline.h"
-#include "benchmark/data_structure.h"
 #include "system/system.h"
 #include "rendering/renderer.h"
 #include "rendering/drawable.h"
@@ -14,20 +13,99 @@
 
 ENGINE_NAMESPACE_BEGIN
 
-static VkShaderModule create_shader_module(VkDevice device, const std::shared_ptr<std::vector<char>>& code)
-{
-    spirv_cross::CompilerGLSL compiler(reinterpret_cast<const uint32_t*>(code->data()), code->size() / sizeof(uint32_t));
-	spirv_cross::ShaderResources resources = compiler.get_shader_resources();
-	for (auto& resource : resources.stage_inputs)
-	{
-        uint32_t set = compiler.get_decoration(resource.id, spv::DecorationDescriptorSet);
-        uint32_t binding = compiler.get_decoration(resource.id, spv::DecorationBinding);
 
-        VkVertexInputBindingDescription binding_description{};
-        binding_description.binding = binding;
-        binding_description.stride = compiler.get_declared_struct_size(compiler.get_type(resource.base_type_id));
+const static std::unordered_map<std::string, size_t> Vertex_Offset =
+{
+#define VERTEX_OFFSET(struct, field) {#field, offsetof(struct, field)}
+	VERTEX_OFFSET(Vertex, position),
+	VERTEX_OFFSET(Vertex, texcoord),
+	VERTEX_OFFSET(Vertex, normal),
+#undef VERTEX_OFFSET
+};
+
+
+class SpirvParser
+{
+public:
+	SpirvParser() = default;
+	SpirvParser(const uint32_t* ir, size_t word_count) : m_compiler(std::make_unique<spirv_cross::CompilerGLSL>(ir, word_count)) {}
+
+	void initialize(const uint32_t* ir, size_t word_count);
+
+	NODISCARD bool get_vertex_input_attribute_description(std::vector<VkVertexInputAttributeDescription>& vertex_input_attributes) const;
+	void get_descriptor_set_layout_binding(VkShaderStageFlags stage, std::unordered_map<uint32_t, std::vector<VkDescriptorSetLayoutBinding>>& descriptor_set_layout_bindings, std::vector<UniformLayout>& uniform_layouts) const;
+private:
+	std::unique_ptr<spirv_cross::CompilerGLSL> m_compiler;
+};
+
+void SpirvParser::initialize(const uint32_t* ir, size_t word_count)
+{
+	m_compiler = std::make_unique<spirv_cross::CompilerGLSL>(ir, word_count);
+}
+
+bool SpirvParser::get_vertex_input_attribute_description(std::vector<VkVertexInputAttributeDescription>& vertex_input_attributes) const
+{
+	const spirv_cross::ShaderResources shader_resources = m_compiler->get_shader_resources();
+
+	for (auto& resource : shader_resources.stage_inputs)
+	{
+		if (auto it = Vertex_Offset.find(resource.name); it != Vertex_Offset.end())
+		{
+			VkVertexInputAttributeDescription attribute_description {
+				.location = m_compiler->get_decoration(resource.id, spv::DecorationLocation),
+				.binding = m_compiler->get_decoration(resource.id, spv::DecorationBinding),
+#ifdef HIGH_PRECISION_FLOAT
+				.format = VK_FORMAT_R64G64B64_SFLOAT,
+#else
+				.format = VK_FORMAT_R32G32B32_SFLOAT,
+#endif
+				.offset = static_cast<uint32_t>(it->second),
+			};
+			vertex_input_attributes.emplace_back(attribute_description);
+		}
+		else
+		{
+			RENDERING_LOG_ERROR("vertex inputs match failed!");
+			return false;
+		}
 	}
-	
+
+	return true;
+}
+
+void SpirvParser::get_descriptor_set_layout_binding(VkShaderStageFlags stage, std::unordered_map<uint32_t, std::vector<VkDescriptorSetLayoutBinding>>& descriptor_set_layout_bindings, std::vector<UniformLayout>& uniform_layouts) const
+{
+	const spirv_cross::ShaderResources shader_resources = m_compiler->get_shader_resources();
+
+	for (auto& resource : shader_resources.uniform_buffers)
+	{
+		const spirv_cross::SPIRType& type = m_compiler->get_type(resource.type_id);
+		uint32_t descriptor_count = 1;
+		if (!type.array.empty())
+			descriptor_count = type.array[0];
+
+		std::string type_name = resource.name;
+		std::string resource_name = m_compiler->get_name(resource.id);
+		uint32_t set = m_compiler->get_decoration(resource.id, spv::DecorationDescriptorSet);
+		uint32_t binding = m_compiler->get_decoration(resource.id, spv::DecorationBinding);
+		size_t size = m_compiler->get_declared_struct_size(m_compiler->get_type(resource.base_type_id));
+
+		VkDescriptorSetLayoutBinding descriptor_set_layout_binding {
+			.binding = binding,
+			.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+			.descriptorCount = descriptor_count,
+			.stageFlags = stage,
+			.pImmutableSamplers = nullptr,
+		};
+
+		uniform_layouts.emplace_back(type_name, resource_name, set, binding, descriptor_count, size);
+		descriptor_set_layout_bindings[set].emplace_back(descriptor_set_layout_binding);
+	}
+
+}
+
+
+static VkShaderModule create_shader_module(VkDevice device, const std::shared_ptr<std::vector<char>>& code){
 
 	VkShaderModuleCreateInfo create_info{
 		.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO,
@@ -40,17 +118,73 @@ static VkShaderModule create_shader_module(VkDevice device, const std::shared_pt
 	return shader_module;
 }
 
-static VkRenderPass transfer_render_pass(VkDevice device, const RenderPassResource& render_pass_resource)
+static VkPipelineLayout transfer_pipeline_layout(VkDevice device, const std::shared_ptr<PipelineLayoutInfo>& pipeline_layout, const std::shared_ptr<RenderResources>& render_resources, std::unordered_map<uint32_t, VkDescriptorSetLayout>& descriptor_set_layouts, std::vector<UniformLayout>& uniform_layouts)
+{
+	// set <---> descriptor_set_layout_bindings
+	std::unordered_map<uint32_t, std::vector<VkDescriptorSetLayoutBinding>> descriptor_set_layout_bindings;
+
+	if (!pipeline_layout->vertex_shader.empty())
+	{
+		auto& resource = render_resources->get_shader_resource(pipeline_layout->vertex_shader);
+
+		SpirvParser parser;
+		parser.initialize(reinterpret_cast<const uint32_t*>(resource.vertex_shader->data()), resource.vertex_shader->size() / sizeof(uint32_t));
+
+		parser.get_descriptor_set_layout_binding(VK_SHADER_STAGE_VERTEX_BIT, descriptor_set_layout_bindings, uniform_layouts);
+	}
+
+	if (!pipeline_layout->fragment_shader.empty())
+	{
+		auto& resource = render_resources->get_shader_resource(pipeline_layout->fragment_shader);
+
+		SpirvParser parser;
+		parser.initialize(reinterpret_cast<const uint32_t*>(resource.fragment_shader->data()), resource.fragment_shader->size() / sizeof(uint32_t));
+
+		parser.get_descriptor_set_layout_binding(VK_SHADER_STAGE_FRAGMENT_BIT, descriptor_set_layout_bindings, uniform_layouts);
+	}
+
+	std::vector<VkDescriptorSetLayout> set_layouts;
+	for (auto& [set, bindings] : descriptor_set_layout_bindings)
+	{
+		VkDescriptorSetLayoutCreateInfo descriptor_set_layout_create_info{
+			.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO,
+			.bindingCount = static_cast<uint32_t>(bindings.size()),
+			.pBindings = bindings.data(),
+		};
+
+		VkDescriptorSetLayout descriptor_set_layout;
+		VK_CHECK_RESULT(vkCreateDescriptorSetLayout(device, &descriptor_set_layout_create_info, nullptr, &descriptor_set_layout));
+
+		descriptor_set_layouts[set] = descriptor_set_layout;
+		set_layouts.emplace_back(descriptor_set_layout);
+	}
+
+	VkPipelineLayoutCreateInfo pipeline_layout_create_info{
+		.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO,
+		.setLayoutCount = static_cast<uint32_t>(set_layouts.size()),
+		.pushConstantRangeCount = 0,
+		.pPushConstantRanges = nullptr,
+	};
+
+	if (!descriptor_set_layouts.empty())
+		pipeline_layout_create_info.pSetLayouts = set_layouts.data();
+	else
+		pipeline_layout_create_info.pSetLayouts = nullptr;
+
+	VkPipelineLayout vk_pipeline_layout;
+	VK_CHECK_RESULT(vkCreatePipelineLayout(device, &pipeline_layout_create_info, nullptr, &vk_pipeline_layout));
+	return vk_pipeline_layout;
+}
+
+static VkRenderPass transfer_render_pass(VkDevice device, const std::shared_ptr<RenderPassInfo>& render_pass, VkFormat format)
 {
 	std::vector<VkAttachmentDescription> attachments;
 	std::vector<VkSubpassDescription> subpasses;
 	std::vector<VkSubpassDependency> dependencies;
 
-    auto& render_pass = render_pass_resource.render_pass;
 	for (auto& attachment : render_pass->attachments.descriptions)
 	{
 		VkAttachmentDescription description{
-			.format			= static_cast<VkFormat>(static_cast<int>(attachment.format)),
 			.samples		= static_cast<VkSampleCountFlagBits>(static_cast<int>(attachment.samples)),
 			.loadOp			= static_cast<VkAttachmentLoadOp>(static_cast<int>(attachment.load_op)),
 			.storeOp		= static_cast<VkAttachmentStoreOp>(static_cast<int>(attachment.store_op)),
@@ -59,6 +193,11 @@ static VkRenderPass transfer_render_pass(VkDevice device, const RenderPassResour
 			.initialLayout	= static_cast<VkImageLayout>(static_cast<int>(attachment.initial_layout)),
 			.finalLayout	= static_cast<VkImageLayout>(static_cast<int>(attachment.final_layout)),
 		};
+		if (!attachment.format)
+			description.format = format;
+		else
+			description.format = static_cast<VkFormat>(static_cast<int>(attachment.format.value()));
+
 		attachments.emplace_back(description);
 	}
 
@@ -139,15 +278,26 @@ static VkRenderPass transfer_render_pass(VkDevice device, const RenderPassResour
 	return vk_render_pass;
 }
 
-static VkPipeline transfer_pipeline(VkDevice device, 
+static VkPipeline transfer_pipeline(VkDevice device,
 									VkPipelineLayout pipeline_layout,
 									VkRenderPass render_pass,
-									const PipelineResource& pipeline_resource, 
+									const std::shared_ptr<PipelineInfo>& pipeline,
 									const std::shared_ptr<RenderResources>& render_resources, 
 									const VkExtent2D& extent)
 {
-    auto& pipeline = pipeline_resource.pipeline;
+	VkGraphicsPipelineCreateInfo pipeline_info{
+		.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO,
+		.layout = pipeline_layout,
+		.renderPass = render_pass,
+		.subpass = 0,
+		.basePipelineHandle = VK_NULL_HANDLE,
+		.basePipelineIndex = -1
+	};
 
+
+	SpirvParser vertex_parser;
+
+	// stages
     std::vector<VkShaderModule> shader_modules;
 	std::vector<VkPipelineShaderStageCreateInfo> shader_stages;
 	for (auto& shader : pipeline->shader_state)
@@ -157,12 +307,14 @@ static VkPipeline transfer_pipeline(VkDevice device,
 		{
         case ShaderStageFlagBits::e_vertex:
         {
+        	vertex_parser.initialize(reinterpret_cast<const uint32_t*>(modules.vertex_shader->data()), modules.vertex_shader->size() / sizeof(uint32_t));
+
             VkShaderModule vert_shader_module = create_shader_module(device, modules.vertex_shader);
-            VkPipelineShaderStageCreateInfo vert_shader_stage_info{
+        	VkPipelineShaderStageCreateInfo vert_shader_stage_info{
                 .sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO,
                 .stage = VK_SHADER_STAGE_VERTEX_BIT,
                 .module = vert_shader_module,
-                .pName = "main"
+                .pName = shader.name.c_str(),
             };
             shader_modules.emplace_back(vert_shader_module);
             shader_stages.emplace_back(vert_shader_stage_info);
@@ -175,7 +327,7 @@ static VkPipeline transfer_pipeline(VkDevice device,
                 .sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO,
                 .stage = VK_SHADER_STAGE_FRAGMENT_BIT,
                 .module = frag_shader_module,
-                .pName = "main"
+                .pName = shader.name.c_str()
             };
             shader_modules.emplace_back(frag_shader_module);
             shader_stages.emplace_back(frag_shader_stage_info);
@@ -186,29 +338,31 @@ static VkPipeline transfer_pipeline(VkDevice device,
 		}
 	}
 
-	VkVertexInputBindingDescription binding_description = VK_CLASS(Vertex)::get_binding_description();
-	auto attribute_descriptions = VK_CLASS(Vertex)::get_attribute_descriptions();
+	if (!shader_stages.empty())
+	{
+		pipeline_info.stageCount = static_cast<uint32_t>(shader_stages.size());
+		pipeline_info.pStages = shader_stages.data();
+	}
 
+	// vertex input state
+	VkVertexInputBindingDescription binding_description{
+		.binding = 0,
+		.stride = sizeof(Vertex),
+		.inputRate = VK_VERTEX_INPUT_RATE_VERTEX
+	};
+	std::vector<VkVertexInputAttributeDescription> vertex_input_attributes;
 	VkPipelineVertexInputStateCreateInfo vertex_input_info{
 		.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO,
-		.vertexBindingDescriptionCount = 1,
-		.pVertexBindingDescriptions = &binding_description,
-		.vertexAttributeDescriptionCount = static_cast<uint32_t>(attribute_descriptions.size()),
-		.pVertexAttributeDescriptions = attribute_descriptions.data()
 	};
+	if (vertex_parser.get_vertex_input_attribute_description(vertex_input_attributes))
+	{
+		vertex_input_info.vertexBindingDescriptionCount = 1;
+		vertex_input_info.pVertexBindingDescriptions = &binding_description;
+		vertex_input_info.vertexAttributeDescriptionCount = static_cast<uint32_t>(vertex_input_attributes.size());
+		vertex_input_info.pVertexAttributeDescriptions = vertex_input_attributes.data();
 
-
-	VkGraphicsPipelineCreateInfo pipeline_info{
-		.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO,
-		.stageCount = static_cast<uint32_t>(shader_stages.size()),
-		.pStages = shader_stages.data(),
-		.pVertexInputState = &vertex_input_info,
-		.layout = pipeline_layout,
-		.renderPass = render_pass,
-		.subpass = 0,
-		.basePipelineHandle = VK_NULL_HANDLE,
-		.basePipelineIndex = -1
-	};
+		pipeline_info.pVertexInputState = &vertex_input_info;
+	}
 
     // input assembly state
 	VkPipelineInputAssemblyStateCreateInfo input_assembly_info{
@@ -406,30 +560,24 @@ static VkPipeline transfer_pipeline(VkDevice device,
 
 VK_CLASS(PipelineLayout)::~VK_CLASS(PipelineLayout)()
 {
-	vkDestroyPipelineLayout(g_system_context->g_render_system->m_drawable->m_device->m_device, m_pipeline_layout, nullptr);
+	auto device = g_system_context->g_render_system->m_drawable->m_device->m_device;
+
+	for (auto& set_layout : std::ranges::views::values(m_descriptor_set_layouts))
+		vkDestroyDescriptorSetLayout(device, set_layout, nullptr);
+	vkDestroyPipelineLayout(device, m_pipeline_layout, nullptr);
 }
 
-constexpr NODISCARD RHIFlag VK_CLASS(PipelineLayout)::flag() const
+void VK_CLASS(PipelineLayout)::initialize(const std::shared_ptr<PipelineLayoutInfo>& pipeline_layout_info)
 {
-	return RHIFlag::e_pipeline_layout;
+	create_pipeline_layout(pipeline_layout_info);
 }
 
-void VK_CLASS(PipelineLayout)::initialize()
+void VK_CLASS(PipelineLayout)::create_pipeline_layout(const std::shared_ptr<PipelineLayoutInfo>& pipeline_layout_info)
 {
-	create_pipeline_layout();
-}
+	auto device = g_system_context->g_render_system->m_drawable->m_device->m_device;
+	auto& render_resources = g_system_context->g_render_system->m_render_resources;
 
-void VK_CLASS(PipelineLayout)::create_pipeline_layout()
-{
-	VkPipelineLayoutCreateInfo pipeline_layout_info{
-		.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO,
-		.setLayoutCount = 0,
-		.pSetLayouts = nullptr,
-		.pushConstantRangeCount = 0,
-		.pPushConstantRanges = nullptr
-	};
-
-	VK_CHECK_RESULT(vkCreatePipelineLayout(g_system_context->g_render_system->m_drawable->m_device->m_device, &pipeline_layout_info, nullptr, &m_pipeline_layout));
+	m_pipeline_layout = transfer_pipeline_layout(device, pipeline_layout_info, render_resources, m_descriptor_set_layouts, m_uniform_layouts);
 }
 
 
@@ -438,24 +586,17 @@ VK_CLASS(RenderPass)::~VK_CLASS(RenderPass)()
 	vkDestroyRenderPass(g_system_context->g_render_system->m_drawable->m_device->m_device, m_render_pass, nullptr);
 }
 
-void VK_CLASS(RenderPass)::initialize(const std::string_view& name)
+void VK_CLASS(RenderPass)::initialize(const std::shared_ptr<RenderPassInfo>& render_pass)
 {
-	create_render_pass(name);
+	create_render_pass(render_pass);
 }
 
-
-constexpr NODISCARD RHIFlag VK_CLASS(RenderPass)::flag() const
-{
-	return RHIFlag::e_render_pass;
-}
-
-void VK_CLASS(RenderPass)::create_render_pass(const std::string_view& name)
+void VK_CLASS(RenderPass)::create_render_pass(const std::shared_ptr<RenderPassInfo>& render_pass)
 {
 	auto device = g_system_context->g_render_system->m_drawable->m_device->m_device;
-	auto swap_chain = g_system_context->g_render_system->m_drawable->m_swap_chain;
+	auto& swap_chain = g_system_context->g_render_system->m_drawable->m_swap_chain;
 
-	auto& render_pass = g_system_context->g_render_system->m_render_resources->get_render_pass_resource(name);
-	m_render_pass = transfer_render_pass(device, render_pass);
+	m_render_pass = transfer_render_pass(device, render_pass, swap_chain->m_details.format.value().format);
 }
 
 
@@ -465,26 +606,23 @@ VK_CLASS(Pipeline)::~VK_CLASS(Pipeline)()
 	vkDestroyPipeline(g_system_context->g_render_system->m_drawable->m_device->m_device, m_pipeline, nullptr);
 }
 
-void VK_CLASS(Pipeline)::initialize(const std::shared_ptr<VK_CLASS(PipelineLayout)>& pipeline_layout, const std::shared_ptr<VK_CLASS(RenderPass)>& render_pass)
+void VK_CLASS(Pipeline)::initialize(const std::shared_ptr<PipelineInfo>& pipeline, const std::shared_ptr<VK_CLASS(PipelineLayout)>& pipeline_layout, const std::shared_ptr<VK_CLASS(RenderPass)>& render_pass)
 {
-	create_pipeline(pipeline_layout, render_pass);
+	create_pipeline(pipeline, pipeline_layout, render_pass);
 }
 
-NODISCARD constexpr RHIFlag VK_CLASS(Pipeline)::flag() const
-{
-	return RHIFlag::e_pipeline;
-}
-
-void VK_CLASS(Pipeline)::create_pipeline(const std::shared_ptr<VK_CLASS(PipelineLayout)>& pipeline_layout, const std::shared_ptr<VK_CLASS(RenderPass)>& render_pass)
+void VK_CLASS(Pipeline)::create_pipeline(const std::shared_ptr<PipelineInfo>& pipeline, const std::shared_ptr<VK_CLASS(PipelineLayout)>& pipeline_layout, const std::shared_ptr<VK_CLASS(RenderPass)>& render_pass)
 {
 	auto device = g_system_context->g_render_system->m_drawable->m_device->m_device;
-    auto& pipeline = g_system_context->g_render_system->m_render_resources->get_pipeline_resource("basic");
+	auto& swap_chain = g_system_context->g_render_system->m_drawable->m_swap_chain;
+	auto& render_resources = g_system_context->g_render_system->m_render_resources;
 
-    m_pipeline = transfer_pipeline(device, 
-		pipeline_layout->m_pipeline_layout, 
-		render_pass->m_render_pass, pipeline, 
-		g_system_context->g_render_system->m_render_resources, 
-		g_system_context->g_render_system->m_drawable->m_swap_chain->m_details.extent.value());
+	m_pipeline = transfer_pipeline(device,
+		pipeline_layout->m_pipeline_layout,
+		render_pass->m_render_pass,
+		pipeline,
+		render_resources,
+		swap_chain->m_details.extent.value());
 }
 
 ENGINE_NAMESPACE_END

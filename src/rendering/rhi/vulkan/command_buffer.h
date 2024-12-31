@@ -10,7 +10,10 @@ class VK_CLASS(CommandBuffer) final : public RHI
 public:
 	VK_CLASS(CommandBuffer)() = default;
 	~VK_CLASS(CommandBuffer)() override;
-	NODISCARD constexpr RHIFlag flag() const override;
+	NODISCARD constexpr RHIFlag flag() const override
+	{
+		return RHIFlag::e_command_buffer;
+	}
 
 	void initialize();
 	// wait for previous frame
@@ -22,10 +25,17 @@ public:
 	void end_render_pass() const;
 	void end_record_command() const;
 	void bind_pipeline(const std::shared_ptr<VK_CLASS(Pipeline)>&  pipeline) const;
-	void bind_vertex_buffers(const std::vector<std::shared_ptr<VK_CLASS(VertexBuffer)>>& vertex_buffers) const;
+	void bind_vertex_buffers(uint32_t first_binding, uint32_t binding_count, const std::shared_ptr<VK_CLASS(Buffer)>& vertex_buffer, const std::vector<VkDeviceSize>& offsets) const;
+	void bind_index_buffers(const std::shared_ptr<VK_CLASS(Buffer)>& index_buffer, VkDeviceSize offset) const;
+	void bind_descriptor_sets(const std::shared_ptr<VK_CLASS(PipelineLayout)>& pipeline_layout, const std::shared_ptr<VK_CLASS(DescriptorSet)>& descriptor_set) const;
 	void draw(uint32_t vertex_count, uint32_t instance_count, uint32_t first_vertex, uint32_t first_instance) const;
+	void draw_indexed(uint32_t index_count, uint32_t instance_count, uint32_t first_index, int32_t vertex_offset, uint32_t first_instance) const;
 	void submit() const;
 	void refresh_frame();
+
+	// single command buffer
+	VkCommandBuffer begin_single_command() const;
+	void end_single_command(VkCommandBuffer command_buffer) const;
 private:
 	void create_command_pool();
 	void create_command_buffer();
@@ -42,6 +52,8 @@ private:
 
 	friend class VK_CLASS(Device);
 	friend class VK_CLASS(SwapChain);
+	friend class VK_CLASS(Buffer);
+	friend class VK_CLASS(PipelineResources);
 };
 
 
