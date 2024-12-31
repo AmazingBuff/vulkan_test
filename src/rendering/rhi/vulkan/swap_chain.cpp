@@ -15,11 +15,6 @@ VK_CLASS(Framebuffer)::~VK_CLASS(Framebuffer)()
 	vkDestroyFramebuffer(device, m_frame_buffer, nullptr);
 }
 
-constexpr NODISCARD RHIFlag VK_CLASS(Framebuffer)::flag() const
-{
-	return RHIFlag::e_framebuffer;
-}
-
 void VK_CLASS(Framebuffer)::initialize(const std::shared_ptr<VK_CLASS(RenderPass)>& render_pass)
 {
 	create_frame_buffer(render_pass);
@@ -70,7 +65,7 @@ NODISCARD bool VK_CLASS(SwapChain)::acquire_next_image()
 	return true;
 }
 
-void VK_CLASS(SwapChain)::create_frame_buffers(const std::shared_ptr<VK_CLASS(RenderPass)>& render_pass)
+void VK_CLASS(SwapChain)::create_frame_buffers(const std::shared_ptr<VK_CLASS(RenderPass)>& render_pass) const
 {
 	for (auto& frame_buffer : m_frame_buffers)
 		frame_buffer->initialize(render_pass);
@@ -199,11 +194,6 @@ void VK_CLASS(SwapChain)::create_image_views()
 		};
 		VK_CHECK_RESULT(vkCreateImageView(g_system_context->g_render_system->m_drawable->m_device->m_device, &create_info, nullptr, &m_frame_buffers[i]->m_image_view));
 	}
-}
-
-constexpr RHIFlag VK_CLASS(SwapChain)::flag() const
-{
-	return RHIFlag::e_swap_chain;
 }
 
 ENGINE_NAMESPACE_END

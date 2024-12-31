@@ -16,6 +16,7 @@ enum class GraphicsAPI : uint8_t
 
 enum class RHIFlag : uint8_t
 {
+	e_unknown,
 	e_instance,
 	e_physical_device,
 	e_device,
@@ -28,11 +29,10 @@ enum class RHIFlag : uint8_t
 	e_semaphore,
 	e_fence,
 	e_buffer,
-	e_vertex_buffer,
-	e_index_buffer,
-	e_uniform_buffer,
+	e_image,
 	e_pipeline_resources,
-	e_unknown
+	e_resource_manager,
+	e_descriptor_set,
 };
 
 static constexpr GraphicsAPI Hardware_API = GraphicsAPI::e_vulkan;

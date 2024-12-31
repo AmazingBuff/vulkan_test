@@ -2,6 +2,7 @@
 #include "system/system.h"
 #include "rendering/renderer.h"
 #include "rendering/drawable.h"
+#include "benchmark/buffer.h"
 
 ENGINE_NAMESPACE_BEGIN
 
@@ -69,11 +70,6 @@ void VK_CLASS(CommandBuffer)::bind_pipeline(const std::shared_ptr<VK_CLASS(Pipel
 	vkCmdSetScissor(m_command_buffers[m_current_frame], 0, 1, &scissor);
 }
 
-constexpr NODISCARD RHIFlag VK_CLASS(CommandBuffer)::flag() const
-{
-	return RHIFlag::e_command_buffer;
-}
-
 void VK_CLASS(CommandBuffer)::begin_record_command() const
 {
 	VkCommandBufferBeginInfo begin_info{
@@ -90,14 +86,43 @@ void VK_CLASS(CommandBuffer)::end_record_command() const
 	VK_CHECK_RESULT(vkEndCommandBuffer(m_command_buffers[m_current_frame]));
 }
 
-void VK_CLASS(CommandBuffer)::bind_vertex_buffers(const std::vector<std::shared_ptr<VK_CLASS(VertexBuffer)>>& vertex_buffers) const
+void VK_CLASS(CommandBuffer)::bind_vertex_buffers(uint32_t first_binding, uint32_t binding_count, const std::shared_ptr<VK_CLASS(Buffer)>& vertex_buffer, const std::vector<VkDeviceSize>& offsets) const
 {
+	std::vector<VkBuffer> buffers;
+	for (uint32_t i = first_binding; i < first_binding + binding_count; ++i)
+		buffers.push_back(vertex_buffer->m_buffer);
 
+	vkCmdBindVertexBuffers(m_command_buffers[m_current_frame], 0, binding_count, buffers.data(), offsets.data());
+}
+
+void VK_CLASS(CommandBuffer)::bind_index_buffers(const std::shared_ptr<VK_CLASS(Buffer)>& index_buffer, VkDeviceSize offset) const
+{
+	vkCmdBindIndexBuffer(m_command_buffers[m_current_frame], index_buffer->m_buffer, offset, VK_INDEX_TYPE_UINT32);
+}
+
+void VK_CLASS(CommandBuffer)::bind_descriptor_sets(const std::shared_ptr<VK_CLASS(PipelineLayout)>& pipeline_layout, const std::shared_ptr<VK_CLASS(DescriptorSet)>& descriptor_set) const
+{
+	std::vector<VkDescriptorSet> descriptor_sets;
+	uint32_t first_set = std::numeric_limits<uint32_t>::max();
+	uint32_t set_count = 0;
+	for (auto& [set, descriptor] : descriptor_set->m_descriptor_sets[m_current_frame])
+	{
+		first_set = std::min(first_set, set);
+		descriptor_sets.push_back(descriptor);
+		set_count++;
+	}
+
+	vkCmdBindDescriptorSets(m_command_buffers[m_current_frame], VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline_layout->m_pipeline_layout, first_set, set_count, descriptor_sets.data(), 0, nullptr);
 }
 
 void VK_CLASS(CommandBuffer)::draw(uint32_t vertex_count, uint32_t instance_count, uint32_t first_vertex, uint32_t first_instance) const
 {
 	vkCmdDraw(m_command_buffers[m_current_frame], vertex_count, instance_count, first_vertex, first_instance);
+}
+
+void VK_CLASS(CommandBuffer)::draw_indexed(uint32_t index_count, uint32_t instance_count, uint32_t first_index, int32_t vertex_offset, uint32_t first_instance) const
+{
+	vkCmdDrawIndexed(m_command_buffers[m_current_frame], index_count, instance_count, first_index, vertex_offset, first_instance);
 }
 
 void VK_CLASS(CommandBuffer)::submit() const
@@ -125,6 +150,49 @@ void VK_CLASS(CommandBuffer)::refresh_frame()
 	m_current_frame = (m_current_frame + 1) % k_Max_Frames_In_Flight;
 }
 
+VkCommandBuffer VK_CLASS(CommandBuffer)::begin_single_command() const
+{
+	auto device = g_system_context->g_render_system->m_drawable->m_device->m_device;
+
+	VkCommandBufferAllocateInfo alloc_info{
+		.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO,
+		.commandPool = m_command_pool,
+		.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY,
+		.commandBufferCount = 1,
+	};
+
+	VkCommandBuffer command_buffer;
+	VK_CHECK_RESULT(vkAllocateCommandBuffers(device, &alloc_info, &command_buffer));
+
+	VkCommandBufferBeginInfo begin_info{
+		.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO,
+		.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT
+	};
+
+	VK_CHECK_RESULT(vkBeginCommandBuffer(command_buffer, &begin_info));
+
+	return command_buffer;
+}
+
+void VK_CLASS(CommandBuffer)::end_single_command(VkCommandBuffer command_buffer) const
+{
+	VK_CHECK_RESULT(vkEndCommandBuffer(command_buffer));
+
+	VkSubmitInfo submit_info{
+		.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO,
+		.commandBufferCount = 1,
+		.pCommandBuffers = &command_buffer,
+	};
+
+
+	auto device = g_system_context->g_render_system->m_drawable->m_device;
+	auto queue = device->m_graphics_queue;
+	VK_CHECK_RESULT(vkQueueSubmit(queue, 1, &submit_info, VK_NULL_HANDLE));
+	VK_CHECK_RESULT(vkQueueWaitIdle(queue));
+
+	vkFreeCommandBuffers(device->m_device, m_command_pool, 1, &command_buffer);
+}
+
 void VK_CLASS(CommandBuffer)::initialize()
 {
 	create_command_pool();
@@ -146,7 +214,6 @@ void VK_CLASS(CommandBuffer)::create_command_pool()
 
 void VK_CLASS(CommandBuffer)::create_command_buffer()
 {
-	auto drawable = g_system_context->g_render_system->m_drawable;
 	VkCommandBufferAllocateInfo allocate_info{
 		.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO,
 		.commandPool = m_command_pool,
@@ -154,7 +221,8 @@ void VK_CLASS(CommandBuffer)::create_command_buffer()
 		.commandBufferCount = k_Max_Frames_In_Flight
 	};
 
-	VK_CHECK_RESULT(vkAllocateCommandBuffers(drawable->m_device->m_device, &allocate_info, m_command_buffers.data()));
+	auto device = g_system_context->g_render_system->m_drawable->m_device->m_device;
+	VK_CHECK_RESULT(vkAllocateCommandBuffers(device, &allocate_info, m_command_buffers.data()));
 }
 
 void VK_CLASS(CommandBuffer)::create_sync_objects()

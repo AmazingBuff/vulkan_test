@@ -2,6 +2,8 @@
 #include "rendering/utils/util.h"
 #include "rendering/rhi/vulkan/trans/structure_rfl.h"
 
+#include <rfl/yaml.hpp>
+
 namespace rfl
 {
     template <>
@@ -9,12 +11,12 @@ namespace rfl
     {
         struct ReflType
         {
-            Amazing::Engine::PipelineStates pipeline;
+            Amazing::Engine::PipelineInfo pipeline;
         };
 
         static Amazing::Engine::PipelineResource to(const ReflType& v) noexcept
         {
-            return { std::make_shared<Amazing::Engine::PipelineStates>(v.pipeline) };
+            return { std::make_shared<Amazing::Engine::PipelineInfo>(v.pipeline) };
         }
 
         static ReflType from(const Amazing::Engine::PipelineResource& v)

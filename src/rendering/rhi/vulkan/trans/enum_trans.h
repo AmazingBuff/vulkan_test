@@ -104,6 +104,17 @@ enum class ColorComponentFlagBits
 	e_g				=	VK_COLOR_COMPONENT_G_BIT,
 	e_b				=	VK_COLOR_COMPONENT_B_BIT,
 	e_a				=	VK_COLOR_COMPONENT_A_BIT,
+	e_rg			=	e_r | e_g,
+	e_rb			=	e_r | e_b,
+	e_ra			=	e_r | e_a,
+	e_gb			=	e_g | e_b,
+	e_ga			=	e_g | e_a,
+	e_ba			=	e_b | e_a,
+	e_rgb			=	e_r | e_g | e_b,
+	e_rga			=	e_r | e_g | e_a,
+	e_rba			=	e_r | e_b | e_a,
+	e_gba			=	e_g | e_b | e_a,
+	e_rgba			=	e_r | e_g | e_b | e_a,
 };
 
 

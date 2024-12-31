@@ -2,7 +2,6 @@ render_pass:
     attachments:
         descriptions:
             -   type: color
-                format: b8g8r8a8_srgb
                 samples: 1
                 load_op: clear
                 store_op: store

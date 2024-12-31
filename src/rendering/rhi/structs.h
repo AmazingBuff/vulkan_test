@@ -1,5 +1,7 @@
 #pragma once
 
+#include "base/macro.h"
+
 ENGINE_NAMESPACE_BEGIN
 
 struct Offset2D;
@@ -15,7 +17,7 @@ struct SubpassDescription;
 struct SubpassDependency;
 struct Attachments;
 struct Subpasses;
-struct RenderPassState;
+struct RenderPassInfo;
 
 // pipeline
 struct PipelineShaderState;
@@ -26,6 +28,6 @@ struct PipelineMultisampleState;
 struct PipelineDepthStencilState;
 struct PipelineColorBlendAttachmentState;
 struct PipelineColorBlendState;
-struct PipelineStates;
+struct PipelineInfo;
 
 ENGINE_NAMESPACE_END

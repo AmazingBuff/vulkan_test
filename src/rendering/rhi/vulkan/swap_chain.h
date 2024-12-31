@@ -10,14 +10,17 @@ class VK_CLASS(Framebuffer) final : public RHI
 public:
 	VK_CLASS(Framebuffer)() = default;
 	~VK_CLASS(Framebuffer)() override;
-	NODISCARD constexpr RHIFlag flag() const override;
+	NODISCARD constexpr RHIFlag flag() const override
+	{
+		return RHIFlag::e_framebuffer;
+	}
 
 	void initialize(const std::shared_ptr<VK_CLASS(RenderPass)>& render_pass);
 private:
 	void create_frame_buffer(const std::shared_ptr<VK_CLASS(RenderPass)>& render_pass);
 private:
-	VK_TYPE_INIT(VkFramebuffer, m_frame_buffer);
-	VK_TYPE_INIT(VkImageView, m_image_view);
+	VK_TYPE_INIT(VkFramebuffer,		m_frame_buffer);
+	VK_TYPE_INIT(VkImageView,		m_image_view);
 
 	friend class VK_CLASS(CommandBuffer);
 	friend class VK_CLASS(SwapChain);
@@ -42,10 +45,13 @@ public:
 public:
 	VK_CLASS(SwapChain)() = default;
 	~VK_CLASS(SwapChain)() override;
-	NODISCARD constexpr RHIFlag flag() const override;
+	NODISCARD constexpr RHIFlag flag() const override
+	{
+		return RHIFlag::e_swap_chain;
+	}
 
 	void initialize();
-	void create_frame_buffers(const std::shared_ptr<VK_CLASS(RenderPass)>& render_pass);
+	void create_frame_buffers(const std::shared_ptr<VK_CLASS(RenderPass)>& render_pass) const;
 	// return false means that a new swap chain need to be created
 	NODISCARD bool acquire_next_image();
 	// must acquire next image first
@@ -67,6 +73,7 @@ private:
 	friend class VK_CLASS(PipelineLayout);
 	friend class VK_CLASS(RenderPass);
 	friend class VK_CLASS(Pipeline);
+	friend class VK_CLASS(PipelineResources);
 	friend class VK_CLASS(Framebuffer);
 	friend class VK_CLASS(CommandBuffer);
 	friend class VK_CLASS(Device);

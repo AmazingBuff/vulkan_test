@@ -28,4 +28,9 @@ std::shared_ptr<std::vector<char>> read_file(const std::string& filename)
 	return buffer;
 }
 
+size_t aligned_size(size_t size, size_t alignment)
+{
+	return (size + (alignment - 1)) & ~(alignment - 1);
+}
+
 AMAZING_NAMESPACE_END

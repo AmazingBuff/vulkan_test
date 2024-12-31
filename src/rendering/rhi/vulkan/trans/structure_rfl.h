@@ -1,12 +1,11 @@
 #pragma once
 
-#define YAML_CPP_STATIC_DEFINE
-#include <rfl.hpp>
-#include <rfl/yaml.hpp>
-#include <func.h>
-
 #include "enum_map.h"
 #include "structure_trans.h"
+
+#define YAML_CPP_STATIC_DEFINE
+#include <rfl.hpp>
+#include <func.h>
 
 namespace rfl 
 {
@@ -134,27 +133,51 @@ namespace rfl
     };
 
 
+    // pipeline layout
+    template <>
+    struct Reflector<Amazing::Engine::PipelineLayoutInfo>
+    {
+        struct ReflType
+        {
+            std::string	                    vertex_shader;
+            std::string	                    fragment_shader;
+        };
+
+        static Amazing::Engine::PipelineLayoutInfo to(const ReflType& v) noexcept
+        {
+            return { v.vertex_shader, v.fragment_shader};
+        }
+
+        static ReflType from(const Amazing::Engine::PipelineLayoutInfo& v)
+        {
+            return { v.vertex_shader, v.fragment_shader};
+        }
+    };
+
+
     // render pass
     template <>
     struct Reflector<Amazing::Engine::AttachmentDescription>
     {
         struct ReflType
         {
-            std::string	    type;
-            std::string	    format;
-            std::string	    samples;
-            std::string	    load_op;
-            std::string	    store_op;
-            std::string	    stencil_load_op;
-            std::string	    stencil_store_op;
-            std::string	    initial_layout;
-            std::string	    final_layout;
+            std::string	                    type;
+            std::optional<std::string>	    format;
+            std::string	                    samples;
+            std::string	                    load_op;
+            std::string	                    store_op;
+            std::string	                    stencil_load_op;
+            std::string	                    stencil_store_op;
+            std::string	                    initial_layout;
+            std::string	                    final_layout;
         };
 
         static Amazing::Engine::AttachmentDescription to(const ReflType& v) noexcept
         {
             REFLECTOR_TO_ENUM(AttachmentType, v, type);
-            REFLECTOR_TO_ENUM(Format, v, format);
+            std::optional<Amazing::Engine::Format> format = std::nullopt;
+            if (v.format)
+                format = Amazing::Engine::string_to_enum<Amazing::Engine::FormatEnum>(v.format.value());
             REFLECTOR_TO_ENUM(SampleCountFlags, v, samples);
             REFLECTOR_TO_ENUM(AttachmentLoadOp, v, load_op);
             REFLECTOR_TO_ENUM(AttachmentStoreOp, v, store_op);
@@ -168,7 +191,9 @@ namespace rfl
         static ReflType from(const Amazing::Engine::AttachmentDescription& v)
         {
             REFLECTOR_FROM_ENUM(AttachmentType, v, type);
-            REFLECTOR_FROM_ENUM(Format, v, format);
+            std::optional<std::string> format = std::nullopt;
+            if (v.format)
+                format = Amazing::Engine::enum_to_string(static_cast<Amazing::Engine::FormatEnum>(v.format.value()));
             REFLECTOR_FROM_ENUM(SampleCountFlags, v, samples);
             REFLECTOR_FROM_ENUM(AttachmentLoadOp, v, load_op);
             REFLECTOR_FROM_ENUM(AttachmentStoreOp, v, store_op);
@@ -310,7 +335,7 @@ namespace rfl
     };
 
     template <>
-    struct Reflector<Amazing::Engine::RenderPassState>
+    struct Reflector<Amazing::Engine::RenderPassInfo>
     {
         struct ReflType
         {
@@ -318,12 +343,12 @@ namespace rfl
             Amazing::Engine::Subpasses		    subpasses;
         };
 
-        static Amazing::Engine::RenderPassState to(const ReflType& v) noexcept
+        static Amazing::Engine::RenderPassInfo to(const ReflType& v) noexcept
         {
             return { v.attachments, v.subpasses };
         }
 
-        static ReflType from(const Amazing::Engine::RenderPassState& v)
+        static ReflType from(const Amazing::Engine::RenderPassInfo& v)
         {
             return { v.attachments, v.subpasses };
         }
@@ -551,7 +576,7 @@ namespace rfl
 
     // self
     template <>
-    struct Reflector<Amazing::Engine::PipelineStates>
+    struct Reflector<Amazing::Engine::PipelineInfo>
     {
         struct ReflType
         {
@@ -563,22 +588,24 @@ namespace rfl
             std::optional<Amazing::Engine::PipelineDepthStencilState>		depth_stencil_state;
             std::optional<Amazing::Engine::PipelineColorBlendState>			color_blend_state;
             std::vector<std::string>			                            dynamic_state;
+            std::string                                                     layout;
+            std::string                                                     render_pass;
         };
 
-        static Amazing::Engine::PipelineStates to(const ReflType& v) noexcept
+        static Amazing::Engine::PipelineInfo to(const ReflType& v) noexcept
         {
             std::vector<Amazing::Engine::DynamicState> dynamic_states;
             for (auto& dynamic_state : v.dynamic_state)
                 dynamic_states.emplace_back(Amazing::Engine::string_to_enum<Amazing::Engine::DynamicStateEnum>(dynamic_state));
-            return { v.shader_state, v.input_assembly_state, v.viewport_state, v.rasterization_state, v.multisample_state, v.depth_stencil_state, v.color_blend_state, dynamic_states };
+            return { v.shader_state, v.input_assembly_state, v.viewport_state, v.rasterization_state, v.multisample_state, v.depth_stencil_state, v.color_blend_state, dynamic_states, v.layout, v.render_pass };
         }
 
-        static ReflType from(const Amazing::Engine::PipelineStates& v)
+        static ReflType from(const Amazing::Engine::PipelineInfo& v)
         {
             std::vector<std::string> dynamic_states;
             for (auto& dynamic_state : v.dynamic_state)
                 dynamic_states.emplace_back(Amazing::Engine::enum_to_string(static_cast<Amazing::Engine::DynamicStateEnum>(dynamic_state)));
-            return { v.shader_state, v.input_assembly_state, v.viewport_state, v.rasterization_state, v.multisample_state, v.depth_stencil_state, v.color_blend_state, dynamic_states };
+            return { v.shader_state, v.input_assembly_state, v.viewport_state, v.rasterization_state, v.multisample_state, v.depth_stencil_state, v.color_blend_state, dynamic_states, v.layout, v.render_pass };
         }
     };
 

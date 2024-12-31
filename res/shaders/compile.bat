@@ -1,1 +1,1 @@
-E:/VulkanSDK/1.3.296/Bin/glslc.exe triangle/triangle.frag -o triangle/frag.spv
+E:/VulkanSDK/1.3.296/Bin/glslc.exe triangle/triangle.vert -o triangle/vert.spv

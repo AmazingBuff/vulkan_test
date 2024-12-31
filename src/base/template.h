@@ -68,7 +68,7 @@ public:
     NODISCARD constexpr BitFlag operator^(const BitFlag& value) const;
     NODISCARD constexpr BitFlag operator~() const;
 
-	NODISCARD BitFlag& operator=(const BitFlag& value);
+	BitFlag& operator=(const BitFlag& value);
 };
 
 #include "template.inl"

@@ -72,11 +72,6 @@ void VK_CLASS(Instance)::initialize()
 	create_surface();
 }
 
-constexpr RHIFlag VK_CLASS(Instance)::flag() const
-{
-	return RHIFlag::e_instance;
-}
-
 void VK_CLASS(Instance)::create_instance()
 {
 	VK_CHECK_RESULT(volkInitialize());
