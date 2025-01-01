@@ -12,5 +12,6 @@
 #include <filesystem>
 #include <functional>
 #include <array>
+#include <queue>
 #include <string>
 #include <string_view>

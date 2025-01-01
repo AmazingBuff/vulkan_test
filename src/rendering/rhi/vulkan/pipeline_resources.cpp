@@ -1,7 +1,4 @@
 #include "pipeline_resources.h"
-
-#include <rfl/thirdparty/ctre.hpp>
-
 #include "system/system.h"
 #include "trans/enum_trans.h"
 #include "trans/structure_trans.h"
@@ -16,9 +13,16 @@
 
 ENGINE_NAMESPACE_BEGIN
 
+static const std::unordered_map<std::string, std::string> name_to_res_name_map =
+{
+	{"sampler_s", "a"}
+};
+
 void VK_CLASS(PipelineResources)::initialize()
 {
 	create_resource_manager();
+	m_resource_manager->create_image("a");
+
 
 	create_pipeline_layout("basic");
 	create_render_pass("basic");
@@ -26,12 +30,12 @@ void VK_CLASS(PipelineResources)::initialize()
 
 	for (auto& [name, pipeline_layout] : m_pipeline_layouts)
 	{
-		auto& layout = pipeline_layout->m_uniform_layouts;
-		for (auto& uniform : layout)
-			m_resource_manager->configure_uniform_buffer(name, uniform.resource_name, uniform.set, uniform.binding, uniform.array_count, uniform.size, m_descriptor_sets.at("basic")->m_descriptor_sets);
+		auto& uniform_buffers = pipeline_layout->m_shader_resources_layout.uniform_buffers;
+		m_resource_manager->configure_uniform_buffer(name, uniform_buffers, m_descriptor_sets.at(name)->m_descriptor_sets);
+	
+        auto& sampled_images = pipeline_layout->m_shader_resources_layout.sampled_images;
+        m_resource_manager->configure_image(sampled_images, name_to_res_name_map, m_descriptor_sets.at(name)->m_descriptor_sets);
 	}
-
-
 }
 
 const std::shared_ptr<VK_CLASS(Pipeline)>& VK_CLASS(PipelineResources)::get_pipeline(const std::string_view& name) const
@@ -127,9 +131,9 @@ void VK_CLASS(PipelineResources)::create_resource_manager()
 	m_resource_manager->init();
 
 	std::vector<Vertex> vertices = {
-		{{-0.5f, -0.5f,  0.0f}, {1.0f, 1.0f},{1.0f, 0.0f, 0.0f}},
-		{{ 0.5f, -0.5f,  0.0f}, {1.0f, 1.0f},{0.0f, 1.0f, 0.0f}},
-		{{ 0.5f,  0.5f,  0.0f}, {1.0f, 1.0f},{0.0f, 0.0f, 1.0f}},
+		{{-0.5f, -0.5f,  0.0f}, {1.0f, 0.0f},{1.0f, 0.0f, 0.0f}},
+		{{ 0.5f, -0.5f,  0.0f}, {0.0f, 0.0f},{0.0f, 1.0f, 0.0f}},
+		{{ 0.5f,  0.5f,  0.0f}, {0.0f, 1.0f},{0.0f, 0.0f, 1.0f}},
 		{{-0.5f,  0.5f,  0.0f}, {1.0f, 1.0f},{1.0f, 1.0f, 1.0f}}
 	};
 

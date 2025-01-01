@@ -85,6 +85,7 @@ private:
 	friend class VK_CLASS(Buffer);
 	friend class VK_CLASS(UniformBuffer);
 	friend class VK_CLASS(Image);
+	friend class VK_CLASS(Sampler);
 };
 
 ENGINE_NAMESPACE_END

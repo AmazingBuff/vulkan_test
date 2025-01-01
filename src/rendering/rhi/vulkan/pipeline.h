@@ -11,7 +11,7 @@ struct RenderPassInfo;
 struct PipelineInfo;
 
 
-struct UniformLayout
+struct UniformBufferLayout
 {
 	std::string		type_name;
 	std::string		resource_name;
@@ -19,6 +19,21 @@ struct UniformLayout
 	uint32_t		binding;
 	uint32_t		array_count;
 	size_t			size;
+};
+
+struct SampledImageLayout
+{
+    std::string		resource_name;
+	uint32_t		dimension;
+    uint32_t		set;
+    uint32_t		binding;
+	uint32_t		array_count;
+};
+
+struct ShaderResourcesLayout
+{
+    std::vector<UniformBufferLayout>	uniform_buffers;
+    std::vector<SampledImageLayout>		sampled_images;
 };
 
 class VK_CLASS(PipelineLayout) final : public RHI
@@ -38,7 +53,7 @@ private:
 	// set <----> descriptor set layout
 	std::unordered_map<uint32_t, VkDescriptorSetLayout>			m_descriptor_set_layouts;
 	VK_TYPE_INIT(VkPipelineLayout,								m_pipeline_layout);
-	std::vector<UniformLayout>									m_uniform_layouts;
+	ShaderResourcesLayout										m_shader_resources_layout;
 
 	friend class VK_CLASS(Pipeline);
 	friend class VK_CLASS(DescriptorSet);
