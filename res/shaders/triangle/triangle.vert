@@ -5,6 +5,7 @@ layout (location = 1) in vec2 texcoord;
 layout (location = 2) in vec3 normal;
 
 layout (location = 0) out vec3 frag_color;
+layout (location = 1) out vec2 frag_texcoord;
 
 layout (set = 0, binding = 0) uniform Transformation
 {
@@ -22,4 +23,5 @@ void main()
 {
 	gl_Position = trans.projection * trans.view * trans.model * vec4(position, 1.0);
 	frag_color = sin(sp.speed) * normal;
+	frag_texcoord = texcoord;
 }

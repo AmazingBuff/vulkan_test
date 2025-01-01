@@ -6,10 +6,10 @@ ENGINE_NAMESPACE_BEGIN
 
 struct TextureResource
 {
-	int				width		= 0;
-	int				height		= 0;
-	int				channels	= 0;
-	uint8_t*		data	= nullptr;
+	int				width		=	0;
+	int				height		=	0;
+	int				channels	=	0;
+	uint8_t*		data		=	nullptr;
 
 	NODISCARD explicit operator bool() const
 	{

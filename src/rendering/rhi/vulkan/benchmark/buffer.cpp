@@ -87,6 +87,9 @@ void VK_CLASS(Buffer)::map_memory(const void* src_data, VkDeviceSize size, VkDev
 	VkMemoryPropertyFlags properties;
 	vmaGetAllocationMemoryProperties(allocator, m_allocation, &properties);
 
+	if (dst_offset + size > m_allocate_size)
+        RENDERING_LOG_ERROR("allocation size can't fill so much data!");
+
 	if (properties & VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT)
 		memcpy(static_cast<uint8_t*>(alloc_info.pMappedData) + dst_offset, src_data, size);
 	else
@@ -95,18 +98,18 @@ void VK_CLASS(Buffer)::map_memory(const void* src_data, VkDeviceSize size, VkDev
 		staging_buffer->init(size, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
 		staging_buffer->map_memory(src_data, size, dst_offset);
 
-		copy_buffer_from(staging_buffer, 0, dst_offset, size);
+		copy_buffer_from(staging_buffer, dst_offset, size);
 	}
 }
 
-void VK_CLASS(Buffer)::copy_buffer_from(const std::shared_ptr<VK_CLASS(Buffer)>& src_buffer, VkDeviceSize src_offset, VkDeviceSize dst_offset, VkDeviceSize size) const
+void VK_CLASS(Buffer)::copy_buffer_from(const std::shared_ptr<VK_CLASS(Buffer)>& src_buffer, VkDeviceSize dst_offset, VkDeviceSize size) const
 {
 	auto command_buffers = g_system_context->g_render_system->m_drawable->m_command_buffer;
 
 	VkCommandBuffer command_buffer = command_buffers->begin_single_command();
 
 	VkBufferCopy copy_region{
-	    .srcOffset = src_offset,
+	    .srcOffset = 0,
 	    .dstOffset = dst_offset,
 	    .size = size,
 	};
@@ -121,22 +124,42 @@ void VK_CLASS(UniformBuffer)::initialize(VkDeviceSize size)
 	VK_CLASS(Buffer)::initialize(size, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
 }
 
-void VK_CLASS(UniformBuffer)::set_uniform_infos(const std::string& name, uint32_t set, uint32_t binding)
+void VK_CLASS(UniformBuffer)::update_descriptor_set(const std::vector<UniformBufferLayout>& layouts, const std::unordered_map<uint32_t, VkDescriptorSet>& descriptor_sets)
 {
-	m_uniform_infos[name] = {set, binding};
-}
-
-void VK_CLASS(UniformBuffer)::update(const std::unordered_map<uint32_t, VkDescriptorSet>& descriptor_sets) const
-{
-	for (auto& [name, info] : m_infos)
+	for (auto& layout : layouts)
 	{
-		VkDescriptorBufferInfo bufferInfo{
+		set_info(layout.resource_name, layout.size, layout.array_count);
+
+		VkDescriptorBufferInfo buffer_info{
+			.buffer = m_buffer,
+			.offset = m_infos.at(layout.resource_name).offset,
+			.range = layout.size,
+		};
+
+		VkWriteDescriptorSet writeInfo{
+			.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
+			.dstSet = descriptor_sets.at(layout.set),
+			.dstBinding = layout.binding,
+			.dstArrayElement = 0,
+			.descriptorCount = 1,
+			.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+			.pImageInfo = nullptr,
+			.pBufferInfo = &buffer_info,
+			.pTexelBufferView = nullptr,
+		};
+		auto device = g_system_context->g_render_system->m_drawable->m_device->m_device;
+		vkUpdateDescriptorSets(device, 1, &writeInfo, 0, nullptr);
+	}
+
+	/*for (auto& [name, info] : m_infos)
+	{
+		VkDescriptorBufferInfo buffer_info{
 			.buffer = m_buffer,
 			.offset = info.offset,
 			.range = info.size,
 		};
 
-		const UniformBufferInfo& ubo_info = m_uniform_infos.at(name);
+		const DescriptorInfo& ubo_info = m_descriptor_infos.at(name);
 		VkWriteDescriptorSet writeInfo{
 			.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
 			.dstSet = descriptor_sets.at(ubo_info.set),
@@ -145,13 +168,13 @@ void VK_CLASS(UniformBuffer)::update(const std::unordered_map<uint32_t, VkDescri
 			.descriptorCount = 1,
 			.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
 			.pImageInfo = nullptr,
-			.pBufferInfo = &bufferInfo,
+			.pBufferInfo = &buffer_info,
 			.pTexelBufferView = nullptr,
 		};
 
 		auto device = g_system_context->g_render_system->m_drawable->m_device->m_device;
 		vkUpdateDescriptorSets(device, 1, &writeInfo, 0, nullptr);
-	}
+	}*/
 }
 
 

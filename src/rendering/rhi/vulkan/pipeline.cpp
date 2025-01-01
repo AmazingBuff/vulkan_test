@@ -33,7 +33,7 @@ public:
 	void initialize(const uint32_t* ir, size_t word_count);
 
 	NODISCARD bool get_vertex_input_attribute_description(std::vector<VkVertexInputAttributeDescription>& vertex_input_attributes) const;
-	void get_descriptor_set_layout_binding(VkShaderStageFlags stage, std::unordered_map<uint32_t, std::vector<VkDescriptorSetLayoutBinding>>& descriptor_set_layout_bindings, std::vector<UniformLayout>& uniform_layouts) const;
+	void get_descriptor_set_layout_binding(VkShaderStageFlags stage, std::unordered_map<uint32_t, std::vector<VkDescriptorSetLayoutBinding>>& descriptor_set_layout_bindings, ShaderResourcesLayout& layout) const;
 private:
 	std::unique_ptr<spirv_cross::CompilerGLSL> m_compiler;
 };
@@ -73,7 +73,7 @@ bool SpirvParser::get_vertex_input_attribute_description(std::vector<VkVertexInp
 	return true;
 }
 
-void SpirvParser::get_descriptor_set_layout_binding(VkShaderStageFlags stage, std::unordered_map<uint32_t, std::vector<VkDescriptorSetLayoutBinding>>& descriptor_set_layout_bindings, std::vector<UniformLayout>& uniform_layouts) const
+void SpirvParser::get_descriptor_set_layout_binding(VkShaderStageFlags stage, std::unordered_map<uint32_t, std::vector<VkDescriptorSetLayoutBinding>>& descriptor_set_layout_bindings, ShaderResourcesLayout& layout) const
 {
 	const spirv_cross::ShaderResources shader_resources = m_compiler->get_shader_resources();
 
@@ -82,9 +82,12 @@ void SpirvParser::get_descriptor_set_layout_binding(VkShaderStageFlags stage, st
 		const spirv_cross::SPIRType& type = m_compiler->get_type(resource.type_id);
 		uint32_t descriptor_count = 1;
 		if (!type.array.empty())
-			descriptor_count = type.array[0];
+		{
+            for (size_t i = 0; i < type.array.size(); i++)
+                descriptor_count *= type.array[i];
+		}
 
-		std::string type_name = resource.name;
+		std::string type_name = m_compiler->get_name(resource.base_type_id);
 		std::string resource_name = m_compiler->get_name(resource.id);
 		uint32_t set = m_compiler->get_decoration(resource.id, spv::DecorationDescriptorSet);
 		uint32_t binding = m_compiler->get_decoration(resource.id, spv::DecorationBinding);
@@ -98,7 +101,49 @@ void SpirvParser::get_descriptor_set_layout_binding(VkShaderStageFlags stage, st
 			.pImmutableSamplers = nullptr,
 		};
 
-		uniform_layouts.emplace_back(type_name, resource_name, set, binding, descriptor_count, size);
+		layout.uniform_buffers.emplace_back(type_name, resource_name, set, binding, descriptor_count, size);
+		descriptor_set_layout_bindings[set].emplace_back(descriptor_set_layout_binding);
+	}
+
+	for (auto& resource : shader_resources.sampled_images)
+	{
+		const spirv_cross::SPIRType& type = m_compiler->get_type(resource.type_id);
+		uint32_t descriptor_count = 1;
+		if (!type.array.empty())
+		{
+			for (size_t i = 0; i < type.array.size(); i++)
+				descriptor_count *= type.array[i];
+		}
+
+		uint32_t dimension = 0;
+		switch (type.image.dim)
+		{
+        case spv::Dim1D:
+			dimension = 1;
+            break;
+        case spv::Dim2D:
+			dimension = 2;
+            break;
+        case spv::Dim3D:
+			dimension = 3;
+            break;
+		default:
+            RENDERING_LOG_ERROR("unsupported image type!");
+			break;
+		}
+
+		std::string resource_name = m_compiler->get_name(resource.id);
+		uint32_t set = m_compiler->get_decoration(resource.id, spv::DecorationDescriptorSet);
+		uint32_t binding = m_compiler->get_decoration(resource.id, spv::DecorationBinding);
+
+		VkDescriptorSetLayoutBinding descriptor_set_layout_binding{
+			.binding = binding,
+			.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
+			.descriptorCount = descriptor_count,
+			.stageFlags = stage,
+			.pImmutableSamplers = nullptr,
+		};
+		layout.sampled_images.emplace_back(resource_name, dimension, set, binding, descriptor_count);
 		descriptor_set_layout_bindings[set].emplace_back(descriptor_set_layout_binding);
 	}
 
@@ -118,7 +163,7 @@ static VkShaderModule create_shader_module(VkDevice device, const std::shared_pt
 	return shader_module;
 }
 
-static VkPipelineLayout transfer_pipeline_layout(VkDevice device, const std::shared_ptr<PipelineLayoutInfo>& pipeline_layout, const std::shared_ptr<RenderResources>& render_resources, std::unordered_map<uint32_t, VkDescriptorSetLayout>& descriptor_set_layouts, std::vector<UniformLayout>& uniform_layouts)
+static VkPipelineLayout transfer_pipeline_layout(VkDevice device, const std::shared_ptr<PipelineLayoutInfo>& pipeline_layout, const std::shared_ptr<RenderResources>& render_resources, std::unordered_map<uint32_t, VkDescriptorSetLayout>& descriptor_set_layouts, ShaderResourcesLayout& layout)
 {
 	// set <---> descriptor_set_layout_bindings
 	std::unordered_map<uint32_t, std::vector<VkDescriptorSetLayoutBinding>> descriptor_set_layout_bindings;
@@ -130,7 +175,7 @@ static VkPipelineLayout transfer_pipeline_layout(VkDevice device, const std::sha
 		SpirvParser parser;
 		parser.initialize(reinterpret_cast<const uint32_t*>(resource.vertex_shader->data()), resource.vertex_shader->size() / sizeof(uint32_t));
 
-		parser.get_descriptor_set_layout_binding(VK_SHADER_STAGE_VERTEX_BIT, descriptor_set_layout_bindings, uniform_layouts);
+		parser.get_descriptor_set_layout_binding(VK_SHADER_STAGE_VERTEX_BIT, descriptor_set_layout_bindings, layout);
 	}
 
 	if (!pipeline_layout->fragment_shader.empty())
@@ -140,7 +185,7 @@ static VkPipelineLayout transfer_pipeline_layout(VkDevice device, const std::sha
 		SpirvParser parser;
 		parser.initialize(reinterpret_cast<const uint32_t*>(resource.fragment_shader->data()), resource.fragment_shader->size() / sizeof(uint32_t));
 
-		parser.get_descriptor_set_layout_binding(VK_SHADER_STAGE_FRAGMENT_BIT, descriptor_set_layout_bindings, uniform_layouts);
+		parser.get_descriptor_set_layout_binding(VK_SHADER_STAGE_FRAGMENT_BIT, descriptor_set_layout_bindings, layout);
 	}
 
 	std::vector<VkDescriptorSetLayout> set_layouts;
@@ -562,7 +607,7 @@ VK_CLASS(PipelineLayout)::~VK_CLASS(PipelineLayout)()
 {
 	auto device = g_system_context->g_render_system->m_drawable->m_device->m_device;
 
-	for (auto& set_layout : std::ranges::views::values(m_descriptor_set_layouts))
+	for (auto& set_layout : std::views::values(m_descriptor_set_layouts))
 		vkDestroyDescriptorSetLayout(device, set_layout, nullptr);
 	vkDestroyPipelineLayout(device, m_pipeline_layout, nullptr);
 }
@@ -577,7 +622,7 @@ void VK_CLASS(PipelineLayout)::create_pipeline_layout(const std::shared_ptr<Pipe
 	auto device = g_system_context->g_render_system->m_drawable->m_device->m_device;
 	auto& render_resources = g_system_context->g_render_system->m_render_resources;
 
-	m_pipeline_layout = transfer_pipeline_layout(device, pipeline_layout_info, render_resources, m_descriptor_set_layouts, m_uniform_layouts);
+	m_pipeline_layout = transfer_pipeline_layout(device, pipeline_layout_info, render_resources, m_descriptor_set_layouts, m_shader_resources_layout);
 }
 
 

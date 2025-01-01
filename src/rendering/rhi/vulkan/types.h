@@ -33,7 +33,8 @@ static const std::vector<const char*> Platform_Extensions = { VK_KHR_SURFACE_EXT
 static const std::vector<const char*> Device_Extensions = { VK_KHR_SWAPCHAIN_EXTENSION_NAME };
 
 // buffer
-static constexpr size_t Default_Buffer_Size = 65536;
+static constexpr size_t Default_Uniform_Buffer_Size = 65535;
+static constexpr size_t Default_Buffer_Size = 1920 * 1080 * 4;
 
 
 class VK_CLASS(Instance);
@@ -52,6 +53,7 @@ class VK_CLASS(Fence);
 class VK_CLASS(Buffer);
 class VK_CLASS(UniformBuffer);
 class VK_CLASS(Image);
+class VK_CLASS(Sampler);
 class VK_CLASS(ResourceManager);
 
 ENGINE_NAMESPACE_END

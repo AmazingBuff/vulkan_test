@@ -22,7 +22,9 @@ static int rate_score(VkPhysicalDevice device, VK_CLASS(PhysicalDevice)& physica
 
 	score += static_cast<int>(physical_device.m_properties.limits.maxImageDimension2D);
 
-	if (!physical_device.m_features.geometryShader)
+	if (!physical_device.m_features.imageCubeArray || 
+		!physical_device.m_features.geometryShader ||
+		!physical_device.m_features.samplerAnisotropy)
 		return 0;
 
 	return score;
@@ -175,7 +177,11 @@ void VK_CLASS(Device)::create_logical_device()
 		}
 	}
 
-	VkPhysicalDeviceFeatures device_features{};
+	VkPhysicalDeviceFeatures device_features{
+        .imageCubeArray = VK_TRUE,
+		.geometryShader = VK_TRUE,
+        .samplerAnisotropy = VK_TRUE,
+	};
 	VkDeviceCreateInfo device_create_info{
 		.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO,
 		.queueCreateInfoCount = static_cast<uint32_t>(queue_create_infos.size()),

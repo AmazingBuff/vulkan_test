@@ -30,6 +30,7 @@ enum class RHIFlag : uint8_t
 	e_fence,
 	e_buffer,
 	e_image,
+	e_sampler,
 	e_pipeline_resources,
 	e_resource_manager,
 	e_descriptor_set,

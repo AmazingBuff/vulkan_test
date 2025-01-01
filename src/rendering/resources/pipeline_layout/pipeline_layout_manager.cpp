@@ -32,7 +32,7 @@ namespace rfl
 
 
 ENGINE_NAMESPACE_BEGIN
-#define RENDER_PASS_PATH SOURCES_DIR"/res/pipeline_layouts/"
+#define PIPELINE_LAYOUT_PATH SOURCES_DIR"/res/pipeline_layouts/"
 
 void PipelineLayoutManager::initialize()
 {
@@ -50,7 +50,7 @@ const PipelineLayoutResource& PipelineLayoutManager::get_pipeline_layout_resourc
 
 void PipelineLayoutManager::load_pipeline_layout_files()
 {
-    for (auto& file : std::filesystem::directory_iterator{ RENDER_PASS_PATH })
+    for (auto& file : std::filesystem::directory_iterator{ PIPELINE_LAYOUT_PATH })
     {
         const std::string file_name = file.path().filename().generic_string();
         if (file_name.find(".yaml") == std::string::npos)
@@ -63,6 +63,6 @@ void PipelineLayoutManager::load_pipeline_layout_files()
     }
 }
 
-#undef RENDER_PASS_PATH
+#undef PIPELINE_LAYOUT_PATH
 
 ENGINE_NAMESPACE_END
