@@ -3,7 +3,7 @@
 #include "base/macro.h"
 #define SDL_MAIN_HANDLED
 #include <SDL2/SDL.h>
-#include "rendering/rhi/interface.h"
+#include "render/rhi/interface.h"
 #include "system/structure.h"
 
 ENGINE_NAMESPACE_BEGIN

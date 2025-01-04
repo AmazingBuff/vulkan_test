@@ -1,6 +1,6 @@
 #include "window.h"
 #include "utils/util.h"
-#include "rendering/rhi/rhi.h"
+#include "render/rhi/rhi.h"
 #include "system/system.h"
 #include <SDL2/SDL_vulkan.h>
 

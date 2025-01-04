@@ -33,4 +33,9 @@ size_t aligned_size(size_t size, size_t alignment)
 	return (size + (alignment - 1)) & ~(alignment - 1);
 }
 
+size_t hash_combine(size_t seed, size_t value)
+{
+    return seed ^ (value + 0x9e3779b9 + (seed << 6) + (seed >> 2));
+}
+
 AMAZING_NAMESPACE_END
