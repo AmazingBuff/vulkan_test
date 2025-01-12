@@ -47,6 +47,9 @@ struct SampledImageLayout;
 class VK_CLASS(Image) final : public VK_CLASS(IBuffer)
 {
 public:
+    static void transition_image_layout(VkImage image, VkFormat format, VkImageLayout old_layout, VkImageLayout new_layout);
+    static void copy_buffer_to_image(VkBuffer buffer, VkImage image, uint32_t width, uint32_t height);
+public:
     VK_CLASS(Image)() = default;
     ~VK_CLASS(Image)() override;
     NODISCARD constexpr RHIFlag flag() const override
@@ -58,9 +61,6 @@ public:
     void map_memory(const std::string& name, VkImage image, const TextureResource& resource, const std::shared_ptr<VK_CLASS(Buffer)>& src_buffer);
     void update_descriptor_set(const std::vector<SampledImageLayout>& layouts, const std::unordered_map<std::string, std::string>& name_to_res_name_map, const std::unordered_map<uint32_t, VkDescriptorSet>& descriptor_sets, const std::shared_ptr<VK_CLASS(Sampler)>& sampler);
     void release_sampler(const std::shared_ptr<VK_CLASS(Sampler)>& sampler);
-private:
-    static void transition_image_layout(VkImage image, VkFormat format, VkImageLayout old_layout, VkImageLayout new_layout);
-    static void copy_buffer_to_image(VkBuffer buffer, VkImage image, uint32_t width, uint32_t height);
 private:
     struct Image
     {

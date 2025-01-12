@@ -61,6 +61,7 @@ const char* vk_result_convert(VkResult res)
 	}
 }
 
+
 SwapChainSupportDetails query_swap_chain_support(VkPhysicalDevice physical_device, VkSurfaceKHR surface)
 {
     SwapChainSupportDetails support_details;

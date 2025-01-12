@@ -5,21 +5,6 @@
 
 ENGINE_NAMESPACE_BEGIN
 
-struct SwapChainSupportDetails
-{
-	std::optional<VkSurfaceCapabilitiesKHR>		capabilities;
-	std::vector<VkSurfaceFormatKHR>				formats;
-	std::vector<VkPresentModeKHR>				present_modes;
-
-	NODISCARD constexpr explicit operator bool() const
-	{
-		return capabilities.has_value() && !formats.empty() && !present_modes.empty();
-	}
-};
-
-SwapChainSupportDetails query_swap_chain_support(VkPhysicalDevice physical_device, VkSurfaceKHR surface);
-
-
 const char* vk_result_convert(VkResult res);
 
 #if defined(_DEBUG) || defined(DEBUG)
@@ -60,5 +45,21 @@ auto vkEnumerateProperties(F&& func, Args&&... args)
 	}
 	return properties;
 }
+
+
+struct SwapChainSupportDetails
+{
+	std::optional<VkSurfaceCapabilitiesKHR>		capabilities;
+	std::vector<VkSurfaceFormatKHR>				formats;
+	std::vector<VkPresentModeKHR>				present_modes;
+
+	NODISCARD constexpr explicit operator bool() const
+	{
+		return capabilities.has_value() && !formats.empty() && !present_modes.empty();
+	}
+};
+
+SwapChainSupportDetails query_swap_chain_support(VkPhysicalDevice physical_device, VkSurfaceKHR surface);
+
 
 ENGINE_NAMESPACE_END

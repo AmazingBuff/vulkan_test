@@ -85,8 +85,7 @@ void Drawable::recreate_swap_chain(GlobalRuntimeInfo& global_info)
 
 	m_device->wait_idle();
 	m_swap_chain = std::make_shared<SwapChain>();
-	m_swap_chain->init();
-	m_swap_chain->create_frame_buffers(current_render_pass());
+	m_swap_chain->init(current_render_pass());
 }
 
 const std::shared_ptr<RenderPass>& Drawable::current_render_pass() const

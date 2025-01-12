@@ -34,6 +34,7 @@ public:
 	}
 
 	void initialize();
+    VkFormat find_supported_format(const std::vector<VkFormat>& candidates, VkImageTiling tiling, VkFormatFeatureFlags features) const;
 public:
 	VkPhysicalDeviceProperties			m_properties{};
 	VkPhysicalDeviceFeatures			m_features{};

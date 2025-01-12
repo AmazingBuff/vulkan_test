@@ -34,6 +34,7 @@ set(THIRD_PARTY_INCLUDE_DIRS
     ext/yaml-cpp/include
     ext/fmt/include
     ext/spirv_cross/include
+    ext/assimp/include
 )
 
 set(THIRD_PARTY_LIB_DIRS
@@ -41,6 +42,7 @@ set(THIRD_PARTY_LIB_DIRS
     ext/yaml-cpp/lib/$<$<CONFIG:Debug>:Debug>$<$<CONFIG:Release>:Release>
     ext/fmt/lib/$<$<CONFIG:Debug>:Debug>$<$<CONFIG:Release>:Release>
     ext/spirv_cross/lib/$<$<CONFIG:Debug>:Debug>$<$<CONFIG:Release>:Release>
+    ext/assimp/lib/$<$<CONFIG:Debug>:Debug>$<$<CONFIG:Release>:Release>
 )
 
 set(THIRD_PARTY_LIBS
@@ -50,6 +52,7 @@ set(THIRD_PARTY_LIBS
     fmtd
     spirv-cross-cored
     spirv-cross-glsld
+    assimpd
     >
     $<$<CONFIG:Release>:
     reflectcpp
@@ -57,6 +60,7 @@ set(THIRD_PARTY_LIBS
     fmt
     spirv-cross-core
     spirv-cross-glsl
+    assimp
     >
 )
 

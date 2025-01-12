@@ -37,8 +37,8 @@ pipeline:
         alpha_to_coverage_enable: 0
         alpha_to_one_enable: 0
     depth_stencil_state:
-        depth_test_enable: 0
-        depth_write_enable: 0
+        depth_test_enable: 1
+        depth_write_enable: 1
         depth_compare_op: less
         depth_bounds_test_enable: 0
         stencil_test_enable: 0
@@ -71,7 +71,7 @@ pipeline:
                 src_alpha_blend_factor: one
                 dst_alpha_blend_factor: zero
                 alpha_blend_op: add
-                color_write_mask: rgba
+                color_write_mask: r | g | b | a
         blend_constants: [0.0, 0.0, 0.0, 0.0]
     dynamic_state:
         -   viewport

@@ -40,10 +40,13 @@ public:
     NODISCARD Enum& operator=(const T& value);
     NODISCARD Enum& operator=(const Enum& value);
 
+	NODISCARD constexpr bool operator==(const T& value) const;
+	NODISCARD constexpr bool operator!=(const T& value) const;
+
 	// transform
 	NODISCARD constexpr explicit operator T() const;
 	NODISCARD constexpr explicit operator type() const;
-private:
+protected:
 	type m_value;
 };
 

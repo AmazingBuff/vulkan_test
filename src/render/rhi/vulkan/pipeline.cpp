@@ -221,7 +221,7 @@ static VkPipelineLayout transfer_pipeline_layout(VkDevice device, const std::sha
 	return vk_pipeline_layout;
 }
 
-static VkRenderPass transfer_render_pass(VkDevice device, const std::shared_ptr<RenderPassInfo>& render_pass, VkFormat format)
+static VkRenderPass transfer_render_pass(VkDevice device, const std::shared_ptr<RenderPassInfo>& render_pass, VkFormat swap_chain_format, VkFormat depth_format)
 {
 	std::vector<VkAttachmentDescription> attachments;
 	std::vector<VkSubpassDescription> subpasses;
@@ -238,8 +238,14 @@ static VkRenderPass transfer_render_pass(VkDevice device, const std::shared_ptr<
 			.initialLayout	= static_cast<VkImageLayout>(static_cast<int>(attachment.initial_layout)),
 			.finalLayout	= static_cast<VkImageLayout>(static_cast<int>(attachment.final_layout)),
 		};
+
 		if (!attachment.format)
-			description.format = format;
+		{
+			if (attachment.type == Amazing::Engine::AttachmentTypeEnum::e_color)
+				description.format = swap_chain_format;
+			else
+                description.format = depth_format;
+		}
 		else
 			description.format = static_cast<VkFormat>(static_cast<int>(attachment.format.value()));
 
@@ -638,10 +644,14 @@ void VK_CLASS(RenderPass)::initialize(const std::shared_ptr<RenderPassInfo>& ren
 
 void VK_CLASS(RenderPass)::create_render_pass(const std::shared_ptr<RenderPassInfo>& render_pass)
 {
-	auto device = g_system_context->g_render_system->m_drawable->m_device->m_device;
-	auto& swap_chain = g_system_context->g_render_system->m_drawable->m_swap_chain;
+    auto drawable = g_system_context->g_render_system->m_drawable;
 
-	m_render_pass = transfer_render_pass(device, render_pass, swap_chain->m_details.format.value().format);
+	m_render_pass = transfer_render_pass(drawable->m_device->m_device, render_pass, 
+		drawable->m_swap_chain->m_details.format.value().format,
+		drawable->m_physical_device->find_supported_format(
+		{ VK_FORMAT_D32_SFLOAT, VK_FORMAT_D32_SFLOAT_S8_UINT, VK_FORMAT_D24_UNORM_S8_UINT,
+		VK_FORMAT_D16_UNORM, VK_FORMAT_D16_UNORM_S8_UINT },
+		VK_IMAGE_TILING_OPTIMAL, VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT));
 }
 
 

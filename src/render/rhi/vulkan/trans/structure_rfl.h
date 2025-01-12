@@ -6,15 +6,60 @@
 #define YAML_CPP_STATIC_DEFINE
 #include <rfl.hpp>
 #include <func.h>
+#include <regex>
+
+
+template<typename Enum>
+Enum string_match_enum(const std::string& str)
+{
+    Enum ret;
+
+    std::regex pattern("\\s*\\|\\s*");
+    std::sregex_token_iterator it(str.begin(), str.end(), pattern, -1);
+
+    while (it != std::sregex_token_iterator())
+    {
+        Enum v(Amazing::Engine::string_to_enum<Amazing::Trait::head_type_t<typename Amazing::Trait::template_traits<Enum>::type>>(it->str()));
+        ret |= v;
+        it++;
+    }
+
+    return ret;
+}
+
+template<typename Enum>
+std::string enum_match_string(const Enum& value)
+{
+    uint32_t v = static_cast<uint32_t>(static_cast<int>(value));
+
+    std::string ret;
+    for (uint32_t i = 0; i < 32; i++)
+    {
+        if (v & (1 << i))
+        {
+            if (!ret.empty())
+                ret += " | ";
+            ret += Amazing::Engine::enum_to_string(static_cast<Amazing::Trait::head_type_t<typename Amazing::Trait::template_traits<Enum>::type>>(1 << i));
+        }
+    }
+
+    return ret;
+}
+
+
+#define REFLECTOR_TO_ENUM(ty, value, name)      \
+            Amazing::Engine::ty name(Amazing::Engine::string_to_enum<Amazing::Trait::head_type_t<typename Amazing::Trait::template_traits<Amazing::Engine::ty>::type>>(value.name))
+#define REFLECTOR_FROM_ENUM(ty, value, name)    \
+            std::string name = Amazing::Engine::enum_to_string(static_cast<Amazing::Trait::head_type_t<typename Amazing::Trait::template_traits<Amazing::Engine::ty>::type>>(value.name))
+
+#define MATCH_TO_ENUM(type, value, name)        \
+            Amazing::Engine::type name = string_match_enum<Amazing::Engine::type>(value.name)
+#define MATCH_FROM_ENUM(type, value, name)      \
+            std::string name = enum_match_string(value.name)
+
 
 namespace rfl 
 {
-
-#define REFLECTOR_TO_ENUM(ty, value, name)   \
-            Amazing::Engine::ty name(Amazing::Engine::string_to_enum<Amazing::Trait::head_type_t<typename Amazing::Trait::template_traits<Amazing::Engine::ty>::type>>(value.name))
-#define REFLECTOR_FROM_ENUM(ty, value, name)  \
-            std::string name = Amazing::Engine::enum_to_string(static_cast<Amazing::Trait::head_type_t<typename Amazing::Trait::template_traits<Amazing::Engine::ty>::type>>(value.name))
-
     template <>
     struct Reflector<Amazing::Engine::Offset2D>
     {
@@ -274,11 +319,11 @@ namespace rfl
 
         static Amazing::Engine::SubpassDependency to(const ReflType& v) noexcept
         {
-            REFLECTOR_TO_ENUM(PipelineStageFlags, v, src_stage_mask);
-            REFLECTOR_TO_ENUM(PipelineStageFlags, v, dst_stage_mask);
-            REFLECTOR_TO_ENUM(AccessFlags, v, src_access_mask);
-            REFLECTOR_TO_ENUM(AccessFlags, v, dst_access_mask);
-            REFLECTOR_TO_ENUM(DependencyFlags, v, dependency_flags);
+            MATCH_TO_ENUM(PipelineStageFlags, v, src_stage_mask);
+            MATCH_TO_ENUM(PipelineStageFlags, v, dst_stage_mask);
+            MATCH_TO_ENUM(AccessFlags, v, src_access_mask);
+            MATCH_TO_ENUM(AccessFlags, v, dst_access_mask);
+            MATCH_TO_ENUM(DependencyFlags, v, dependency_flags);
             uint32_t src_subpass = v.src_subpass == "external" ? VK_SUBPASS_EXTERNAL : std::stoul(v.src_subpass);
             uint32_t dst_subpass = v.dst_subpass == "external" ? VK_SUBPASS_EXTERNAL : std::stoul(v.dst_subpass);
             return { v.name, src_subpass, dst_subpass, src_stage_mask, dst_stage_mask, src_access_mask, dst_access_mask, dependency_flags };
@@ -286,11 +331,11 @@ namespace rfl
 
         static ReflType from(const Amazing::Engine::SubpassDependency& v)
         {
-            REFLECTOR_FROM_ENUM(PipelineStageFlags, v, src_stage_mask);
-            REFLECTOR_FROM_ENUM(PipelineStageFlags, v, dst_stage_mask);
-            REFLECTOR_FROM_ENUM(AccessFlags, v, src_access_mask);
-            REFLECTOR_FROM_ENUM(AccessFlags, v, dst_access_mask);
-            REFLECTOR_FROM_ENUM(DependencyFlags, v, dependency_flags);
+            MATCH_FROM_ENUM(PipelineStageFlags, v, src_stage_mask);
+            MATCH_FROM_ENUM(PipelineStageFlags, v, dst_stage_mask);
+            MATCH_FROM_ENUM(AccessFlags, v, src_access_mask);
+            MATCH_FROM_ENUM(AccessFlags, v, dst_access_mask);
+            MATCH_FROM_ENUM(DependencyFlags, v, dependency_flags);
             std::string src_subpass = v.src_subpass == VK_SUBPASS_EXTERNAL ? "external" : std::to_string(v.src_subpass);
             std::string dst_subpass = v.dst_subpass == VK_SUBPASS_EXTERNAL ? "external" : std::to_string(v.dst_subpass);
             return { v.name, src_subpass, dst_subpass, src_stage_mask, dst_stage_mask, src_access_mask, dst_access_mask, dependency_flags };
@@ -533,7 +578,7 @@ namespace rfl
             REFLECTOR_TO_ENUM(BlendFactor, v, src_alpha_blend_factor);
             REFLECTOR_TO_ENUM(BlendFactor, v, dst_alpha_blend_factor);
             REFLECTOR_TO_ENUM(BlendOp, v, alpha_blend_op);
-            REFLECTOR_TO_ENUM(ColorComponentFlags, v, color_write_mask);
+            MATCH_TO_ENUM(ColorComponentFlags, v, color_write_mask);
             return { v.blend_enable, src_color_blend_factor, dst_color_blend_factor, color_blend_op, src_alpha_blend_factor, dst_alpha_blend_factor, alpha_blend_op, color_write_mask };
         }
 
@@ -545,7 +590,7 @@ namespace rfl
             REFLECTOR_FROM_ENUM(BlendFactor, v, src_alpha_blend_factor);
             REFLECTOR_FROM_ENUM(BlendFactor, v, dst_alpha_blend_factor);
             REFLECTOR_FROM_ENUM(BlendOp, v, alpha_blend_op);
-            REFLECTOR_FROM_ENUM(ColorComponentFlags, v, color_write_mask);
+            MATCH_FROM_ENUM(ColorComponentFlags, v, color_write_mask);
             return { v.blend_enable, src_color_blend_factor, dst_color_blend_factor, color_blend_op, src_alpha_blend_factor, dst_alpha_blend_factor, alpha_blend_op, color_write_mask };
         }
     };
@@ -609,7 +654,9 @@ namespace rfl
         }
     };
 
+}
 
 #undef REFLECTOR_TO_ENUM
 #undef REFLECTOR_FROM_ENUM
-}
+#undef MATCH_TO_ENUM
+#undef MATCH_FROM_ENUM

@@ -88,6 +88,20 @@ Enum<T>& Enum<T>::operator=(const Enum& value)
 
 template<typename T>
 	requires std::is_enum_v<T>
+constexpr bool Enum<T>::operator==(const T& value) const
+{
+    return m_value == std::to_underlying(value);
+}
+
+template<typename T>
+	requires std::is_enum_v<T>
+constexpr bool Enum<T>::operator!=(const T& value) const
+{
+    return m_value != std::to_underlying(value);
+}
+
+template<typename T>
+	requires std::is_enum_v<T>
 constexpr Enum<T>::operator T() const
 {
 	return static_cast<T>(m_value);
@@ -123,7 +137,7 @@ template<typename T>
 	requires std::is_enum_v<T>
 constexpr BitFlag<T>& BitFlag<T>::operator|=(const BitFlag& value)
 {
-	*this |= value;
+	this->m_value |= value.m_value;
 	return *this;
 }
 
@@ -131,7 +145,7 @@ template<typename T>
 	requires std::is_enum_v<T>
 constexpr BitFlag<T>& BitFlag<T>::operator&=(const BitFlag& value)
 {
-	*this &= value;
+	this->m_value &= value.m_value;
 	return *this;
 }
 
@@ -139,7 +153,7 @@ template<typename T>
 	requires std::is_enum_v<T>
 constexpr BitFlag<T>& BitFlag<T>::operator^=(const BitFlag& value)
 {
-	*this ^= value;
+	this->m_value ^= value.m_value;
 	return *this;
 }
 
@@ -147,28 +161,28 @@ template<typename T>
 	requires std::is_enum_v<T>
 constexpr BitFlag<T> BitFlag<T>::operator|(const BitFlag& value) const
 {
-	return BitFlag(*this | value);
+	return BitFlag(this->m_value | value.m_value);
 }
 
 template<typename T>
 	requires std::is_enum_v<T>
 constexpr BitFlag<T> BitFlag<T>::operator&(const BitFlag& value) const
 {
-	return BitFlag(*this & value);
+	return BitFlag(this->m_value & value.m_value);
 }
 
 template<typename T>
 	requires std::is_enum_v<T>
 constexpr BitFlag<T> BitFlag<T>::operator^(const BitFlag& value) const
 {
-	return BitFlag(*this ^ value);
+	return BitFlag(this->m_value ^ value.m_value);
 }
 
 template<typename T>
 	requires std::is_enum_v<T>
 constexpr BitFlag<T> BitFlag<T>::operator~() const
 {
-	return BitFlag(~*this);
+	return BitFlag(~this->m_value);
 }
 
 template<typename T>

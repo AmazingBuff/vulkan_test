@@ -15,5 +15,7 @@ struct PipelineResource;
 class PipelineManager;
 struct TextureResource;
 class TextureManager;
+struct ModelResource;
+class ModelManager;
 
 ENGINE_NAMESPACE_END

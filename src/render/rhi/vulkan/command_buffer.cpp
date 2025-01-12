@@ -25,9 +25,10 @@ void VK_CLASS(CommandBuffer)::reset() const
 
 void VK_CLASS(CommandBuffer)::begin_render_pass(const std::shared_ptr<VK_CLASS(RenderPass)>& render_pass, const std::shared_ptr<VK_CLASS(Framebuffer)>& framebuffer) const
 {
-	VkClearValue clear_color{
-		.color = {0.0f, 0.0f, 0.0f, 1.0f}
-	};
+	std::array<VkClearValue, 2> clear_color{};
+	clear_color[0].color = { 0.0f, 0.0f, 0.0f, 1.0f };
+	clear_color[1].depthStencil = { 1.0f, 0 };
+
 	VkRenderPassBeginInfo begin_info{
 		.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO,
 		.renderPass = render_pass->m_render_pass,
@@ -36,8 +37,8 @@ void VK_CLASS(CommandBuffer)::begin_render_pass(const std::shared_ptr<VK_CLASS(R
 			.offset = {0, 0},
 			.extent = g_system_context->g_render_system->m_drawable->m_swap_chain->m_details.extent.value()
 		},
-		.clearValueCount = 1,
-		.pClearValues = &clear_color
+		.clearValueCount = static_cast<uint32_t>(clear_color.size()),
+		.pClearValues = clear_color.data()
 	};
 
 	vkCmdBeginRenderPass(m_command_buffers[m_current_frame], &begin_info, VK_SUBPASS_CONTENTS_INLINE);
