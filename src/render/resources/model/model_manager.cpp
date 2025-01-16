@@ -3,8 +3,8 @@
 #include "render/utils/util.h"
 #include "render/resources/fork/stb_image.h"
 
-#include <assimp/Importer.hpp>
-#include <assimp/scene.h>
+//#include <assimp/Importer.hpp>
+//#include <assimp/scene.h>
 
 ENGINE_NAMESPACE_BEGIN
 
@@ -24,9 +24,9 @@ void ModelManager::load_model_files()
 {
 	for (auto& dir_entry : std::filesystem::directory_iterator{ MODEL_PATH })
 	{
-        Assimp::Importer importer;
+        /*Assimp::Importer importer;
         const aiScene* scene =  importer.ReadFile(dir_entry.path().generic_string(), 0);
-		scene->mNumMeshes;
+		scene->mNumMeshes;*/
 
 		const std::string file_name = dir_entry.path().filename().generic_string();
 		if (file_name.find(".png") == std::string::npos)
