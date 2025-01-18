@@ -14,7 +14,7 @@ const char* vk_result_convert(VkResult res);
 	if (res != VK_SUCCESS)																			\
 	{																								\
 		const char* message = vk_result_convert(res);												\
-        std::string format = fmt::format(															\
+        std::string format = std::format(															\
 			"[vulkan, fatal, result]: VkResult is \"{}\" in line: {}, function: {}, file: {}.",     \
 			message, __LINE__, __FUNCTION__, __FILE__);												\
 		std::cerr << format << std::endl;															\

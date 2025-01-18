@@ -5,62 +5,42 @@ project(
     LANGUAGES CXX
 )
 
-find_package(Vulkan REQUIRED)
-find_package(SDL2 REQUIRED)
-find_package(Eigen3 REQUIRED)
-
-#include(FetchContent)
-#
-#FetchContent_Declare(
-#    yaml-cpp
-#    GIT_REPOSITORY https://bgithub.xyz/jbeder/yaml-cpp.git
-#    GIT_TAG da82fd982c260e7f335ce5acbceff24b270544d1
-#)
-#FetchContent_MakeAvailable(yaml-cpp)
-#
-#FetchContent_Declare(
-#    fmt
-#    GIT_REPOSITORY https://bgithub.xyz/fmtlib/fmt
-#    GIT_TAG 527e98e3f873562b640377ad8f3c6088ac34e01d
-#)
-#FetchContent_MakeAvailable(fmt)
+add_subdirectory(ext/yaml-cpp)
+add_subdirectory(ext/reflect-cpp)
+add_subdirectory(ext/eigen)
+add_subdirectory(ext/assimp)
 
 file(GLOB_RECURSE HEADER_FILES src/*.h)
 file(GLOB_RECURSE SOURCE_FILES src/*.cpp)
 
 set(THIRD_PARTY_INCLUDE_DIRS 
-    ext/traits/include
+    3rd/traits/include
+    3rd/spirv_cross/include
+    3rd/sdl2/include
+    3rd/vulkan/include
     ext/reflect-cpp/include
-    ext/yaml-cpp/include
-    ext/fmt/include
-    ext/spirv_cross/include
-    ext/assimp/include
 )
 
 set(THIRD_PARTY_LIB_DIRS
-    ext/reflect-cpp/lib/$<$<CONFIG:Debug>:Debug>$<$<CONFIG:Release>:Release>
-    ext/yaml-cpp/lib/$<$<CONFIG:Debug>:Debug>$<$<CONFIG:Release>:Release>
-    ext/fmt/lib/$<$<CONFIG:Debug>:Debug>$<$<CONFIG:Release>:Release>
-    ext/spirv_cross/lib/$<$<CONFIG:Debug>:Debug>$<$<CONFIG:Release>:Release>
-    ext/assimp/lib/$<$<CONFIG:Debug>:Debug>$<$<CONFIG:Release>:Release>
+    3rd/spirv_cross/lib/$<$<CONFIG:Debug>:Debug>$<$<CONFIG:Release>:Release>
+    3rd/sdl2/lib/$<$<CONFIG:Debug>:Debug>$<$<CONFIG:Release>:Release>
+    3rd/vulkan/lib
 )
 
 set(THIRD_PARTY_LIBS
     $<$<CONFIG:Debug>:
-    reflectcppd
-    yaml-cppd
-    fmtd
     spirv-cross-cored
     spirv-cross-glsld
-    assimpd
+    SDL2d
+    SDL2maind
+    vulkan-1
     >
     $<$<CONFIG:Release>:
-    reflectcpp
-    yaml-cpp
-    fmt
     spirv-cross-core
     spirv-cross-glsl
-    assimp
+    SDL2
+    SDL2main
+    vulkan-1
     >
 )
 
@@ -73,8 +53,6 @@ add_executable(
 target_include_directories(
     ${PROJECT_NAME}
     PRIVATE
-    ${Vulkan_INCLUDE_DIRS}
-    ${SDL2_INCLUDE_DIRS}
     ${THIRD_PARTY_INCLUDE_DIRS}
     src/
 )
@@ -88,16 +66,16 @@ target_precompile_headers(
 target_link_directories(
     ${PROJECT_NAME}
     PRIVATE
-    ${SDL2_LIBDIR}
     ${THIRD_PARTY_LIB_DIRS}
 )
 
 target_link_libraries(
     ${PROJECT_NAME}
     PRIVATE
-    ${Vulkan_LIBRARIES}
-    ${SDL2_LIBRARIES}
     Eigen3::Eigen
+    yaml-cpp::yaml-cpp
+    assimp::assimp
+    reflectcpp
     ${THIRD_PARTY_LIBS} 
 )
 

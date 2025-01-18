@@ -1,6 +1,5 @@
 #pragma once
 
-#include <fmt/format.h>
 #include "util.h"
 
 AMAZING_NAMESPACE_BEGIN
@@ -23,7 +22,7 @@ template<typename... Args>
 void Logger::log(const Level& level, const char* loc, const std::string& message, Args&&... args)
 {
 	if constexpr (sizeof...(Args) != 0)
-		message = fmt::vformat(message, std::forward<Args>(args)...);
+		message = std::format(message, std::forward<Args>(args)...);
 	switch (level)
 	{
 	case Level::e_info:

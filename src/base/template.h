@@ -37,8 +37,8 @@ public:
 	NODISCARD constexpr bool operator<(const Enum& value) const;
 	NODISCARD constexpr bool operator<=(const Enum& value) const;
 
-    NODISCARD Enum& operator=(const T& value);
-    NODISCARD Enum& operator=(const Enum& value);
+    Enum& operator=(const T& value);
+    Enum& operator=(const Enum& value);
 
 	NODISCARD constexpr bool operator==(const T& value) const;
 	NODISCARD constexpr bool operator!=(const T& value) const;
@@ -63,9 +63,9 @@ public:
     BitFlag(BitFlag&& other) noexcept;
 
     // bit op
-    NODISCARD constexpr BitFlag& operator|=(const BitFlag& value);
-    NODISCARD constexpr BitFlag& operator&=(const BitFlag& value);
-    NODISCARD constexpr BitFlag& operator^=(const BitFlag& value);
+    constexpr BitFlag& operator|=(const BitFlag& value);
+    constexpr BitFlag& operator&=(const BitFlag& value);
+    constexpr BitFlag& operator^=(const BitFlag& value);
     NODISCARD constexpr BitFlag operator|(const BitFlag& value) const;
     NODISCARD constexpr BitFlag operator&(const BitFlag& value) const;
     NODISCARD constexpr BitFlag operator^(const BitFlag& value) const;
