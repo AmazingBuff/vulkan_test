@@ -3,12 +3,12 @@
 #include "render/utils/util.h"
 #include "render/resources/fork/stb_image.h"
 
-//#include <assimp/Importer.hpp>
-//#include <assimp/scene.h>
+#include <assimp/Importer.hpp>
+#include <assimp/scene.h>
 
 ENGINE_NAMESPACE_BEGIN
 
-#define MODEL_PATH SOURCES_DIR"/res/textures/"
+#define MODEL_PATH SOURCES_DIR"/asset/obj/"
 
 
 ModelManager::~ModelManager()
@@ -24,24 +24,50 @@ void ModelManager::load_model_files()
 {
 	for (auto& dir_entry : std::filesystem::directory_iterator{ MODEL_PATH })
 	{
-        /*Assimp::Importer importer;
-        const aiScene* scene =  importer.ReadFile(dir_entry.path().generic_string(), 0);
-		scene->mNumMeshes;*/
-
-		const std::string file_name = dir_entry.path().filename().generic_string();
-		if (file_name.find(".png") == std::string::npos)
-			continue;
-
-		ModelResource resource;
-		resource.data = stbi_load(dir_entry.path().generic_string().c_str(), &resource.width, &resource.height, &resource.channels, STBI_rgb_alpha);
-        resource.channels = 4;
-		if (!resource.data)
-			RENDERING_LOG_ERROR("failed to load texture file: " + file_name);
-
-		if (resource)
+		for (auto& file : std::filesystem::directory_iterator{ dir_entry })
 		{
-			const std::string name = file_name.substr(0, file_name.find(".png"));
-			m_model_resources.emplace(name, resource);
+			const std::string file_name = file.path().filename().generic_string();
+			if (file_name.find(".obj") == std::string::npos)
+				continue;
+
+			Assimp::Importer importer;
+			const aiScene* scene = importer.ReadFile(file.path().generic_string(), 0);
+			for (uint32_t i = 0; i < scene->mNumMeshes; i++)
+			{
+				const aiMesh* mesh = scene->mMeshes[i];
+				ModelResource resource;
+				resource.vertices.resize(mesh->mNumVertices);
+
+				if (mesh->HasPositions())
+				{
+					for (uint32_t j = 0; j < mesh->mNumVertices; j++)
+					{
+						resource.vertices[j].position.x() = mesh->mVertices[j].x;
+						resource.vertices[j].position.y() = mesh->mVertices[j].y;
+						resource.vertices[j].position.z() = mesh->mVertices[j].z;
+					}
+				}
+
+
+                if (mesh->HasTextureCoords(0))
+                {
+                    for (uint32_t j = 0; j < mesh->mNumVertices; j++)
+                    {
+                        resource.vertices[j].texcoord.x() = mesh->mTextureCoords[0][j].x;
+                        resource.vertices[j].texcoord.y() = mesh->mTextureCoords[0][j].y;
+                    }
+                }
+
+				if (mesh->HasNormals())
+				{
+					for (uint32_t j = 0; j < mesh->mNumVertices; j++)
+					{
+						resource.vertices[j].normal.x() = mesh->mNormals[j].x;
+						resource.vertices[j].normal.y() = mesh->mNormals[j].y;
+						resource.vertices[j].normal.z() = mesh->mNormals[j].z;
+					}
+				}
+			}
 		}
 	}
 }

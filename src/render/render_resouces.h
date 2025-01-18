@@ -22,6 +22,7 @@ private:
 	std::shared_ptr<RenderPassManager>			m_render_pass_manager;
 	std::shared_ptr<PipelineManager>			m_pipeline_manager;
 	std::shared_ptr<TextureManager>				m_texture_manager;
+	std::shared_ptr<ModelManager>				m_model_manager;
 };
 
 ENGINE_NAMESPACE_END

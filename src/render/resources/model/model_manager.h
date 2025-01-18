@@ -1,19 +1,17 @@
 #pragma once
 
 #include "render/resources/resource_types.h"
+#include "render/resources/geometry/geometry_data.h"
 
 ENGINE_NAMESPACE_BEGIN
 
 struct ModelResource
 {
-	int				width		=	0;
-	int				height		=	0;
-	int				channels	=	0;
-	uint8_t*		data		=	nullptr;
+	std::vector<Vertex> vertices;
 
 	NODISCARD explicit operator bool() const
 	{
-		return width > 0 && height > 0 && channels > 0 && data != nullptr;
+		return !vertices.empty();
 	}
 };
 

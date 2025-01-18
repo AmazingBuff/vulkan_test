@@ -34,19 +34,22 @@ public:
 	void refresh_frame();
 
 	// single command buffer
-	VkCommandBuffer begin_single_command() const;
-	void end_single_command(VkCommandBuffer command_buffer) const;
+	VkCommandBuffer begin_single_command();
+	void end_single_command(VkCommandBuffer command_buffer);
 private:
 	void create_command_pool();
-	void create_command_buffer();
+	void create_render_command_buffer();
 	void create_sync_objects();
 private:
-	std::array<VkCommandBuffer, k_Max_Frames_In_Flight>								m_command_buffers{};
+	std::array<VkCommandBuffer, k_Max_Frames_In_Flight>								m_render_command_buffers{};
 	std::array<std::shared_ptr<VK_CLASS(Semaphore)>, k_Max_Frames_In_Flight>		m_image_available_semaphores;
 	std::array<std::shared_ptr<VK_CLASS(Semaphore)>, k_Max_Frames_In_Flight>		m_render_finished_semaphores;
 	std::array<std::shared_ptr<VK_CLASS(Fence)>, k_Max_Frames_In_Flight>			m_in_flight_fences;
 
 	uint32_t																		m_current_frame = 0;
+
+    // this two queues are used to manage command buffers for single command
+    std::queue<VkCommandBuffer>			                                            m_single_command_buffers;
 private:
 	VK_TYPE_INIT(VkCommandPool,														m_command_pool);
 

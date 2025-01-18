@@ -4,6 +4,7 @@
 #include "resources/render_pass/render_pass_manager.h"
 #include "resources/pipeline/pipeline_manager.h"
 #include "resources/texture/texture_manager.h"
+#include "resources/model/model_manager.h"
 
 ENGINE_NAMESPACE_BEGIN
 
@@ -19,6 +20,8 @@ void RenderResources::initialize()
 	m_pipeline_manager->initialize();
     m_texture_manager = std::make_shared<TextureManager>();
     m_texture_manager->initialize();
+    m_model_manager = std::make_shared<ModelManager>();
+    m_model_manager->initialize();
 }
 
 const ShaderResource& RenderResources::get_shader_resource(const std::string_view& name) const
