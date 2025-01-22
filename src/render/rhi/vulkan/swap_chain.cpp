@@ -99,7 +99,7 @@ void VK_CLASS(SwapChain)::choose_swap_chain_details()
 	if (!std::ranges::any_of(m_support_details.formats,
 	                         [&](const VkSurfaceFormatKHR& available_format) -> bool
 	                         {
-		                         if (available_format.format == VK_FORMAT_B8G8R8A8_SRGB &&
+		                         if (available_format.format == VK_FORMAT_R8G8B8A8_SRGB &&
 			                         available_format.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR)
 		                         {
 			                         m_details.format = available_format;
@@ -245,7 +245,7 @@ void VK_CLASS(SwapChain)::create_depth_resources()
 
 	VK_CHECK_RESULT(vmaCreateImage(device->m_allocator, &image_create_info, &allocation_create_info, &m_depth_image, &m_depth_image_allocation, nullptr));
 
-    VK_CLASS(Image)::transition_image_layout(m_depth_image, depth_format, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL);
+    VK_CLASS(Image)::transition_image_layout(m_depth_image, depth_format, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL, 1);
 
     // image view
 	VkImageViewCreateInfo create_info{

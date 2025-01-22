@@ -1,5 +1,6 @@
 #include "pipeline_resources.h"
 #include "system/system.h"
+#include "camera/camera.h"
 #include "trans/enum_trans.h"
 #include "trans/structure_trans.h"
 #include "benchmark/resource_manager.h"
@@ -9,6 +10,7 @@
 #include "render/resources/pipeline/pipeline_manager.h"
 #include "render/resources/pipeline_layout/pipeline_layout_manager.h"
 #include "render/resources/render_pass/render_pass_manager.h"
+#include "render/resources/model/model_manager.h"
 
 
 ENGINE_NAMESPACE_BEGIN
@@ -114,24 +116,10 @@ void VK_CLASS(PipelineResources)::create_resource_manager()
 	m_resource_manager = std::make_shared<VK_CLASS(ResourceManager)>();
 	m_resource_manager->init();
 
-	std::vector<Vertex> vertices = {
-		{{-0.5f, -0.5f,  0.0f}, {1.0f, 0.0f},{1.0f, 0.0f, 0.0f}},
-		{{ 0.5f, -0.5f,  0.0f}, {0.0f, 0.0f},{0.0f, 1.0f, 0.0f}},
-		{{ 0.5f,  0.5f,  0.0f}, {0.0f, 1.0f},{0.0f, 0.0f, 1.0f}},
-		{{-0.5f,  0.5f,  0.0f}, {1.0f, 1.0f},{1.0f, 1.0f, 1.0f}},
-		{{-0.5f, -0.5f, -0.5f}, {1.0f, 0.0f},{1.0f, 0.0f, 0.0f}},
-		{{ 0.5f, -0.5f, -0.5f}, {0.0f, 0.0f},{0.0f, 1.0f, 0.0f}},
-		{{ 0.5f,  0.5f, -0.5f}, {0.0f, 1.0f},{0.0f, 0.0f, 1.0f}},
-		{{-0.5f,  0.5f, -0.5f}, {1.0f, 1.0f},{1.0f, 1.0f, 1.0f}},
-	};
+	auto& model = g_system_context->g_render_system->m_render_resources->get_model_resource("viking_room");
 
-	std::vector<uint32_t> indices = {
-		0, 1, 2, 2, 3, 0,
-		4, 5, 6, 6, 7, 4,
-	};
-
-	m_resource_manager->map_vertex_buffer("basic", vertices);
-	m_resource_manager->map_index_buffer("basic", indices);
+	m_resource_manager->map_vertex_buffer("basic", model.vertices);
+	m_resource_manager->map_index_buffer("basic", model.indices);
 
 	static const std::unordered_map<std::string, std::string> name_to_res_name_map_1 =
 	{
@@ -143,38 +131,34 @@ void VK_CLASS(PipelineResources)::create_resource_manager()
 		{"sampler_s", "b"}
 	};
 
-	m_resource_manager->create_image("a");
-	m_resource_manager->create_image("b");
+	m_resource_manager->create_image("a", model.textures[0], false);
 	for (auto& [name, pipeline_layout] : m_pipeline_layouts)
 	{
 		auto& uniform_buffers = pipeline_layout->m_shader_resources_layout.uniform_buffers;
 		m_resource_manager->configure_uniform_buffer(name, uniform_buffers, m_descriptor_sets.at(name)->m_descriptor_sets);
 
 		auto& sampled_images = pipeline_layout->m_shader_resources_layout.sampled_images;
-		m_resource_manager->configure_image(sampled_images, name_to_res_name_map_2, m_descriptor_sets.at(name)->m_descriptor_sets);
+		m_resource_manager->configure_image(sampled_images, name_to_res_name_map_1, m_descriptor_sets.at(name)->m_descriptor_sets);
 	}
 }
 
-void VK_CLASS(PipelineResources)::update_uniform_buffer(const std::string_view& name) const
+void VK_CLASS(PipelineResources)::update_uniform_buffer(const std::string_view& name, const GlobalRuntimeInfo& info) const
 {
 	uint32_t current_image = g_system_context->g_render_system->m_drawable->m_command_buffer->m_current_frame;
 	VkExtent2D extent = g_system_context->g_render_system->m_drawable->m_swap_chain->m_details.extent.value();
 
-	static auto start = std::chrono::high_resolution_clock::now();
-	auto current = std::chrono::high_resolution_clock::now();
-
-	float delta_time = std::chrono::duration_cast<std::chrono::duration<float>>(current - start).count();
+	auto camera = g_system_context->g_camera_system;
 
 	Transformation transformation;
-	transformation.model = Eigen::Translation3f::Identity() * Eigen::AngleAxisf(delta_time, Eigen::Vector3f::UnitZ());
-	transformation.view = look_at({1.0, 0.0, 1.0}, {0.0, 0.0, 0.0}, {0.0, 0.0, 1.0});
-	transformation.projection = perspective(45.0, static_cast<float>(extent.width) / static_cast<float>(extent.height), 0.1, 10.0);
+	transformation.model = Eigen::Translation3f::Identity() * Eigen::AngleAxisf(info.current_time, Eigen::Vector3f::UnitZ());
+	transformation.view = camera->look_at();
+	transformation.projection = camera->perspective(static_cast<float>(extent.width) / static_cast<float>(extent.height));
 	transformation.projection(1, 1) *= -1.0;
 
 	std::vector<Transformation> transformations;
 	transformations.emplace_back(transformation);
 	m_resource_manager->map_uniform_buffer("basic", "trans", current_image, transformations);
-	m_resource_manager->map_uniform_buffer("basic", "sp", current_image, delta_time);
+	m_resource_manager->map_uniform_buffer("basic", "sp", current_image, info.current_time);
 }
 
 

@@ -3,7 +3,6 @@
 #include "enum_map.h"
 #include "structure_trans.h"
 
-#define YAML_CPP_STATIC_DEFINE
 #include <rfl.hpp>
 #include <func.h>
 #include <regex>

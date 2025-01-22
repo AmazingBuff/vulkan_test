@@ -7,6 +7,7 @@
 #include "render/renderer.h"
 #include "render/drawable.h"
 #include "render/resources/texture/texture_manager.h"
+#include "render/resources/fork/stb_image.h"
 
 ENGINE_NAMESPACE_BEGIN
 
@@ -29,7 +30,7 @@ VK_CLASS(Image)::~VK_CLASS(Image)()
 
 void VK_CLASS(Image)::initialize(MemoryRequirements memory_requirements)
 {
-    auto device = g_system_context->g_render_system->m_drawable->m_device;
+    auto allocator = g_system_context->g_render_system->m_drawable->m_device->m_allocator;
 
     VkMemoryRequirements requirements{
         .size = Default_Image_Memory_Size,
@@ -42,12 +43,12 @@ void VK_CLASS(Image)::initialize(MemoryRequirements memory_requirements)
     };
 
     VmaAllocationInfo alloc_info;
-    VK_CHECK_RESULT(vmaAllocateMemory(device->m_allocator, &requirements, &alloc_create_info, &m_allocation, &alloc_info));
+    VK_CHECK_RESULT(vmaAllocateMemory(allocator, &requirements, &alloc_create_info, &m_allocation, &alloc_info));
     m_allocate_size = alloc_info.size;
     m_alignment = memory_requirements.alignment;
 }
 
-void VK_CLASS(Image)::map_memory(const std::string& name, VkImage image, const TextureResource& resource, const std::shared_ptr<VK_CLASS(Buffer)>& src_buffer)
+void VK_CLASS(Image)::map_memory(const std::string& name, VkImage image, const TextureResource& resource, const std::shared_ptr<VK_CLASS(Buffer)>& src_buffer, uint32_t mip_levels)
 {   
     auto device = g_system_context->g_render_system->m_drawable->m_device;
     VK_CHECK_RESULT(vmaBindImageMemory2(device->m_allocator, m_allocation, m_current_offset, image, nullptr));    
@@ -72,10 +73,10 @@ void VK_CLASS(Image)::map_memory(const std::string& name, VkImage image, const T
         break;
     }
 
-    transition_image_layout(image, format, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+    transition_image_layout(image, format, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, mip_levels);
     copy_buffer_to_image(src_buffer->m_buffer, image, static_cast<uint32_t>(resource.width), static_cast<uint32_t>(resource.height));
-    transition_image_layout(image, format, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
-
+    generate_mipmaps(image, format, resource.width, resource.height, mip_levels);
+    
     // image view
     VkImageViewCreateInfo create_info{
         .sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO,
@@ -91,7 +92,7 @@ void VK_CLASS(Image)::map_memory(const std::string& name, VkImage image, const T
         .subresourceRange = {
             .aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
             .baseMipLevel = 0,
-            .levelCount = 1,
+            .levelCount = mip_levels,
             .baseArrayLayer = 0,
             .layerCount = 1
         }
@@ -100,7 +101,7 @@ void VK_CLASS(Image)::map_memory(const std::string& name, VkImage image, const T
     VkImageView image_view;
     VK_CHECK_RESULT(vkCreateImageView(device->m_device, &create_info, nullptr, &image_view));
     
-    m_images.emplace(name, Image{ image, image_view });
+    m_images.emplace(name, Image{ image, image_view, mip_levels });
 }
 
 void VK_CLASS(Image)::update_descriptor_set(const std::vector<SampledImageLayout>& layouts, const std::unordered_map<std::string, std::string>& name_to_res_name_map, const std::unordered_map<uint32_t, VkDescriptorSet>& descriptor_sets, const std::shared_ptr<VK_CLASS(Sampler)>& sampler)
@@ -111,7 +112,7 @@ void VK_CLASS(Image)::update_descriptor_set(const std::vector<SampledImageLayout
         if (it == m_images.end())
             continue;
 
-        VkSampler vk_sampler = sampler->get_sampler(it->second.image);
+        VkSampler vk_sampler = sampler->get_sampler(it->second.image, it->second.mip_levels);
         VkDescriptorImageInfo image_info{
             .sampler = vk_sampler,
             .imageView = it->second.image_view,
@@ -137,11 +138,11 @@ void VK_CLASS(Image)::update_descriptor_set(const std::vector<SampledImageLayout
 
 void VK_CLASS(Image)::release_sampler(const std::shared_ptr<VK_CLASS(Sampler)>& sampler)
 {
-    for (auto& [image, image_view] : std::views::values(m_images))
+    for (auto& [image, image_view, mip_levels] : std::views::values(m_images))
         sampler->recycle_sampler(image);
 }
 
-void VK_CLASS(Image)::transition_image_layout(VkImage image, VkFormat format, VkImageLayout old_layout, VkImageLayout new_layout)
+void VK_CLASS(Image)::transition_image_layout(VkImage image, VkFormat format, VkImageLayout old_layout, VkImageLayout new_layout, uint32_t mip_levels)
 {
     auto command_buffers = g_system_context->g_render_system->m_drawable->m_command_buffer;
 
@@ -159,7 +160,7 @@ void VK_CLASS(Image)::transition_image_layout(VkImage image, VkFormat format, Vk
         .subresourceRange = {
             .aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
             .baseMipLevel = 0,
-            .levelCount = 1,
+            .levelCount = mip_levels,
             .baseArrayLayer = 0,
             .layerCount = 1
         },
@@ -230,6 +231,94 @@ void VK_CLASS(Image)::copy_buffer_to_image(VkBuffer buffer, VkImage image, uint3
     command_buffers->end_single_command(command_buffer);
 }
 
+void VK_CLASS(Image)::generate_mipmaps(VkImage image, VkFormat format, int32_t width, int32_t height, uint32_t mip_levels)
+{
+    auto drawable = g_system_context->g_render_system->m_drawable;
+
+    if (drawable->m_physical_device->is_supported_format(format, VK_IMAGE_TILING_OPTIMAL, VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT))
+    {
+        // generate mipmap by vulkan
+
+        auto command_buffers = drawable->m_command_buffer;
+        VkCommandBuffer command_buffer = command_buffers->begin_single_command();
+
+        VkImageMemoryBarrier barrier{
+            .sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER,
+            .srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
+            .dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
+            .image = image,
+            .subresourceRange = {
+                .aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
+                .levelCount = 1,
+                .baseArrayLayer = 0,
+                .layerCount = 1
+            },
+        };
+
+        int32_t mip_width = width;
+        int32_t mip_height = height;
+        for (uint32_t i = 1; i < mip_levels; i++)
+        {
+            barrier.subresourceRange.baseMipLevel = i - 1;
+            barrier.oldLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
+            barrier.newLayout = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
+            barrier.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+            barrier.dstAccessMask = VK_ACCESS_TRANSFER_READ_BIT;
+
+            vkCmdPipelineBarrier(command_buffer, VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT, 0, 0, nullptr, 0, nullptr, 1, &barrier);
+
+
+            VkImageBlit blit{
+                .srcSubresource = {
+                    .aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
+                    .mipLevel = i - 1,
+                    .baseArrayLayer = 0,
+                    .layerCount = 1
+                },
+                .srcOffsets = {{0, 0, 0}, {mip_width, mip_height, 1}},
+                .dstSubresource = {
+                    .aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
+                    .mipLevel = i,
+                    .baseArrayLayer = 0,
+                    .layerCount = 1
+                },
+                .dstOffsets = {{0, 0, 0}, {mip_width > 1 ? mip_width / 2 : 1, mip_height > 1 ? mip_height / 2 : 1, 1}},
+            };
+
+            vkCmdBlitImage(command_buffer, image, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &blit, VK_FILTER_LINEAR);
+
+
+            barrier.oldLayout = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
+            barrier.newLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+            barrier.srcAccessMask = VK_ACCESS_TRANSFER_READ_BIT;
+            barrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
+
+            vkCmdPipelineBarrier(command_buffer, VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT, 0, 0, nullptr, 0, nullptr, 1, &barrier);
+
+            if (mip_width > 1)
+                mip_width /= 2;
+            if (mip_height > 1)
+                mip_height /= 2;
+        }
+
+        barrier.subresourceRange.baseMipLevel = mip_levels - 1;
+        barrier.oldLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
+        barrier.newLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+        barrier.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+        barrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
+
+        vkCmdPipelineBarrier(command_buffer, VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT, 0, 0, nullptr, 0, nullptr, 1, &barrier);
+
+
+        command_buffers->end_single_command(command_buffer);
+    }
+    else
+    {
+        // todo: generate mipmap by software
+
+    }
+}
+
 
 VK_CLASS(Sampler)::~VK_CLASS(Sampler)()
 {
@@ -246,14 +335,14 @@ VK_CLASS(Sampler)::~VK_CLASS(Sampler)()
 
 void VK_CLASS(Sampler)::initialize(){}
 
-VkSampler VK_CLASS(Sampler)::get_sampler(VkImage image)
+VkSampler VK_CLASS(Sampler)::get_sampler(VkImage image, uint32_t mip_levels)
 {
     auto it = m_occupied_map.find(image);
     if (it != m_occupied_map.end())
         return it->second;
 
     if (m_available_queue.empty())
-        create_sampler();
+        create_sampler(mip_levels);
 
     VkSampler sampler = m_available_queue.front();
     m_available_queue.pop();
@@ -272,7 +361,7 @@ void VK_CLASS(Sampler)::recycle_sampler(VkImage image)
     }
 }
 
-void VK_CLASS(Sampler)::create_sampler()
+void VK_CLASS(Sampler)::create_sampler(uint32_t mip_levels)
 {
     auto drawable = g_system_context->g_render_system->m_drawable;
     auto device = drawable->m_device;
@@ -292,7 +381,7 @@ void VK_CLASS(Sampler)::create_sampler()
         .compareEnable = VK_FALSE,
         .compareOp = VK_COMPARE_OP_ALWAYS,
         .minLod = 0.0f,
-        .maxLod = 0.0f,
+        .maxLod = static_cast<float>(mip_levels),
         .borderColor = VK_BORDER_COLOR_INT_OPAQUE_BLACK,
         .unnormalizedCoordinates = VK_FALSE,
     };

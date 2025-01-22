@@ -2,6 +2,8 @@
 #include "utils/util.h"
 #include "render/rhi/rhi.h"
 #include "system/system.h"
+#define SDL_MAIN_HANDLED
+#include <SDL2/SDL.h>
 #include <SDL2/SDL_vulkan.h>
 
 ENGINE_NAMESPACE_BEGIN
@@ -37,6 +39,9 @@ void Window::initialize()
     if ((m_window = SDL_CreateWindow(Window_Title, SDL_WINDOWPOS_CENTERED,
         SDL_WINDOWPOS_CENTERED, Window_Width, Window_Height, flags)) == nullptr)
         WINDOW_LOG_ERROR(SDL_GetError());
+
+	// for mouse postion capture
+	SDL_SetRelativeMouseMode(SDL_TRUE);
 }
 
 void Window::present(GlobalRuntimeInfo& global_info) const
@@ -64,10 +69,24 @@ void Window::present(GlobalRuntimeInfo& global_info) const
 			}
 		}
 			break;
+		case SDL_KEYDOWN:
+		case SDL_KEYUP:
+		{
+			global_info.events.emplace_back(event);
+		}
+			break;
 		default:
+		{
+			global_info.events.emplace_back(event);
+		}
 			break;
 		}
 	}
+}
+
+void Window::window_size(int* width, int* height) const
+{
+	SDL_GetWindowSize(m_window, width, height);
 }
 
 ENGINE_NAMESPACE_END

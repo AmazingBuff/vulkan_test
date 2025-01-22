@@ -6,8 +6,6 @@
 #include "system/system.h"
 #include "render/renderer.h"
 #include "render/drawable.h"
-#include "render/render_resouces.h"
-#include "render/resources/texture/texture_manager.h"
 
 ENGINE_NAMESPACE_BEGIN
 
@@ -73,10 +71,8 @@ void VK_CLASS(ResourceManager)::configure_uniform_buffer(const std::string& res_
     }
 }
 
-void VK_CLASS(ResourceManager)::create_image(const std::string& res_name)
+void VK_CLASS(ResourceManager)::create_image(const std::string& res_name, const TextureResource& resource, bool mipmap)
 {
-    const TextureResource& resource = g_system_context->g_render_system->m_render_resources->get_texture_resource(res_name);
-
     VkFormat format = VK_FORMAT_UNDEFINED;
     switch (resource.channels)
     {
@@ -94,21 +90,27 @@ void VK_CLASS(ResourceManager)::create_image(const std::string& res_name)
         break;
     }
 
+    uint32_t width = static_cast<uint32_t>(resource.width);
+    uint32_t height = static_cast<uint32_t>(resource.height);
+    uint32_t mip_levels = 1;
+    if (mipmap)
+        mip_levels = static_cast<uint32_t>(std::floor(std::log2(std::max(width, height)))) + 1u;
+
     // image
     VkImageCreateInfo image_create_info{
         .sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO,
         .imageType = VK_IMAGE_TYPE_2D,
         .format = format,
         .extent = {
-            .width = static_cast<uint32_t>(resource.width),
-            .height = static_cast<uint32_t>(resource.height),
+            .width = width,
+            .height = height,
             .depth = 1,
         },
-        .mipLevels = 1,
+        .mipLevels = mip_levels,
         .arrayLayers = 1,
         .samples = VK_SAMPLE_COUNT_1_BIT,
         .tiling = VK_IMAGE_TILING_OPTIMAL,
-        .usage = VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT,
+        .usage = VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT,
         .sharingMode = VK_SHARING_MODE_EXCLUSIVE,
         .initialLayout = VK_IMAGE_LAYOUT_UNDEFINED,
     };
@@ -126,12 +128,12 @@ void VK_CLASS(ResourceManager)::create_image(const std::string& res_name)
     };
     auto it = m_images.find(requirements);
     if (it != m_images.end())
-        it->second->map_memory(res_name, vk_image, resource, m_staging_buffer);
+        it->second->map_memory(res_name, vk_image, resource, m_staging_buffer, mip_levels);
     else
     {
         std::shared_ptr<VK_CLASS(Image)> image = std::make_shared<VK_CLASS(Image)>();
         image->init(requirements);
-        image->map_memory(res_name, vk_image, resource, m_staging_buffer);
+        image->map_memory(res_name, vk_image, resource, m_staging_buffer, mip_levels);
         m_images[requirements] = image;
     }
 }

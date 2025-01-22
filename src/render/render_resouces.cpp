@@ -49,4 +49,9 @@ const TextureResource& RenderResources::get_texture_resource(const std::string_v
     return m_texture_manager->get_texture_resource(name);
 }
 
+const ModelResource& RenderResources::get_model_resource(const std::string_view& name) const
+{
+	return m_model_manager->get_model_resource(name);
+}
+
 ENGINE_NAMESPACE_END

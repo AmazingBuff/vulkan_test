@@ -6,6 +6,8 @@
 
 #include "buffer.h"
 #include "image.h"
+#include "render/resources/texture/texture_manager.h"
+
 #include <func.h>
 
 ENGINE_NAMESPACE_BEGIN
@@ -26,7 +28,7 @@ public:
     void configure_uniform_buffer(const std::string& res_name, const std::vector<UniformBufferLayout>& layouts, const std::array<std::unordered_map<uint32_t, VkDescriptorSet>, k_Max_Frames_In_Flight>& descriptor_sets);
 
     // res_name is the name of the texture resource that the image is associated with
-    void create_image(const std::string& res_name);
+    void create_image(const std::string& res_name, const TextureResource& resource, bool mipmap);
 
     void configure_image(const std::vector<SampledImageLayout>& layouts, const std::unordered_map<std::string, std::string>& name_to_res_name_map, const std::array<std::unordered_map<uint32_t, VkDescriptorSet>, k_Max_Frames_In_Flight>& descriptor_sets);
 

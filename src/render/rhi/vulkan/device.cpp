@@ -59,16 +59,23 @@ static bool check_device_extension_support(VkPhysicalDevice device)
 	return required_extensions.empty();
 }
 
+bool VK_CLASS(PhysicalDevice)::is_supported_format(VkFormat format, VkImageTiling tiling, VkFormatFeatureFlags features) const
+{
+	VkFormatProperties props;
+	vkGetPhysicalDeviceFormatProperties(m_device, format, &props);
+	if ((tiling == VK_IMAGE_TILING_OPTIMAL && (props.optimalTilingFeatures & features) == features) ||
+		(tiling == VK_IMAGE_TILING_LINEAR && (props.linearTilingFeatures & features) == features))
+		return true;
+	else
+		return false;
+}
+
 VkFormat VK_CLASS(PhysicalDevice)::find_supported_format(const std::vector<VkFormat>& candidates, VkImageTiling tiling, VkFormatFeatureFlags features) const
 {
 	for (VkFormat format : candidates)
 	{
-		VkFormatProperties props;
-		vkGetPhysicalDeviceFormatProperties(m_device, format, &props);
-		if (tiling == VK_IMAGE_TILING_OPTIMAL && (props.optimalTilingFeatures & features) == features)
+		if (is_supported_format(format, tiling, features))
 			return format;
-		else if (tiling == VK_IMAGE_TILING_LINEAR && (props.linearTilingFeatures & features) == features)
-			 return format;
 	}
 	RENDERING_LOG_ERROR("failed to find supported format!");
 	return VK_FORMAT_UNDEFINED;

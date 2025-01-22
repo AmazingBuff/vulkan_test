@@ -4,6 +4,7 @@
 
 ENGINE_NAMESPACE_BEGIN
 
+struct GlobalRuntimeInfo;
 
 class VK_CLASS(PipelineResources) final : public RHI
 {
@@ -26,7 +27,7 @@ public:
 	NODISCARD const BufferInfo& get_vertex_info(const std::string_view& name) const;
 	NODISCARD const BufferInfo& get_index_info(const std::string_view& name) const;
 
-	void update_uniform_buffer(const std::string_view& name) const;
+	void update_uniform_buffer(const std::string_view& name, const GlobalRuntimeInfo& info) const;
 private:
 	void create_render_pass(const std::string& name);
 	void create_pipeline_layout(const std::string& name);

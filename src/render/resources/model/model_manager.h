@@ -7,7 +7,9 @@ ENGINE_NAMESPACE_BEGIN
 
 struct ModelResource
 {
-	std::vector<Vertex> vertices;
+	std::vector<Vertex>				vertices;
+	std::vector<uint32_t>			indices;
+	std::vector<TextureResource>	textures;
 
 	NODISCARD explicit operator bool() const
 	{

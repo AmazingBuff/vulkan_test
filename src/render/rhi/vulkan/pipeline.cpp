@@ -51,14 +51,56 @@ bool SpirvParser::get_vertex_input_attribute_description(std::vector<VkVertexInp
 	{
 		if (auto it = Vertex_Offset.find(resource.name); it != Vertex_Offset.end())
 		{
+			VkFormat format = VK_FORMAT_UNDEFINED;
+
+			const spirv_cross::SPIRType& type = m_compiler->get_type(resource.type_id);
+			switch (type.basetype)
+			{
+			case spirv_cross::SPIRType::BaseType::Float:
+			{
+				switch (type.vecsize)
+				{
+				case 1:
+#ifdef HIGH_PRECISION_FLOAT
+					format = VK_FORMAT_R64_SFLOAT;
+#else
+					format = VK_FORMAT_R32_SFLOAT;
+#endif
+					break;
+				case 2:
+#ifdef HIGH_PRECISION_FLOAT
+					format = VK_FORMAT_R64G64_SFLOAT;
+#else
+					format = VK_FORMAT_R32G32_SFLOAT;
+#endif
+					break;
+				case 3:
+#ifdef HIGH_PRECISION_FLOAT
+					format = VK_FORMAT_R64G64B64_SFLOAT;
+#else
+					format = VK_FORMAT_R32G32B32_SFLOAT;
+#endif
+					break;
+				case 4:
+#ifdef HIGH_PRECISION_FLOAT
+					format = VK_FORMAT_R64G64B64A64_SFLOAT;
+#else
+					format = VK_FORMAT_R32G32B32A32_SFLOAT;
+#endif
+					break;
+				default:
+					break;
+				}
+			}
+				break;
+			default:
+				break;
+			}
+
 			VkVertexInputAttributeDescription attribute_description {
 				.location = m_compiler->get_decoration(resource.id, spv::DecorationLocation),
 				.binding = m_compiler->get_decoration(resource.id, spv::DecorationBinding),
-#ifdef HIGH_PRECISION_FLOAT
-				.format = VK_FORMAT_R64G64B64_SFLOAT,
-#else
-				.format = VK_FORMAT_R32G32B32_SFLOAT,
-#endif
+				.format = format,
 				.offset = static_cast<uint32_t>(it->second),
 			};
 			vertex_input_attributes.emplace_back(attribute_description);

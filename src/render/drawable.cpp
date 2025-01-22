@@ -1,6 +1,9 @@
 #include "drawable.h"
 #include "window/window.h"
 
+#define SDL_MAIN_HANDLED
+#include <SDL2/SDL.h>
+
 ENGINE_NAMESPACE_BEGIN
 
 Drawable::~Drawable()
@@ -48,7 +51,7 @@ void Drawable::draw(GlobalRuntimeInfo& global_info)
 	m_command_buffer->begin_render_pass(current_render_pass(), m_swap_chain->current_frame_buffer());
 	m_command_buffer->bind_pipeline(current_pipeline());
 
-	m_pipeline_resources->update_uniform_buffer("basic");
+	m_pipeline_resources->update_uniform_buffer("basic", global_info);
 	std::vector<VkDeviceSize> offsets;
 	for (auto& info : current_vertex_infos())
 		offsets.emplace_back(info.offset);

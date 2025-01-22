@@ -16,6 +16,7 @@ public:
     NODISCARD const PipelineResource& get_pipeline_resource(const std::string_view& name) const;
     NODISCARD const PipelineLayoutResource& get_pipeline_layout_resource(const std::string_view& name) const;
     NODISCARD const TextureResource& get_texture_resource(const std::string_view& name) const;
+    NODISCARD const ModelResource& get_model_resource(const std::string_view& name) const;
 private:
 	std::shared_ptr<ShaderManager>				m_shader_manager;
 	std::shared_ptr<PipelineLayoutManager>		m_pipeline_layout_manager;

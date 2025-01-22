@@ -1,0 +1,57 @@
+render_pass:
+    attachments:
+        descriptions:
+            -   type: color
+                samples: 4
+                load_op: clear
+                store_op: store
+                stencil_load_op: dont_care
+                stencil_store_op: dont_care
+                initial_layout: undefined
+                final_layout: color_attachment_optimal
+            -   type: depth_stencil
+                samples: 4
+                load_op: clear
+                store_op: dont_care
+                stencil_load_op: clear
+                stencil_store_op: dont_care
+                initial_layout: undefined
+                final_layout: depth_stencil_attachment_optimal
+            -   type: color
+                samples: 1
+                load_op: clear
+                store_op: store
+                stencil_load_op: dont_care
+                stencil_store_op: dont_care
+                initial_layout: undefined
+                final_layout: present_src
+        references:
+            -   &first
+                type: color      
+                attachment: 0    
+                layout: color_attachment_optimal
+            -   &second
+                type: depth_stencil      
+                attachment: 1    
+                layout: depth_stencil_attachment_optimal
+            -   &third
+                type: color      
+                attachment: 2    
+                layout: color_attachment_optimal
+    subpasses:
+        descriptions:
+            -   name: main
+                color_attachments: 
+                    - *first
+                resolve_attachments:
+                    - *third
+                depth_stencil_attachment: *second
+        dependencies:
+            -   name: main
+                src_subpass: external
+                dst_subpass: 0
+                src_stage_mask: color_attachment_output | early_fragment_tests
+                dst_stage_mask: color_attachment_output | early_fragment_tests
+                src_access_mask: none
+                dst_access_mask: color_attachment_write | depth_stencil_attachment_write               
+     

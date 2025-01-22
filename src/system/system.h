@@ -4,6 +4,7 @@
 
 ENGINE_NAMESPACE_BEGIN
 class Window;
+class Camera;
 class Renderer;
 
 class System final
@@ -15,6 +16,7 @@ public:
 	void run();
 public:
 	std::shared_ptr<Window>		g_window_system;
+	std::shared_ptr<Camera>		g_camera_system;
 	std::shared_ptr<Renderer>	g_render_system;
 };
 
