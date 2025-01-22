@@ -3,8 +3,7 @@
 #include "system/system.h"
 #include "window/window.h"
 
-#define SDL_MAIN_HANDLED
-#include <SDL2/SDL.h>
+#include <SDL3/SDL.h>
 
 ENGINE_NAMESPACE_BEGIN
 
@@ -31,11 +30,11 @@ void Camera::update(GlobalRuntimeInfo& global_info)
     {
         switch (it->type)
         {
-        case SDL_KEYDOWN:
+        case SDL_EVENT_KEY_DOWN:
         {
-            if (it->key.state == SDL_PRESSED)
+            if (it->key.down)
             {
-                switch (it->key.keysym.scancode)
+                switch (it->key.scancode)
                 {
                 case SDL_SCANCODE_A:
                     offset.x() -= m_move_speed * delta_time;
@@ -63,7 +62,7 @@ void Camera::update(GlobalRuntimeInfo& global_info)
             it = events.erase(it);
         }
             break;
-        case SDL_MOUSEMOTION:
+        case SDL_EVENT_MOUSE_MOTION:
         {
             int width, height;
             g_system_context->g_window_system->window_size(&width, &height);
@@ -86,7 +85,7 @@ void Camera::update(GlobalRuntimeInfo& global_info)
             it = events.erase(it);
         }
             break;
-        case SDL_KEYUP:
+        case SDL_EVENT_KEY_UP:
             it = events.erase(it);
             break;
         default:

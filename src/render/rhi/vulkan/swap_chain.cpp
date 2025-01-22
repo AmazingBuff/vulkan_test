@@ -4,7 +4,7 @@
 #include "render/drawable.h"
 #include "window/window.h"
 #include "benchmark/image.h"
-#include <SDL2/SDL_vulkan.h>
+#include <SDL3/SDL.h>
 
 
 ENGINE_NAMESPACE_BEGIN
@@ -128,7 +128,9 @@ void VK_CLASS(SwapChain)::choose_swap_chain_details()
 	else
 	{
 		int width, height;
-		SDL_Vulkan_GetDrawableSize(g_system_context->g_window_system->m_window, &width, &height);
+		
+		if (!SDL_GetWindowSizeInPixels(g_system_context->g_window_system->m_window, &width, &height))
+			RENDERING_LOG_ERROR(SDL_GetError());
 		VkExtent2D actual_extent{ static_cast<uint32_t>(width), static_cast<uint32_t>(height) };
 		actual_extent.width = std::clamp(actual_extent.width, m_support_details.capabilities->minImageExtent.width, m_support_details.capabilities->maxImageExtent.width);
 		actual_extent.height = std::clamp(actual_extent.height, m_support_details.capabilities->minImageExtent.height, m_support_details.capabilities->maxImageExtent.height);

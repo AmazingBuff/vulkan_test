@@ -1,7 +1,7 @@
 #pragma once
 
 #include "base/macro.h"
-#include <SDL2/SDL_events.h>
+#include <SDL3/SDL_events.h>
 
 ENGINE_NAMESPACE_BEGIN
 

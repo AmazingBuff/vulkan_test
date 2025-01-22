@@ -2,9 +2,8 @@
 #include "utils/util.h"
 #include "render/rhi/rhi.h"
 #include "system/system.h"
-#define SDL_MAIN_HANDLED
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_vulkan.h>
+#include <SDL3/SDL.h>
+#include <SDL3/SDL_vulkan.h>
 
 ENGINE_NAMESPACE_BEGIN
 
@@ -16,10 +15,10 @@ Window::~Window()
 
 void Window::initialize()
 {
-    if (SDL_Init(SDL_INIT_VIDEO) != 0)
+    if (!SDL_Init(SDL_INIT_VIDEO))
 		WINDOW_LOG_ERROR(SDL_GetError());
 
-    Uint32 flags = SDL_WINDOW_ALLOW_HIGHDPI | SDL_WINDOW_RESIZABLE;
+    Uint32 flags = SDL_WINDOW_HIGH_PIXEL_DENSITY | SDL_WINDOW_RESIZABLE;
     switch (Hardware_API)
     {
 	case GraphicsAPI::e_opengl:
@@ -36,12 +35,9 @@ void Window::initialize()
 		break;
     }
 
-    if ((m_window = SDL_CreateWindow(Window_Title, SDL_WINDOWPOS_CENTERED,
-        SDL_WINDOWPOS_CENTERED, Window_Width, Window_Height, flags)) == nullptr)
+	m_window = SDL_CreateWindow(Window_Title, Window_Width, Window_Height, flags);
+    if (!m_window || !SDL_SetWindowRelativeMouseMode(m_window, true)) // for mouse postion capture
         WINDOW_LOG_ERROR(SDL_GetError());
-
-	// for mouse postion capture
-	SDL_SetRelativeMouseMode(SDL_TRUE);
 }
 
 void Window::present(GlobalRuntimeInfo& global_info) const
@@ -51,26 +47,17 @@ void Window::present(GlobalRuntimeInfo& global_info) const
 	{
 		switch (event.type)
 		{
-		case SDL_QUIT:
+		case SDL_EVENT_QUIT:
 			global_info.window_quit = true;
 			break;
-		case SDL_WINDOWEVENT:
-		{
-			switch (event.window.event)
-			{
-			case SDL_WINDOWEVENT_RESIZED:
-				global_info.window_resized = true;
-				break;
-			case SDL_WINDOWEVENT_MINIMIZED:
-				global_info.window_minimized = true;
-				break;
-			default:
-				break;
-			}
-		}
+		case SDL_EVENT_WINDOW_RESIZED:
+			global_info.window_resized = true;
 			break;
-		case SDL_KEYDOWN:
-		case SDL_KEYUP:
+		case SDL_EVENT_WINDOW_MINIMIZED:
+			global_info.window_minimized = true;
+			break;
+		case SDL_EVENT_KEY_DOWN:
+		case SDL_EVENT_KEY_UP:
 		{
 			global_info.events.emplace_back(event);
 		}

@@ -2,7 +2,7 @@
 #include "base/logger.h"
 #include "window/window.h"
 #include "system/system.h"
-#include <SDL2/SDL_vulkan.h>
+#include <SDL3/SDL_vulkan.h>
 
 ENGINE_NAMESPACE_BEGIN
 
@@ -148,7 +148,7 @@ void VK_CLASS(Instance)::create_instance()
 
 void VK_CLASS(Instance)::create_surface()
 {
-	if (SDL_Vulkan_CreateSurface(g_system_context->g_window_system->m_window, m_instance, &m_surface) == SDL_FALSE)
+	if (!SDL_Vulkan_CreateSurface(g_system_context->g_window_system->m_window, m_instance, nullptr, &m_surface))
 		RENDERING_LOG_ERROR(SDL_GetError());
 }
 

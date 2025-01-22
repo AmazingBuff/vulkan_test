@@ -9,6 +9,7 @@ add_subdirectory(ext/yaml-cpp)
 add_subdirectory(ext/reflect-cpp)
 add_subdirectory(ext/eigen)
 add_subdirectory(ext/assimp)
+add_subdirectory(ext/SDL)
 
 file(GLOB_RECURSE HEADER_FILES src/*.h)
 file(GLOB_RECURSE SOURCE_FILES src/*.cpp)
@@ -16,14 +17,12 @@ file(GLOB_RECURSE SOURCE_FILES src/*.cpp)
 set(THIRD_PARTY_INCLUDE_DIRS 
     3rd/traits/include
     3rd/spirv_cross/include
-    3rd/sdl2/include
     3rd/vulkan/include
     ext/reflect-cpp/include
 )
 
 set(THIRD_PARTY_LIB_DIRS
     3rd/spirv_cross/lib/$<$<CONFIG:Debug>:Debug>$<$<CONFIG:Release>:Release>
-    3rd/sdl2/lib/$<$<CONFIG:Debug>:Debug>$<$<CONFIG:Release>:Release>
     3rd/vulkan/lib
 )
 
@@ -31,15 +30,11 @@ set(THIRD_PARTY_LIBS
     $<$<CONFIG:Debug>:
     spirv-cross-cored
     spirv-cross-glsld
-    SDL2d
-    SDL2maind
     vulkan-1
     >
     $<$<CONFIG:Release>:
     spirv-cross-core
     spirv-cross-glsl
-    SDL2
-    SDL2main
     vulkan-1
     >
 )
@@ -75,6 +70,7 @@ target_link_libraries(
     Eigen3::Eigen
     yaml-cpp::yaml-cpp
     assimp::assimp
+    SDL3::SDL3
     reflectcpp
     ${THIRD_PARTY_LIBS} 
 )

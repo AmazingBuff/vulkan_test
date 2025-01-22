@@ -1,8 +1,7 @@
 #include "drawable.h"
 #include "window/window.h"
 
-#define SDL_MAIN_HANDLED
-#include <SDL2/SDL.h>
+#include <SDL3/SDL.h>
 
 ENGINE_NAMESPACE_BEGIN
 
@@ -82,7 +81,7 @@ void Drawable::recreate_swap_chain(GlobalRuntimeInfo& global_info)
 	while (global_info.window_minimized)
 	{
 		SDL_WaitEvent(&event);
-		if(event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_RESTORED)
+		if(event.type == SDL_EVENT_WINDOW_RESTORED)
 			global_info.window_minimized = false;
 	}
 
