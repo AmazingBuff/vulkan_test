@@ -11,19 +11,19 @@
 namespace rfl
 {
     template <>
-    struct Reflector<Amazing::Engine::PipelineLayoutResource>
+    struct Reflector<ENGINE_NAMESPACE_CONCAT(PipelineLayoutResource)>
     {
         struct ReflType
         {
-            Amazing::Engine::PipelineLayoutInfo   pipeline_layout;
+            ENGINE_NAMESPACE_CONCAT(PipelineLayoutInfo)   pipeline_layout;
         };
 
-        static Amazing::Engine::PipelineLayoutResource to(const ReflType& v) noexcept
+        static ENGINE_NAMESPACE_CONCAT(PipelineLayoutResource) to(const ReflType& v) noexcept
         {
-            return { std::make_shared<Amazing::Engine::PipelineLayoutInfo>(v.pipeline_layout) };
+            return { std::make_shared<ENGINE_NAMESPACE_CONCAT(PipelineLayoutInfo)>(v.pipeline_layout) };
         }
 
-        static ReflType from(const Amazing::Engine::PipelineLayoutResource& v)
+        static ReflType from(const ENGINE_NAMESPACE_CONCAT(PipelineLayoutResource)& v)
         {
             return { *v.pipeline_layout };
         }

@@ -7,19 +7,19 @@
 namespace rfl
 {
     template <>
-    struct Reflector<Amazing::Engine::PipelineResource>
+    struct Reflector<ENGINE_NAMESPACE_CONCAT(PipelineResource)>
     {
         struct ReflType
         {
-            Amazing::Engine::PipelineInfo pipeline;
+            ENGINE_NAMESPACE_CONCAT(PipelineInfo) pipeline;
         };
 
-        static Amazing::Engine::PipelineResource to(const ReflType& v) noexcept
+        static ENGINE_NAMESPACE_CONCAT(PipelineResource) to(const ReflType& v) noexcept
         {
-            return { std::make_shared<Amazing::Engine::PipelineInfo>(v.pipeline) };
+            return { std::make_shared<ENGINE_NAMESPACE_CONCAT(PipelineInfo)>(v.pipeline) };
         }
 
-        static ReflType from(const Amazing::Engine::PipelineResource& v)
+        static ReflType from(const ENGINE_NAMESPACE_CONCAT(PipelineResource)& v)
         {
             return { *v.pipeline };
         }
@@ -32,25 +32,25 @@ ENGINE_NAMESPACE_BEGIN
 
 void PipelineManager::initialize()
 {
-	load_pipeline_files();
+    load_pipeline_files();
 }
 
 const PipelineResource& PipelineManager::get_pipeline_resource(const std::string_view& name)
 {
-	auto it = m_pipeline_resources.find(name.data());
-	if (it == m_pipeline_resources.end())
-		RENDERING_LOG_ERROR("pipeline resource not found: " + std::string(name));
+    auto it = m_pipeline_resources.find(name.data());
+    if (it == m_pipeline_resources.end())
+        RENDERING_LOG_ERROR("pipeline resource not found: " + std::string(name));
 
-	return it->second;
+    return it->second;
 }
 
 void PipelineManager::load_pipeline_files()
 {
-	for (auto& file : std::filesystem::directory_iterator{ PIPELINE_PATH })
-	{
-		const std::string file_name = file.path().filename().generic_string();
-		if (file_name.find(".yaml") == std::string::npos)
-			continue;
+    for (auto& file : std::filesystem::directory_iterator{ PIPELINE_PATH })
+    {
+        const std::string file_name = file.path().filename().generic_string();
+        if (file_name.find(".yaml") == std::string::npos)
+            continue;
         const std::string name = file_name.substr(0, file_name.find(".yaml"));
 
         YAML::Node config = YAML::LoadFile(file.path().generic_string());

@@ -7,19 +7,19 @@
 namespace rfl
 {
     template <>
-    struct Reflector<Amazing::Engine::RenderPassResource>
+    struct Reflector<ENGINE_NAMESPACE_CONCAT(RenderPassResource)>
     {
         struct ReflType
         {
-            Amazing::Engine::RenderPassInfo   render_pass;
+            ENGINE_NAMESPACE_CONCAT(RenderPassInfo)   render_pass;
         };
 
-        static Amazing::Engine::RenderPassResource to(const ReflType& v) noexcept
+        static ENGINE_NAMESPACE_CONCAT(RenderPassResource) to(const ReflType& v) noexcept
         {
-            return { std::make_shared<Amazing::Engine::RenderPassInfo>(v.render_pass) };
+            return { std::make_shared<ENGINE_NAMESPACE_CONCAT(RenderPassInfo)>(v.render_pass) };
         }
 
-        static ReflType from(const Amazing::Engine::RenderPassResource& v)
+        static ReflType from(const ENGINE_NAMESPACE_CONCAT(RenderPassResource)& v)
         {
             return { *v.render_pass };
         }
@@ -32,25 +32,25 @@ ENGINE_NAMESPACE_BEGIN
 
 void RenderPassManager::initialize()
 {
-	load_render_pass_files();
+    load_render_pass_files();
 }
 
 const RenderPassResource& RenderPassManager::get_render_pass_resource(const std::string_view& name)
 {
-	auto it = m_render_pass_resources.find(name.data());
-	if (it == m_render_pass_resources.end())
-		RENDERING_LOG_ERROR("render pass resource not found: " + std::string(name));
+    auto it = m_render_pass_resources.find(name.data());
+    if (it == m_render_pass_resources.end())
+        RENDERING_LOG_ERROR("render pass resource not found: " + std::string(name));
 
-	return it->second;
+    return it->second;
 }
 
 void RenderPassManager::load_render_pass_files()
 {
-	for (auto& file : std::filesystem::directory_iterator{ RENDER_PASS_PATH })
-	{
-		const std::string file_name = file.path().filename().generic_string();
-		if (file_name.find(".yaml") == std::string::npos)
-			continue;
+    for (auto& file : std::filesystem::directory_iterator{ RENDER_PASS_PATH })
+    {
+        const std::string file_name = file.path().filename().generic_string();
+        if (file_name.find(".yaml") == std::string::npos)
+            continue;
         const std::string name = file_name.substr(0, file_name.find(".yaml"));
 
         YAML::Node config = YAML::LoadFile(file.path().generic_string());
