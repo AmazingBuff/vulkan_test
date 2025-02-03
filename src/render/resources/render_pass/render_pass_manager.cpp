@@ -4,27 +4,24 @@
 
 #include <rfl/yaml.hpp>
 
-namespace rfl
+template <>
+struct rfl::Reflector<ENGINE_NAMESPACE_CONCAT(RenderPassResource)>
 {
-    template <>
-    struct Reflector<ENGINE_NAMESPACE_CONCAT(RenderPassResource)>
+    struct ReflType
     {
-        struct ReflType
-        {
-            ENGINE_NAMESPACE_CONCAT(RenderPassInfo)   render_pass;
-        };
-
-        static ENGINE_NAMESPACE_CONCAT(RenderPassResource) to(const ReflType& v) noexcept
-        {
-            return { std::make_shared<ENGINE_NAMESPACE_CONCAT(RenderPassInfo)>(v.render_pass) };
-        }
-
-        static ReflType from(const ENGINE_NAMESPACE_CONCAT(RenderPassResource)& v)
-        {
-            return { *v.render_pass };
-        }
+        ENGINE_NAMESPACE_CONCAT(RenderPassInfo)   render_pass;
     };
-}
+
+    static ENGINE_NAMESPACE_CONCAT(RenderPassResource) to(const ReflType& v) noexcept
+    {
+        return { std::make_shared<ENGINE_NAMESPACE_CONCAT(RenderPassInfo)>(v.render_pass) };
+    }
+
+    static ReflType from(const ENGINE_NAMESPACE_CONCAT(RenderPassResource)& v)
+    {
+        return { *v.render_pass };
+    }
+};
 
 
 ENGINE_NAMESPACE_BEGIN

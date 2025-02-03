@@ -7,7 +7,6 @@
 #include "render/renderer.h"
 #include "render/drawable.h"
 #include "render/resources/texture/texture_manager.h"
-#include "render/resources/fork/stb_image.h"
 
 ENGINE_NAMESPACE_BEGIN
 
@@ -49,13 +48,13 @@ void VK_CLASS(Image)::initialize(MemoryRequirements memory_requirements)
 }
 
 void VK_CLASS(Image)::map_memory(const std::string& name, VkImage image, const TextureResource& resource, const std::shared_ptr<VK_CLASS(Buffer)>& src_buffer, uint32_t mip_levels)
-{   
+{
     auto device = g_system_context->g_render_system->m_drawable->m_device;
-    VK_CHECK_RESULT(vmaBindImageMemory2(device->m_allocator, m_allocation, m_current_offset, image, nullptr));    
+    VK_CHECK_RESULT(vmaBindImageMemory2(device->m_allocator, m_allocation, m_current_offset, image, nullptr));
 
     VkDeviceSize buffer_size = static_cast<VkDeviceSize>(resource.width * resource.height * resource.channels);
     src_buffer->map_memory(resource.data, buffer_size, 0);
-    
+
     VkFormat format = VK_FORMAT_UNDEFINED;
     switch (resource.channels)
     {
@@ -76,7 +75,7 @@ void VK_CLASS(Image)::map_memory(const std::string& name, VkImage image, const T
     transition_image_layout(image, format, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, mip_levels);
     copy_buffer_to_image(src_buffer->m_buffer, image, static_cast<uint32_t>(resource.width), static_cast<uint32_t>(resource.height));
     generate_mipmaps(image, format, resource.width, resource.height, mip_levels);
-    
+
     // image view
     VkImageViewCreateInfo create_info{
         .sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO,
@@ -100,7 +99,7 @@ void VK_CLASS(Image)::map_memory(const std::string& name, VkImage image, const T
 
     VkImageView image_view;
     VK_CHECK_RESULT(vkCreateImageView(device->m_device, &create_info, nullptr, &image_view));
-    
+
     m_images.emplace(name, Image{ image, image_view, mip_levels });
 }
 
@@ -173,7 +172,7 @@ void VK_CLASS(Image)::transition_image_layout(VkImage image, VkFormat format, Vk
     {
         barrier.srcAccessMask = 0;
         barrier.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
-        
+
         source_stage = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
         destination_stage = VK_PIPELINE_STAGE_TRANSFER_BIT;
     }
@@ -181,7 +180,7 @@ void VK_CLASS(Image)::transition_image_layout(VkImage image, VkFormat format, Vk
     {
         barrier.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
         barrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
-        
+
         source_stage = VK_PIPELINE_STAGE_TRANSFER_BIT;
         destination_stage = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
     }
@@ -333,7 +332,7 @@ VK_CLASS(Sampler)::~VK_CLASS(Sampler)()
     }
 }
 
-void VK_CLASS(Sampler)::initialize(){}
+void VK_CLASS(Sampler)::initialize() {}
 
 VkSampler VK_CLASS(Sampler)::get_sampler(VkImage image, uint32_t mip_levels)
 {

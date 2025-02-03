@@ -55,6 +55,7 @@ class VK_CLASS(Buffer);
 class VK_CLASS(UniformBuffer);
 class VK_CLASS(Image);
 class VK_CLASS(Sampler);
+class VK_CLASS(Model);
 class VK_CLASS(ResourceManager);
 
 ENGINE_NAMESPACE_END

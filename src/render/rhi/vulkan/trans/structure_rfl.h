@@ -254,23 +254,20 @@ namespace rfl
     {
         struct ReflType
         {
-            std::string	    type;
             uint32_t        attachment;
             std::string	    layout;
         };
 
         static ENGINE_NAMESPACE_CONCAT(AttachmentReference) to(const ReflType& v) noexcept
         {
-            REFLECTOR_TO_ENUM(AttachmentType, v, type);
             REFLECTOR_TO_ENUM(ImageLayout, v, layout);
-            return { type, v.attachment, layout };
+            return { v.attachment, layout };
         }
 
         static ReflType from(const ENGINE_NAMESPACE_CONCAT(AttachmentReference)& v)
         {
-            REFLECTOR_FROM_ENUM(AttachmentType, v, type);
             REFLECTOR_FROM_ENUM(ImageLayout, v, layout);
-            return { type, v.attachment, layout };
+            return { v.attachment, layout };
         }
     };
 
@@ -279,25 +276,24 @@ namespace rfl
     {
         struct ReflType
         {
-            std::string	                                                    name;
             std::string	                                                    pipeline_bind_point;
-            std::vector<ENGINE_NAMESPACE_CONCAT(AttachmentReference)>     input_attachments;
-            std::vector<ENGINE_NAMESPACE_CONCAT(AttachmentReference)>     color_attachments;
-            std::vector<ENGINE_NAMESPACE_CONCAT(AttachmentReference)>     resolve_attachments;
-            std::optional<ENGINE_NAMESPACE_CONCAT(AttachmentReference)>   depth_stencil_attachment;
+            std::vector<ENGINE_NAMESPACE_CONCAT(AttachmentReference)>       input_attachments;
+            std::vector<ENGINE_NAMESPACE_CONCAT(AttachmentReference)>       color_attachments;
+            std::vector<ENGINE_NAMESPACE_CONCAT(AttachmentReference)>       resolve_attachments;
+            std::optional<ENGINE_NAMESPACE_CONCAT(AttachmentReference)>     depth_stencil_attachment;
             std::vector<uint32_t>				                            preserve_attachments;
         };
 
         static ENGINE_NAMESPACE_CONCAT(SubpassDescription) to(const ReflType& v) noexcept
         {
             REFLECTOR_TO_ENUM(PipelineBindPoint, v, pipeline_bind_point);
-            return { v.name, pipeline_bind_point, v.input_attachments, v.color_attachments, v.resolve_attachments, v.depth_stencil_attachment, v.preserve_attachments };
+            return { pipeline_bind_point, v.input_attachments, v.color_attachments, v.resolve_attachments, v.depth_stencil_attachment, v.preserve_attachments };
         }
 
         static ReflType from(const ENGINE_NAMESPACE_CONCAT(SubpassDescription)& v)
         {
             REFLECTOR_FROM_ENUM(PipelineBindPoint, v, pipeline_bind_point);
-            return { v.name, pipeline_bind_point, v.input_attachments, v.color_attachments, v.resolve_attachments, v.depth_stencil_attachment, v.preserve_attachments };
+            return { pipeline_bind_point, v.input_attachments, v.color_attachments, v.resolve_attachments, v.depth_stencil_attachment, v.preserve_attachments };
         }
     };
 
@@ -306,7 +302,6 @@ namespace rfl
     {
         struct ReflType
         {
-            std::string	    name;
             std::string		src_subpass;
             std::string		dst_subpass;
             std::string	    src_stage_mask;
@@ -325,7 +320,7 @@ namespace rfl
             MATCH_TO_ENUM(DependencyFlags, v, dependency_flags);
             uint32_t src_subpass = v.src_subpass == "external" ? VK_SUBPASS_EXTERNAL : std::stoul(v.src_subpass);
             uint32_t dst_subpass = v.dst_subpass == "external" ? VK_SUBPASS_EXTERNAL : std::stoul(v.dst_subpass);
-            return { v.name, src_subpass, dst_subpass, src_stage_mask, dst_stage_mask, src_access_mask, dst_access_mask, dependency_flags };
+            return { src_subpass, dst_subpass, src_stage_mask, dst_stage_mask, src_access_mask, dst_access_mask, dependency_flags };
         }
 
         static ReflType from(const ENGINE_NAMESPACE_CONCAT(SubpassDependency)& v)
@@ -337,7 +332,7 @@ namespace rfl
             MATCH_FROM_ENUM(DependencyFlags, v, dependency_flags);
             std::string src_subpass = v.src_subpass == VK_SUBPASS_EXTERNAL ? "external" : std::to_string(v.src_subpass);
             std::string dst_subpass = v.dst_subpass == VK_SUBPASS_EXTERNAL ? "external" : std::to_string(v.dst_subpass);
-            return { v.name, src_subpass, dst_subpass, src_stage_mask, dst_stage_mask, src_access_mask, dst_access_mask, dependency_flags };
+            return { src_subpass, dst_subpass, src_stage_mask, dst_stage_mask, src_access_mask, dst_access_mask, dependency_flags };
         }
     };
 

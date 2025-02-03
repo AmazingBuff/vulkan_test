@@ -19,22 +19,19 @@ render_pass:
                 final_layout: depth_stencil_attachment_optimal
         references:
             -   &first
-                type: color      
                 attachment: 0    
                 layout: color_attachment_optimal
             -   &second
-                type: depth_stencil      
                 attachment: 1    
                 layout: depth_stencil_attachment_optimal
     subpasses:
         descriptions:
-            -   name: main
+            -   pipeline_bind_point: graphics
                 color_attachments: 
                     - *first
                 depth_stencil_attachment: *second
         dependencies:
-            -   name: main
-                src_subpass: external
+            -   src_subpass: external
                 dst_subpass: 0
                 src_stage_mask: color_attachment_output | early_fragment_tests
                 dst_stage_mask: color_attachment_output | early_fragment_tests
