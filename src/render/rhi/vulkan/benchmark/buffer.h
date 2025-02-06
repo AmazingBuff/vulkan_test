@@ -1,8 +1,7 @@
 #pragma once
 
-#include "render/resources/geometry/geometry_data.h"
-#include "render/rhi/vulkan/fork/vk_mem_alloc.h"
 #include "render/rhi/vulkan/types.h"
+#include "render/rhi/vulkan/fork/vk_mem_alloc.h"
 
 ENGINE_NAMESPACE_BEGIN
 

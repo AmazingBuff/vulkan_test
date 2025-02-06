@@ -3,11 +3,9 @@
 #include "render/renderer.h"
 #include "render/drawable.h"
 #include "render/render_resouces.h"
+#include "render/resources/resource_types.h"
 #include "render/rhi/vulkan/trans/enum_trans.h"
 #include "render/rhi/vulkan/trans/structure_trans.h"
-#include "render/resources/shader/shader_manager.h"
-#include "render/resources/render_pass/render_pass_manager.h"
-#include "render/resources/pipeline/pipeline_manager.h"
 
 #include <spirv_glsl.hpp>
 
@@ -215,7 +213,8 @@ static VkPipelineLayout transfer_pipeline_layout(VkDevice device, const std::sha
         auto& resource = render_resources->get_shader_resource(pipeline_layout->vertex_shader);
 
         SpirvParser parser;
-        parser.initialize(reinterpret_cast<const uint32_t*>(resource.vertex_shader->data()), resource.vertex_shader->size() / sizeof(uint32_t));
+        parser.initialize(reinterpret_cast<const uint32_t*>(resource->vertex_shader->data()),
+                          resource->vertex_shader->size() / sizeof(uint32_t));
 
         parser.get_descriptor_set_layout_binding(VK_SHADER_STAGE_VERTEX_BIT, descriptor_set_layout_bindings, layout);
     }
@@ -225,7 +224,8 @@ static VkPipelineLayout transfer_pipeline_layout(VkDevice device, const std::sha
         auto& resource = render_resources->get_shader_resource(pipeline_layout->fragment_shader);
 
         SpirvParser parser;
-        parser.initialize(reinterpret_cast<const uint32_t*>(resource.fragment_shader->data()), resource.fragment_shader->size() / sizeof(uint32_t));
+        parser.initialize(reinterpret_cast<const uint32_t*>(resource->fragment_shader->data()),
+                          resource->fragment_shader->size() / sizeof(uint32_t));
 
         parser.get_descriptor_set_layout_binding(VK_SHADER_STAGE_FRAGMENT_BIT, descriptor_set_layout_bindings, layout);
     }
@@ -400,9 +400,10 @@ static VkPipeline transfer_pipeline(VkDevice device,
         {
         case ShaderStageFlagBits::e_vertex:
         {
-            vertex_parser.initialize(reinterpret_cast<const uint32_t*>(modules.vertex_shader->data()), modules.vertex_shader->size() / sizeof(uint32_t));
+            vertex_parser.initialize(reinterpret_cast<const uint32_t*>(modules->vertex_shader->data()),
+                                     modules->vertex_shader->size() / sizeof(uint32_t));
 
-            VkShaderModule vert_shader_module = create_shader_module(device, modules.vertex_shader);
+            VkShaderModule vert_shader_module = create_shader_module(device, modules->vertex_shader);
             VkPipelineShaderStageCreateInfo vert_shader_stage_info{
                 .sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO,
                 .stage = VK_SHADER_STAGE_VERTEX_BIT,
@@ -415,7 +416,7 @@ static VkPipeline transfer_pipeline(VkDevice device,
         }
         case ShaderStageFlagBits::e_fragment:
         {
-            VkShaderModule frag_shader_module = create_shader_module(device, modules.fragment_shader);
+            VkShaderModule frag_shader_module = create_shader_module(device, modules->fragment_shader);
             VkPipelineShaderStageCreateInfo frag_shader_stage_info{
                 .sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO,
                 .stage = VK_SHADER_STAGE_FRAGMENT_BIT,

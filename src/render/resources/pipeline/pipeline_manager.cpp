@@ -1,5 +1,6 @@
 #include "pipeline_manager.h"
 #include "render/utils/util.h"
+#include "render/resources/resource_types.h"
 #include "render/rhi/vulkan/trans/structure_rfl.h"
 
 #include <rfl/yaml.hpp>
@@ -35,7 +36,7 @@ void PipelineManager::initialize()
     load_pipeline_files();
 }
 
-const PipelineResource& PipelineManager::get_pipeline_resource(const std::string_view& name)
+const std::shared_ptr<PipelineResource>& PipelineManager::get_pipeline_resource(const std::string_view& name)
 {
     auto it = m_pipeline_resources.find(name.data());
     if (it == m_pipeline_resources.end())
@@ -54,7 +55,8 @@ void PipelineManager::load_pipeline_files()
         const std::string name = file_name.substr(0, file_name.find(".yaml"));
 
         YAML::Node config = YAML::LoadFile(file.path().generic_string());
-        PipelineResource resource = rfl::yaml::read<PipelineResource, rfl::DefaultIfMissing>(config).value();
+        std::shared_ptr<PipelineResource> resource = std::make_shared<PipelineResource>(
+            rfl::yaml::read<PipelineResource, rfl::DefaultIfMissing>(config).value());
         m_pipeline_resources.emplace(name, resource);
     }
 }

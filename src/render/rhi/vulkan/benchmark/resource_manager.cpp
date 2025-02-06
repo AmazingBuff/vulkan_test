@@ -6,6 +6,8 @@
 #include "render/drawable.h"
 #include "render/renderer.h"
 #include "system/system.h"
+#include "render/resources/resource_types.h"
+#include "render/resources/geometry/geometry_data.h"
 
 ENGINE_NAMESPACE_BEGIN
 
@@ -33,22 +35,26 @@ void VK_CLASS(ResourceManager)::initialize(VkDeviceSize buffer_size)
     m_samplers->init();
 }
 
-void VK_CLASS(ResourceManager)::map_vertex_buffer(const std::string& name, const std::vector<Vertex>& vertices) const
+void VK_CLASS(ResourceManager)::map_model(const std::string& name, const std::shared_ptr<ModelResource>& resource,
+                                          bool mipmap)
 {
+    auto& vertices = resource->vertices;
+    auto& indices = resource->indices;
+
     VkDeviceSize buffer_size = sizeof(Vertex) * vertices.size();
     m_staging_buffer->map_memory(vertices.data(), buffer_size, 0);
     m_vertex_buffer->set_info(name, buffer_size, static_cast<uint32_t>(vertices.size()));
-    auto& info = m_vertex_buffer->get_info(name);
-    m_vertex_buffer->copy_buffer_from(m_staging_buffer, info.offset, buffer_size);
-}
+    auto& vertex_info = m_vertex_buffer->get_info(name);
+    m_vertex_buffer->copy_buffer_from(m_staging_buffer, vertex_info.offset, buffer_size);
 
-void VK_CLASS(ResourceManager)::map_index_buffer(const std::string& name, const std::vector<uint32_t>& indices) const
-{
-    VkDeviceSize buffer_size = sizeof(uint32_t) * indices.size();
+    buffer_size = sizeof(uint32_t) * indices.size();
     m_staging_buffer->map_memory(indices.data(), buffer_size, 0);
     m_index_buffer->set_info(name, buffer_size, static_cast<uint32_t>(indices.size()));
-    auto& info = m_index_buffer->get_info(name);
-    m_index_buffer->copy_buffer_from(m_staging_buffer, info.offset, buffer_size);
+    auto& index_info = m_index_buffer->get_info(name);
+    m_index_buffer->copy_buffer_from(m_staging_buffer, index_info.offset, buffer_size);
+
+    for (auto& [res_name, texture] : resource->textures)
+        create_image(res_name, texture, mipmap);
 }
 
 void VK_CLASS(ResourceManager)::configure_uniform_buffer(
@@ -76,10 +82,12 @@ void VK_CLASS(ResourceManager)::configure_uniform_buffer(
     }
 }
 
-void VK_CLASS(ResourceManager)::create_image(const std::string& res_name, const TextureResource& resource, bool mipmap)
+void VK_CLASS(ResourceManager)::create_image(const std::string& res_name, 
+                                             const std::shared_ptr<TextureResource>& resource,
+                                             bool mipmap)
 {
     VkFormat format = VK_FORMAT_UNDEFINED;
-    switch (resource.channels)
+    switch (resource->channels)
     {
     case 1:
         format = VK_FORMAT_R8_SRGB;
@@ -95,8 +103,8 @@ void VK_CLASS(ResourceManager)::create_image(const std::string& res_name, const 
         break;
     }
 
-    uint32_t width = static_cast<uint32_t>(resource.width);
-    uint32_t height = static_cast<uint32_t>(resource.height);
+    uint32_t width = static_cast<uint32_t>(resource->width);
+    uint32_t height = static_cast<uint32_t>(resource->height);
     uint32_t mip_levels = 1;
     if (mipmap)
         mip_levels = static_cast<uint32_t>(std::floor(std::log2(std::max(width, height)))) + 1u;

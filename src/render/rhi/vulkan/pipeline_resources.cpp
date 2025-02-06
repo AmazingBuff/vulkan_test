@@ -7,10 +7,7 @@
 #include "render/renderer.h"
 #include "render/drawable.h"
 #include "render/render_resouces.h"
-#include "render/resources/pipeline/pipeline_manager.h"
-#include "render/resources/pipeline_layout/pipeline_layout_manager.h"
-#include "render/resources/render_pass/render_pass_manager.h"
-#include "render/resources/model/model_manager.h"
+#include "render/resources/resource_types.h"
 
 
 ENGINE_NAMESPACE_BEGIN
@@ -66,7 +63,8 @@ const BufferInfo& VK_CLASS(PipelineResources)::get_index_info(const std::string_
 
 void VK_CLASS(PipelineResources)::create_render_pass(const std::string& name)
 {
-    auto& render_pass_info = g_system_context->g_render_system->m_render_resources->get_render_pass_resource(name).render_pass;
+    auto& render_pass_info =
+        g_system_context->g_render_system->m_render_resources->get_render_pass_resource(name)->render_pass;
 
     std::shared_ptr<VK_CLASS(RenderPass)> render_pass = std::make_shared<VK_CLASS(RenderPass)>();
     render_pass->init(render_pass_info);
@@ -75,7 +73,8 @@ void VK_CLASS(PipelineResources)::create_render_pass(const std::string& name)
 
 void VK_CLASS(PipelineResources)::create_pipeline_layout(const std::string& name)
 {
-    auto& pipeline_info = g_system_context->g_render_system->m_render_resources->get_pipeline_layout_resource(name).pipeline_layout;
+    auto& pipeline_info =
+        g_system_context->g_render_system->m_render_resources->get_pipeline_layout_resource(name)->pipeline_layout;
 
     std::shared_ptr<VK_CLASS(PipelineLayout)> layout = std::make_shared<VK_CLASS(PipelineLayout)>();
     layout->init(pipeline_info);
@@ -89,7 +88,7 @@ void VK_CLASS(PipelineResources)::create_pipeline_layout(const std::string& name
 
 void VK_CLASS(PipelineResources)::create_pipeline(const std::string& name)
 {
-    auto& pipeline_info = g_system_context->g_render_system->m_render_resources->get_pipeline_resource(name).pipeline;
+    auto& pipeline_info = g_system_context->g_render_system->m_render_resources->get_pipeline_resource(name)->pipeline;
     auto layout_it = m_pipeline_layouts.find(pipeline_info->layout);
     if (layout_it == m_pipeline_layouts.end())
     {
@@ -118,8 +117,7 @@ void VK_CLASS(PipelineResources)::create_resource_manager()
 
     auto& model = g_system_context->g_render_system->m_render_resources->get_model_resource("viking_room");
 
-    m_resource_manager->map_vertex_buffer("basic", model.vertices);
-    m_resource_manager->map_index_buffer("basic", model.indices);
+    m_resource_manager->map_model("basic", model, false);
 
     static const std::unordered_map<std::string, std::string> name_to_res_name_map_1 =
     {
@@ -131,7 +129,6 @@ void VK_CLASS(PipelineResources)::create_resource_manager()
         {"sampler_s", "b"}
     };
 
-    m_resource_manager->create_image("a", model.textures[0], false);
     for (auto& [name, pipeline_layout] : m_pipeline_layouts)
     {
         auto& uniform_buffers = pipeline_layout->m_shader_resources_layout.uniform_buffers;

@@ -1,5 +1,6 @@
 #include "render_pass_manager.h"
 #include "render/utils/util.h"
+#include "render/resources/resource_types.h"
 #include "render/rhi/vulkan/trans/structure_rfl.h"
 
 #include <rfl/yaml.hpp>
@@ -32,7 +33,7 @@ void RenderPassManager::initialize()
     load_render_pass_files();
 }
 
-const RenderPassResource& RenderPassManager::get_render_pass_resource(const std::string_view& name)
+const std::shared_ptr<RenderPassResource>& RenderPassManager::get_render_pass_resource(const std::string_view& name)
 {
     auto it = m_render_pass_resources.find(name.data());
     if (it == m_render_pass_resources.end())
@@ -51,7 +52,8 @@ void RenderPassManager::load_render_pass_files()
         const std::string name = file_name.substr(0, file_name.find(".yaml"));
 
         YAML::Node config = YAML::LoadFile(file.path().generic_string());
-        RenderPassResource resource = rfl::yaml::read<RenderPassResource, rfl::DefaultIfMissing>(config).value();
+        std::shared_ptr<RenderPassResource> resource = std::make_shared<RenderPassResource>(
+            rfl::yaml::read<RenderPassResource, rfl::DefaultIfMissing>(config).value());
         m_render_pass_resources.emplace(name, resource);
     }
 }

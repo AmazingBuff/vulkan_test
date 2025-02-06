@@ -5,6 +5,9 @@
 
 ENGINE_NAMESPACE_BEGIN
 
+struct ModelResource;
+
+
 class VK_CLASS(Model) final : public RHI
 {
 public:

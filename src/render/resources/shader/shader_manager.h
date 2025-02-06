@@ -1,21 +1,10 @@
 #pragma once
 
-#include "render/resources/resource_types.h"
+#include "base/macro.h"
 
 ENGINE_NAMESPACE_BEGIN
 
-struct ShaderResource
-{
-	std::shared_ptr<std::vector<char>> vertex_shader;
-	std::shared_ptr<std::vector<char>> fragment_shader;
-	// more for geometry shader, tessellation shader, compute shader, etc.
-
-	NODISCARD explicit operator bool() const
-	{
-		return vertex_shader && fragment_shader && !vertex_shader->empty() && !fragment_shader->empty();
-	}
-};
-
+struct ShaderResource;
 
 class ShaderManager final
 {
@@ -24,11 +13,11 @@ public:
 	~ShaderManager() = default;
 
 	void initialize();
-	NODISCARD const ShaderResource& get_shader_resource(const std::string_view& name);
+    NODISCARD const std::shared_ptr<ShaderResource>& get_shader_resource(const std::string_view& name);
 private:
 	void load_shader_files();
 private:
-	std::unordered_map<std::string, ShaderResource>		m_shader_resources;
+    std::unordered_map<std::string, std::shared_ptr<ShaderResource>> m_shader_resources;
 };
 
 ENGINE_NAMESPACE_END

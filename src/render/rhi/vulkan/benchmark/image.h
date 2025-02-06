@@ -55,7 +55,7 @@ public:
     NODISCARD constexpr RHIFlag flag() const override { return RHIFlag::e_image; }
 
     void initialize(MemoryRequirements memory_requirements);
-    void map_memory(const std::string& name, VkImage image, const TextureResource& resource,
+    void map_memory(const std::string& name, VkImage image, const std::shared_ptr<TextureResource>& resource,
                     const std::shared_ptr<VK_CLASS(Buffer)>& src_buffer, uint32_t mip_levels);
     void update_descriptor_set(const std::vector<SampledImageLayout>&               layouts,
                                const std::unordered_map<std::string, std::string>&  name_to_res_name_map,

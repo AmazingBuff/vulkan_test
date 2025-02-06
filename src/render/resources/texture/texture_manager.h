@@ -1,22 +1,10 @@
 #pragma once
 
-#include "render/resources/resource_types.h"
+#include "base/macro.h"
 
 ENGINE_NAMESPACE_BEGIN
 
-struct TextureResource
-{
-	int				width		=	0;
-	int				height		=	0;
-	int				channels	=	0;
-	uint8_t*		data		=	nullptr;
-
-	NODISCARD explicit operator bool() const
-	{
-		return width > 0 && height > 0 && channels > 0 && data != nullptr;
-	}
-};
-
+struct TextureResource;
 
 class TextureManager final
 {
@@ -25,11 +13,11 @@ public:
 	~TextureManager();
 
 	void initialize();
-	NODISCARD const TextureResource& get_texture_resource(const std::string_view& name);
+    NODISCARD const std::shared_ptr<TextureResource>& get_texture_resource(const std::string_view& name);
 private:
 	void load_texture_files();
 private:
-	std::unordered_map<std::string, TextureResource>		m_texture_resources;
+    std::unordered_map<std::string, std::shared_ptr<TextureResource>> m_texture_resources;
 };
 
 ENGINE_NAMESPACE_END

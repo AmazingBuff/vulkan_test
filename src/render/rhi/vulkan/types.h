@@ -26,7 +26,7 @@ static constexpr uint32_t Vulkan_Version = VK_API_VERSION_1_0;
 static const char* Validation_Layers = "VK_LAYER_KHRONOS_validation";
 #endif
 
-#if defined(_WIN32) || defined(WIN32) 
+#ifdef VK_USE_PLATFORM_WIN32_KHR
 static const std::vector<const char*> Platform_Extensions = { VK_KHR_SURFACE_EXTENSION_NAME, VK_KHR_WIN32_SURFACE_EXTENSION_NAME };
 #endif
 

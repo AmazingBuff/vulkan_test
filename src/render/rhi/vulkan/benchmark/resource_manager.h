@@ -6,11 +6,12 @@
 
 #include "buffer.h"
 #include "image.h"
-#include "render/resources/texture/texture_manager.h"
+#include "model.h"
 
 #include <func.h>
 
 ENGINE_NAMESPACE_BEGIN
+
 class VK_CLASS(ResourceManager) : public RHI
 {
 public:
@@ -26,15 +27,14 @@ public:
         const std::array<std::unordered_map<uint32_t, VkDescriptorSet>, k_Max_Frames_In_Flight>& descriptor_sets);
 
     // res_name is the name of the texture resource that the image is associated with
-    void create_image(const std::string& res_name, const TextureResource& resource, bool mipmap);
+    void create_image(const std::string& res_name, const std::shared_ptr<TextureResource>& resource, bool mipmap);
 
     void configure_image(
         const std::vector<SampledImageLayout>&                                                   layouts,
         const std::unordered_map<std::string, std::string>&                                      name_to_res_name_map,
         const std::array<std::unordered_map<uint32_t, VkDescriptorSet>, k_Max_Frames_In_Flight>& descriptor_sets);
 
-    void map_vertex_buffer(const std::string& name, const std::vector<Vertex>& vertices) const;
-    void map_index_buffer(const std::string& name, const std::vector<uint32_t>& indices) const;
+    void map_model(const std::string& name, const std::shared_ptr<ModelResource>& resource, bool mipmap);
 
     template <typename Ty>
         requires(std::is_object_v<Ty> || Trait::is_same_template_v<Ty, std::vector<void>>)

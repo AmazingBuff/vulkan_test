@@ -4,16 +4,11 @@
 
 #pragma once
 
-#include "render/resources/resource_types.h"
+#include "base/macro.h"
 
 ENGINE_NAMESPACE_BEGIN
 
-struct PipelineLayoutInfo;
-
-struct PipelineLayoutResource
-{
-    std::shared_ptr<PipelineLayoutInfo>	pipeline_layout;
-};
+struct PipelineLayoutResource;
 
 class PipelineLayoutManager
 {
@@ -22,11 +17,11 @@ public:
     ~PipelineLayoutManager() = default;
 
     void initialize();
-    NODISCARD const PipelineLayoutResource& get_pipeline_layout_resource(const std::string_view& name);
+    NODISCARD const std::shared_ptr<PipelineLayoutResource>& get_pipeline_layout_resource(const std::string_view& name);
 private:
     void load_pipeline_layout_files();
 private:
-    std::unordered_map<std::string, PipelineLayoutResource>		m_pipeline_layout_resources;
+    std::unordered_map<std::string, std::shared_ptr<PipelineLayoutResource>> m_pipeline_layout_resources;
 };
 
 

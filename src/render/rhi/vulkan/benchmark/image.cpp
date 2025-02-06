@@ -6,7 +6,7 @@
 #include "system/system.h"
 #include "render/renderer.h"
 #include "render/drawable.h"
-#include "render/resources/texture/texture_manager.h"
+#include "render/resources/resource_types.h"
 
 ENGINE_NAMESPACE_BEGIN
 
@@ -47,16 +47,18 @@ void VK_CLASS(Image)::initialize(MemoryRequirements memory_requirements)
     m_alignment = memory_requirements.alignment;
 }
 
-void VK_CLASS(Image)::map_memory(const std::string& name, VkImage image, const TextureResource& resource, const std::shared_ptr<VK_CLASS(Buffer)>& src_buffer, uint32_t mip_levels)
+void VK_CLASS(Image)::map_memory(const std::string& name, VkImage image,
+                                 const std::shared_ptr<TextureResource>&  resource,
+                                 const std::shared_ptr<VK_CLASS(Buffer)>& src_buffer, uint32_t mip_levels)
 {
     auto device = g_system_context->g_render_system->m_drawable->m_device;
     VK_CHECK_RESULT(vmaBindImageMemory2(device->m_allocator, m_allocation, m_current_offset, image, nullptr));
 
-    VkDeviceSize buffer_size = static_cast<VkDeviceSize>(resource.width * resource.height * resource.channels);
-    src_buffer->map_memory(resource.data, buffer_size, 0);
+    VkDeviceSize buffer_size = static_cast<VkDeviceSize>(resource->width * resource->height * resource->channels);
+    src_buffer->map_memory(resource->data, buffer_size, 0);
 
     VkFormat format = VK_FORMAT_UNDEFINED;
-    switch (resource.channels)
+    switch (resource->channels)
     {
     case 1:
         format = VK_FORMAT_R8_SRGB;
@@ -73,8 +75,9 @@ void VK_CLASS(Image)::map_memory(const std::string& name, VkImage image, const T
     }
 
     transition_image_layout(image, format, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, mip_levels);
-    copy_buffer_to_image(src_buffer->m_buffer, image, static_cast<uint32_t>(resource.width), static_cast<uint32_t>(resource.height));
-    generate_mipmaps(image, format, resource.width, resource.height, mip_levels);
+    copy_buffer_to_image(src_buffer->m_buffer, image, static_cast<uint32_t>(resource->width),
+                         static_cast<uint32_t>(resource->height));
+    generate_mipmaps(image, format, resource->width, resource->height, mip_levels);
 
     // image view
     VkImageViewCreateInfo create_info{

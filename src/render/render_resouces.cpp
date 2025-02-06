@@ -24,32 +24,32 @@ void RenderResources::initialize()
     m_model_manager->initialize();
 }
 
-const ShaderResource& RenderResources::get_shader_resource(const std::string_view& name) const
+const std::shared_ptr<ShaderResource>& RenderResources::get_shader_resource(const std::string_view& name) const
 {
 	return m_shader_manager->get_shader_resource(name);
 }
 
-const PipelineLayoutResource& RenderResources::get_pipeline_layout_resource(const std::string_view& name) const
+const std::shared_ptr<PipelineLayoutResource>& RenderResources::get_pipeline_layout_resource(const std::string_view& name) const
 {
 	return m_pipeline_layout_manager->get_pipeline_layout_resource(name);
 }
 
-const RenderPassResource& RenderResources::get_render_pass_resource(const std::string_view& name) const
+const std::shared_ptr<RenderPassResource>& RenderResources::get_render_pass_resource(const std::string_view& name) const
 {
     return m_render_pass_manager->get_render_pass_resource(name);
 }
 
-const PipelineResource& RenderResources::get_pipeline_resource(const std::string_view& name) const
+const std::shared_ptr<PipelineResource>& RenderResources::get_pipeline_resource(const std::string_view& name) const
 {
 	return m_pipeline_manager->get_pipeline_resource(name);
 }
 
-const TextureResource& RenderResources::get_texture_resource(const std::string_view& name) const
+const std::shared_ptr<TextureResource>& RenderResources::get_texture_resource(const std::string_view& name) const
 {
     return m_texture_manager->get_texture_resource(name);
 }
 
-const ModelResource& RenderResources::get_model_resource(const std::string_view& name) const
+const std::shared_ptr<ModelResource>& RenderResources::get_model_resource(const std::string_view& name) const
 {
 	return m_model_manager->get_model_resource(name);
 }

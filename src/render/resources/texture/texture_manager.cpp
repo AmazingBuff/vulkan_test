@@ -1,6 +1,7 @@
 #include "texture_manager.h"
 #include "base/util.h"
 #include "render/utils/util.h"
+#include "render/resources/resource_types.h"
 #include "render/resources/fork/stb_image.h"
 
 ENGINE_NAMESPACE_BEGIN
@@ -12,8 +13,8 @@ TextureManager::~TextureManager()
 {
 	for (auto& resource : std::views::values(m_texture_resources))
 	{
-		if (resource.data)
-			stbi_image_free(resource.data);
+        if (resource->data)
+            stbi_image_free(resource->data);
 	}
 }
 
@@ -25,13 +26,13 @@ void TextureManager::load_texture_files()
 		if (file_name.find(".png") == std::string::npos)
 			continue;
 
-		TextureResource resource;
-		resource.data = stbi_load(dir_entry.path().generic_string().c_str(), &resource.width, &resource.height, &resource.channels, STBI_rgb_alpha);
-        resource.channels = 4;
-		if (!resource.data)
+		std::shared_ptr<TextureResource> resource = std::make_shared<TextureResource>();
+		resource->data = stbi_load(dir_entry.path().generic_string().c_str(), &resource->width, &resource->height, &resource->channels, STBI_rgb_alpha);
+        resource->channels = 4;
+		if (!resource->data)
 			RENDERING_LOG_ERROR("failed to load texture file: " + file_name);
 
-		if (resource)
+		if (*resource)
 		{
 			const std::string name = file_name.substr(0, file_name.find(".png"));
 			m_texture_resources.emplace(name, resource);
@@ -44,7 +45,7 @@ void TextureManager::initialize()
 	load_texture_files();
 }
 
-const TextureResource& TextureManager::get_texture_resource(const std::string_view& name)
+const std::shared_ptr<TextureResource>& TextureManager::get_texture_resource(const std::string_view& name)
 {
 	auto it = m_texture_resources.find(name.data());
 	if (it == m_texture_resources.end())

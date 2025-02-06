@@ -1,6 +1,7 @@
 #include "shader_manager.h"
 #include "base/util.h"
 #include "render/utils/util.h"
+#include "render/resources/resource_types.h"
 
 ENGINE_NAMESPACE_BEGIN
 
@@ -32,7 +33,7 @@ void ShaderManager::load_shader_files()
 	{
 		if (!dir_entry.is_directory())
 			continue;
-		ShaderResource resources;
+        std::shared_ptr<ShaderResource> resources = std::make_shared<ShaderResource>();
 		for (auto& dir : std::filesystem::directory_iterator{ dir_entry })
 		{
 			const std::string file_name = dir.path().filename().generic_string();
@@ -43,16 +44,16 @@ void ShaderManager::load_shader_files()
 			switch (it->second)
 			{
 			case ShaderType::e_vertex:
-				resources.vertex_shader = std::move(shader);
+				resources->vertex_shader = std::move(shader);
 				break;
 			case ShaderType::e_fragment:
-				resources.fragment_shader = std::move(shader);
+				resources->fragment_shader = std::move(shader);
 				break;
 			default:
 				break;
 			}
 		}
-		if (resources)
+		if (*resources)
 		{
 			std::string dir_name = dir_entry.path().filename().generic_string();
 			m_shader_resources.emplace(dir_name, resources);
@@ -65,7 +66,7 @@ void ShaderManager::initialize()
 	load_shader_files();
 }
 
-const ShaderResource& ShaderManager::get_shader_resource(const std::string_view& name)
+const std::shared_ptr<ShaderResource>& ShaderManager::get_shader_resource(const std::string_view& name)
 {
 	auto it = m_shader_resources.find(name.data());
 	if (it == m_shader_resources.end())
